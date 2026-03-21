@@ -32,7 +32,7 @@ const ManagerLoginPage = () => {
 
   useEffect(() => {
     const handleMessage = (event) => {
-      if (!event.origin.includes('localhost') && !event.origin.includes('127.0.0.1')) return;
+      if (event.origin !== window.location.origin) return;
       if (event.data?.type === 'OAUTH_SUCCESS') {
         try {
           const userData = JSON.parse(event.data.payload);
