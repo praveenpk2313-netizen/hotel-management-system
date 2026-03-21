@@ -19,6 +19,7 @@ const path = require('path');
 const generateToken = require('./utils/generateToken');
 
 const app = express();
+app.set('trust proxy', 1);
 
 app.use(cors());
 app.use(express.json());
