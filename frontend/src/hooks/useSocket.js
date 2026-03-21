@@ -5,7 +5,7 @@ import { addNotification } from '../redux/slices/notificationSlice';
 import { getAdminStats } from '../redux/slices/adminSlice';
 import { getManagerStats, getManagerAnalytics } from '../redux/slices/managerSlice';
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export const useSocket = () => {
   const dispatch = useDispatch();
