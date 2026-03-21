@@ -77,7 +77,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID || 'dummy-google-client-id',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'dummy-google-client-secret',
-      callbackURL: `${process.env.BACKEND_URL || 'http://localhost:5000'}/auth/google/callback`,
+      callbackURL: '/auth/google/callback',
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
@@ -109,7 +109,7 @@ passport.use(
     {
       clientID: process.env.GITHUB_CLIENT_ID || 'dummy-github-client-id',
       clientSecret: process.env.GITHUB_CLIENT_SECRET || 'dummy-github-client-secret',
-      callbackURL: `${process.env.BACKEND_URL || 'http://localhost:5000'}/auth/github/callback`,
+      callbackURL: '/auth/github/callback',
       scope: ['user:email'],
     },
     async (accessToken, refreshToken, profile, done) => {
