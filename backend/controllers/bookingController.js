@@ -52,12 +52,23 @@ const confirmAfterPayment = async (req, res) => {
     // 3. Fetch Snapshot info
     const hotel = await Hotel.findById(hotelId);
     const room  = await Room.findById(roomId);
-    if (!hotel || !room) return res.status(404).json({ message: 'Property details not found.' });
+    if (!hotel || !room) {
+      console.error('❌ Property details missing for booking:', { hotelId, roomId });
+      return res.status(404).json({ message: 'Property details not found.' });
+    }
 
     // Calculate nights & price per night
     const diffTime = Math.abs(checkOut - checkIn);
-    const nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    const pricePerNight = room.price;
+    let nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    if (isNaN(nights) || nights <= 0) nights = 1; // Fallback
+    
+    const pricePerNight = room.price || 0;
+
+    console.log('📝 Creating booking with snapshot:', { 
+      hotelName: hotel.name, 
+      nights, 
+      transactionId 
+    });
 
     // 4. Create the formal booking record
     const booking = await Booking.create({
@@ -65,15 +76,15 @@ const confirmAfterPayment = async (req, res) => {
       hotelId,
       roomId,
       hotelName: hotel.name,
-      location: hotel.location || hotel.address,
+      location: hotel.location || hotel.address || hotel.city || 'StayNow Property',
       roomType: room.type,
       checkInDate: checkIn,
       checkOutDate: checkOut,
-      numGuests,
+      numGuests: numGuests || 1,
       nights,
       pricePerNight,
-      totalPrice,
-      paymentMethod,
+      totalPrice: totalPrice || 0,
+      paymentMethod: paymentMethod || 'Online',
       transactionId,
       paymentStatus: 'paid',
       status: 'confirmed'
@@ -118,8 +129,12 @@ const confirmAfterPayment = async (req, res) => {
 
     res.status(201).json(booking);
   } catch (err) {
-    console.error('Booking confirmation error:', err);
-    res.status(500).json({ message: 'Failed to finalize booking. Please contact support with Transaction ID.' });
+    console.error('🔥 Booking confirmation error:', err);
+    res.status(500).json({ 
+      message: 'Failed to finalize booking.',
+      error: err.message,
+      transactionId: req.body.transactionId
+    });
   }
 };
 

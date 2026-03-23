@@ -1,6 +1,4 @@
 const PDFDocument = require('pdfkit');
-const fs = require('fs');
-const path = require('path');
 
 /**
  * Generate a booking invoice PDF
@@ -16,75 +14,115 @@ const generateInvoice = (booking) => {
       doc.on('data', (chunk) => chunks.push(chunk));
       doc.on('end', () => resolve(Buffer.concat(chunks)));
 
-      // Header
+      // --- Brand Header ---
       doc
-        .fillColor('#444444')
+        .fillColor('#0f172a')
+        .fontSize(24)
+        .font('Helvetica-Bold')
+        .text('StayNow Hotels', 50, 50)
+        .fontSize(10)
+        .font('Helvetica')
+        .fillColor('#c5a059')
+        .text('Elite Stays • Verified Luxury', 50, 80)
+        .text('www.staynow.app', 200, 50, { align: 'right' })
+        .text('support@staynow.app', 200, 65, { align: 'right' })
+        .moveDown();
+
+      doc.rect(50, 110, 500, 2).fill('#f1f5f9');
+
+      // --- Identity & Meta ---
+      const metaTop = 140;
+      doc
+        .fillColor('#64748b')
         .fontSize(20)
-        .text('Grand Horizon Hotels', 110, 57)
-        .fontSize(10)
-        .text('Luxury Redefined', 110, 80)
-        .text('123 Luxury Ave, Marina Bay', 200, 65, { align: 'right' })
-        .text('Singapore, 018956', 200, 80, { align: 'right' })
-        .moveDown();
-
-      doc.rect(0, 120, 600, 2).fill('#c5a059');
-
-      // Invoice Details
-      doc
-        .fillColor('#444444')
-        .fontSize(25)
-        .text('INVOICE', 50, 160);
+        .text('INVOICE / RECEIPT', 50, metaTop);
 
       doc
-        .fontSize(10)
-        .text(`Invoice Number: INV-${booking._id.toString().substr(-6).toUpperCase()}`, 50, 200)
-        .text(`Date: ${new Date().toLocaleDateString()}`, 50, 215)
-        .text(`Booking ID: ${booking._id}`, 50, 230)
-        .moveDown();
-
-      // Customer Details
-      doc
-        .fontSize(12)
-        .text('Billed To:', 50, 260)
-        .fontSize(10)
-        .text(booking.userId?.name || 'Valued Guest', 50, 280)
-        .text(booking.userId?.email || '', 50, 295)
-        .moveDown();
-
-      // Table Header
-      const tableTop = 330;
-      doc
-        .fontSize(10)
+        .fontSize(9)
+        .fillColor('#0f172a')
+        .text(`Invoice ID:`, 350, metaTop)
         .font('Helvetica-Bold')
-        .text('Description', 50, tableTop)
-        .text('Details', 200, tableTop)
-        .text('Amount', 400, tableTop, { align: 'right' });
-
-      doc.rect(50, tableTop + 15, 500, 1).stroke('#eeeeee');
-
-      // Table Row
-      const rowTop = tableTop + 30;
-      doc
+        .text(`STAY-${booking._id.toString().substr(-8).toUpperCase()}`, 430, metaTop)
         .font('Helvetica')
-        .text('Hotel Stay', 50, rowTop)
-        .text(`${booking.hotelId?.name} - ${booking.roomId?.type}`, 200, rowTop)
-        .text(`$${booking.totalPrice.toFixed(2)}`, 400, rowTop, { align: 'right' });
+        .text(`Issue Date:`, 350, metaTop + 15)
+        .text(new Date().toLocaleDateString(), 430, metaTop + 15)
+        .text(`Reference:`, 350, metaTop + 30)
+        .text(booking.transactionId || 'Confirmed', 430, metaTop + 30);
 
-      // Footer
-      doc.rect(50, rowTop + 20, 500, 1).stroke('#eeeeee');
+      // --- Customer ---
       doc
         .fontSize(12)
         .font('Helvetica-Bold')
-        .text('Total Amount:', 300, rowTop + 40)
-        .text(`$${booking.totalPrice.toFixed(2)}`, 400, rowTop + 40, { align: 'right' });
+        .fillColor('#0f172a')
+        .text('Guest Account:', 50, metaTop + 60)
+        .fontSize(10)
+        .font('Helvetica')
+        .fillColor('#475569')
+        .text(booking.userId?.name || 'StayNow Guest', 50, metaTop + 80)
+        .text(booking.userId?.email || '', 50, metaTop + 95);
+
+      // --- Line Items Table ---
+      const tableTop = 270;
+      doc.rect(50, tableTop, 500, 20).fill('#f8fafc');
+      
+      doc
+        .fontSize(9)
+        .font('Helvetica-Bold')
+        .fillColor('#64748b')
+        .text('DESCRIPTION', 60, tableTop + 6)
+        .text('PROPERTY / ROOM', 180, tableTop + 6)
+        .text('TOTAL PAID', 450, tableTop + 6, { align: 'right' });
+
+      // Row 1
+      const rowTop = tableTop + 35;
+      const price = Number(booking.totalPrice) || 0;
 
       doc
         .fontSize(10)
         .font('Helvetica')
-        .text('Thank you for choosing Grand Horizon Hotels. Have a pleasant stay!', 50, 700, { align: 'center', width: 500 });
+        .fillColor('#0f172a')
+        .text('Luxury Accommodation', 60, rowTop)
+        .font('Helvetica-Bold')
+        .text(`${booking.hotelName || 'StayNow Property'}`, 180, rowTop)
+        .font('Helvetica')
+        .fontSize(9)
+        .fillColor('#64748b')
+        .text(`${booking.roomType}`, 180, rowTop + 12)
+        .fontSize(11)
+        .font('Helvetica-Bold')
+        .fillColor('#0f172a')
+        .text(`$${price.toFixed(2)}`, 450, rowTop, { align: 'right' });
+
+      // --- Calculations ---
+      const calcTop = 400;
+      doc.rect(300, calcTop, 250, 1).stroke('#f1f5f9');
+      
+      doc
+        .fontSize(10)
+        .fillColor('#64748b')
+        .text('Subtotal:', 300, calcTop + 20)
+        .text(`$${price.toFixed(2)}`, 450, calcTop + 20, { align: 'right' })
+        .text('Taxes & Fees:', 300, calcTop + 35)
+        .text('$0.00', 450, calcTop + 35, { align: 'right' });
+
+      doc.rect(300, calcTop + 55, 250, 40).fill('#0f172a');
+      doc
+        .fillColor('#ffffff')
+        .fontSize(12)
+        .text('TOTAL AMOUNT', 320, calcTop + 68)
+        .fontSize(14)
+        .text(`$${price.toFixed(2)}`, 430, calcTop + 66, { align: 'right' });
+
+      // --- Footer ---
+      doc
+        .fillColor('#94a3b8')
+        .fontSize(8)
+        .text('This is a computer-generated document. No signature required.', 50, 700, { align: 'center', width: 500 })
+        .text('Copyright © 2026 StayNow. All rights reserved.', 50, 715, { align: 'center', width: 500 });
 
       doc.end();
     } catch (error) {
+      console.error('PDF Generation Error:', error);
       reject(error);
     }
   });
