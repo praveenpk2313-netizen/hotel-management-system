@@ -15,12 +15,11 @@ import {
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { 
-  createBooking, 
+  confirmBookingAfterPayment,
   createRazorpayOrder, 
   verifyRazorpayPayment,
   createStripeIntent,
   verifyStripePayment,
-  updateBookingStatus
 } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { formatCurrency, formatDate } from '../utils/helpers';
@@ -69,57 +68,50 @@ const PaymentPage = () => {
     try {
       if (MOCK_PAYMENT) {
         // --- 1. HANDLE MOCK PAYMENT ---
+        const mockTransactionId = 'MOCK_TRX_' + Math.random().toString(36).substr(2, 9).toUpperCase();
         
-        let targetBooking;
-        if (bookingData?._id) {
-          // If paying for an EXISTING booking (e.g. from History)
-          const { data } = await updateBookingStatus(bookingData._id, { paymentStatus: 'paid', status: 'confirmed' });
-          targetBooking = data;
-        } else {
-          // If it's a NEW booking from the Hotel Details page
-          const { data } = await createBooking({ ...bookingData, paymentStatus: 'paid', status: 'confirmed' });
-          targetBooking = data;
-        }
+        const bookingPayload = {
+          ...bookingData,
+          paymentMethod: 'Mock/Razorpay',
+          transactionId: mockTransactionId
+        };
+        
+        const { data: finalBooking } = await confirmBookingAfterPayment(bookingPayload);
         
         // --- 2. SIMULATE SUCCESS ---
         setTimeout(() => {
-          setSuccess(true);
           setLoading(false);
-          // Auto-confirm the booking in logic already done by controller above
+          navigate('/booking-success', { state: { booking: finalBooking } });
         }, 1500);
         return;
       }
 
       // --- 3. HANDLE REAL PAYMENT (SECURE BACKEND FLOW) ---
       
-      // 1. Get or Create Booking
-      let booking;
-      if (bookingData?._id) {
-        booking = bookingData;
-      } else {
-        const { data } = await createBooking({ ...bookingData, paymentStatus: 'unpaid' });
-        booking = data;
-      }
-
-      // 2. Create Razorpay Order on Backend
-      const { data: orderData } = await createRazorpayOrder(booking._id);
+      // 1. Create Razorpay Order (using temporary values as booking isn't in DB yet)
+      const { data: orderData } = await createRazorpayOrder({ amount: bookingData.totalPrice });
       
       const options = {
         key: orderData.key,
         amount: orderData.amount,
         currency: orderData.currency,
-        name: "PK UrbanStay",
-        description: `Booking at ${hotel.name}`,
+        name: "StayNow Luxury",
+        description: `Stay at ${hotel.name}`,
         image: hotel.images?.[0],
         order_id: orderData.orderId,
         handler: async (response) => {
           try {
-            // 3. Verify Payment and Send Email (Backend does this)
-            await verifyRazorpayPayment({ ...response, bookingId: booking._id });
-            setSuccess(true);
-            setLoading(false);
+            // 2. Verify and Create Booking in ONE step
+            const { data: finalBooking } = await confirmBookingAfterPayment({
+              ...bookingData,
+              paymentMethod: 'Razorpay',
+              transactionId: response.razorpay_payment_id,
+              razorpayData: response // optional for extra verification
+            });
+            
+            navigate('/booking-success', { state: { booking: finalBooking } });
           } catch (err) {
-            setError(err.response?.data?.message || 'Verification failed.');
+            setError(err.response?.data?.message || 'Verification failed. Contact support with Payment ID: ' + response.razorpay_payment_id);
             setLoading(false);
           }
         },
@@ -129,7 +121,7 @@ const PaymentPage = () => {
       };
 
       if (!window.Razorpay) {
-        setError('Payment gateway (Razorpay) failed to load. This might be due to Tracking Prevention or an AdBlocker. Please try disabling them for this site.');
+        setError('Payment gateway (Razorpay) failed to load. Please disable AdBlockers.');
         setLoading(false);
         return;
       }
@@ -142,37 +134,7 @@ const PaymentPage = () => {
     }
   };
 
-  if (success) {
-    return (
-      <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
-        <div className="animate-fade" style={{ background: 'white', padding: '4rem', borderRadius: '32px', textAlign: 'center', boxShadow: '0 10px 40px rgba(0,0,0,0.05)', maxWidth: '550px', width: '100%' }}>
-           <div style={{ width: '80px', height: '80px', background: '#ecfdf5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 2rem' }}>
-             <CheckCircle size={48} color="#10b981" />
-           </div>
-           <h2 className="luxury-font" style={{ fontSize: '2.5rem', marginBottom: '1rem', color: '#0f172a' }}>Payment Successful!</h2>
-           <p style={{ color: '#64748b', fontSize: '1.2rem', marginBottom: '2.5rem', lineHeight: '1.6' }}>
-             Thank you for choosing <strong>{hotel?.name}</strong>. Your luxury stay is now confirmed and your receipt has been emailed to you.
-           </p>
-           
-           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-             <button 
-               onClick={() => navigate('/customer/dashboard')}
-               className="payment-submit-btn"
-               style={{ background: '#10b981', boxShadow: '0 10px 25px -5px rgba(16, 185, 129, 0.4)' }}
-             >
-               Go to My Bookings
-             </button>
-             <button 
-               onClick={() => navigate('/hotels')}
-               style={{ background: 'none', border: 'none', color: '#64748b', fontWeight: '600', cursor: 'pointer' }}
-             >
-               Back to Search
-             </button>
-           </div>
-        </div>
-      </div>
-    );
-  }
+  // Success case is handled by navigate('/booking-success') now
 
   if (!bookingData || !hotel) return null;
 
@@ -394,33 +356,29 @@ const StripeCheckoutForm = ({ bookingData, onSuccess, onError, setLoading, loadi
 
     try {
       if (MOCK_PAYMENT) {
-          // 1. Create OR Update booking
-          if (bookingData?._id) {
-              await updateBookingStatus(bookingData._id, { paymentStatus: 'paid', status: 'confirmed' });
-          } else {
-              await createBooking({ ...bookingData, paymentStatus: 'paid', status: 'confirmed' });
-          }
+          const mockTransactionId = 'MOCK_STRIPE_' + Math.random().toString(36).substr(2, 9).toUpperCase();
+          const { data: finalBooking } = await confirmBookingAfterPayment({
+              ...bookingData,
+              paymentMethod: 'Mock/Stripe',
+              transactionId: mockTransactionId
+          });
           
           setTimeout(() => {
-              onSuccess();
               setLoading(false);
+              navigate('/booking-success', { state: { booking: finalBooking } });
           }, 1500);
           return;
       }
 
-      if (!stripe || !elements) {
-          setError('Stripe not initialized');
-          setLoading(false);
-          return;
-      }
+      if (!stripe || !elements) return;
 
-      const { data: booking } = await createBooking({ ...bookingData, paymentStatus: 'unpaid' });
-      const { data: intentData } = await createStripeIntent(booking._id);
+      // 1. Create Intent without a booking reference (using just amount)
+      const { data: intentData } = await createStripeIntent({ amount: bookingData.totalPrice });
 
       const result = await stripe.confirmCardPayment(intentData.clientSecret, {
         payment_method: {
           card: elements.getElement(CardElement),
-          billing_details: { name: bookingData.hotelName || 'Valued Guest' },
+          billing_details: { name: user?.name || 'Valued Guest' },
         }
       });
 
@@ -428,15 +386,16 @@ const StripeCheckoutForm = ({ bookingData, onSuccess, onError, setLoading, loadi
         onError(result.error.message);
         setLoading(false);
       } else if (result.paymentIntent.status === 'succeeded') {
-        await verifyStripePayment({ 
-          paymentIntentId: result.paymentIntent.id, 
-          bookingId: booking._id 
+        // 2. Verified Creation
+        const { data: finalBooking } = await confirmBookingAfterPayment({
+            ...bookingData,
+            paymentMethod: 'Stripe',
+            transactionId: result.paymentIntent.id
         });
-        onSuccess();
-        setLoading(false);
+        navigate('/booking-success', { state: { booking: finalBooking } });
       }
     } catch (err) {
-      onError(err.response?.data?.message || 'Stripe payment failed. Ensure STRIPE_SECRET_KEY is set in .env');
+      onError(err.response?.data?.message || 'Transaction failed.');
       setLoading(false);
     }
   };

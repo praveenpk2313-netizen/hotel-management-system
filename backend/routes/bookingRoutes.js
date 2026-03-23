@@ -1,26 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const {
-  createBooking,
+  confirmAfterPayment,
   getUserBookings,
-  updateBooking,
   cancelBooking,
   getAllBookings,
-  updateBookingStatus,
 } = require('../controllers/bookingController');
 const { protect } = require('../middleware/authMiddleware');
-const { manager, admin } = require('../middleware/roleMiddleware');
+const { manager } = require('../middleware/roleMiddleware');
 
 // ─── User Routes ─────────────────────────────────────────────────────────────
 
 // GET /api/bookings/user — Get current user's bookings
 router.get('/user', protect, getUserBookings);
 
-// POST /api/bookings — Create a new booking
-router.post('/', protect, createBooking);
-
-// PUT /api/bookings/:id — Modify booking (dates/price)
-router.put('/:id', protect, updateBooking);
+// POST /api/bookings/confirm-after-payment — Create booking after success payment
+router.post('/confirm-after-payment', protect, confirmAfterPayment);
 
 // DELETE /api/bookings/:id — Cancel booking
 router.delete('/:id', protect, cancelBooking);
@@ -29,8 +24,5 @@ router.delete('/:id', protect, cancelBooking);
 
 // GET /api/bookings — Admin/Manager view all bookings
 router.get('/', protect, manager, getAllBookings);
-
-// PUT /api/bookings/:id/status — Update status (confirmed/completed etc)
-router.put('/:id/status', protect, updateBookingStatus);
 
 module.exports = router;

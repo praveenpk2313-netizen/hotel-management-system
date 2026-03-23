@@ -38,6 +38,7 @@ import RealTimeToast from './components/RealTimeToast';
 import VerifyEmail from './pages/VerifyEmail';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import BookingSuccess from './pages/BookingSuccess';
 
 // ─── Role → dashboard mapping ────────────────────────────────────────────────
 
@@ -184,6 +185,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <PaymentPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/booking-success"
+            element={
+              <ProtectedRoute>
+                <BookingSuccess />
               </ProtectedRoute>
             }
           />

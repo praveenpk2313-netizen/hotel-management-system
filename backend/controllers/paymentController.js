@@ -20,17 +20,23 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 // @access  Private
 const createOrder = async (req, res) => {
   try {
-    const { bookingId } = req.body;
-    const booking = await Booking.findById(bookingId);
+    const { bookingId, amount: directAmount } = req.body;
+    let amount;
 
-    if (!booking) {
-      return res.status(404).json({ message: 'Booking not found' });
+    if (bookingId) {
+      const booking = await Booking.findById(bookingId);
+      if (!booking) return res.status(404).json({ message: 'Booking not found' });
+      amount = Math.round(booking.totalPrice * 100);
+    } else if (directAmount) {
+      amount = Math.round(directAmount * 100);
+    } else {
+      return res.status(400).json({ message: 'Amount or Booking ID required' });
     }
 
     const options = {
-      amount: Math.round(booking.totalPrice * 100), // amount in smallest currency unit (paise for INR)
+      amount, 
       currency: 'INR',
-      receipt: `receipt_${booking._id}`,
+      receipt: `rcpt_${Date.now()}`,
     };
 
     if (process.env.RAZORPAY_KEY_ID === 'your_razorpay_key_id') {
@@ -38,15 +44,6 @@ const createOrder = async (req, res) => {
     }
 
     const order = await razorpay.orders.create(options);
-
-    const payment = new Payment({
-      userId: req.user._id,
-      bookingId: booking._id,
-      amount: booking.totalPrice,
-      razorpayOrderId: order.id,
-    });
-
-    await payment.save();
 
     res.status(201).json({
       orderId: order.id,
@@ -146,21 +143,23 @@ const verifyPayment = async (req, res) => {
 // @access  Private
 const createStripeIntent = async (req, res) => {
   try {
-    const { bookingId } = req.body;
-    const booking = await Booking.findById(bookingId);
+    const { bookingId, amount: directAmount } = req.body;
+    let amount;
 
-    if (!booking) {
-      return res.status(404).json({ message: 'Booking not found' });
-    }
-
-    if (process.env.STRIPE_SECRET_KEY === 'sk_test_your_secret_key') {
-      return res.status(400).json({ message: 'Stripe Secret Key is not configured. Update server/.env' });
+    if (bookingId) {
+       const booking = await Booking.findById(bookingId);
+       if (!booking) return res.status(404).json({ message: 'Booking not found' });
+       amount = Math.round(booking.totalPrice * 100);
+    } else if (directAmount) {
+       amount = Math.round(directAmount * 100);
+    } else {
+       return res.status(400).json({ message: 'Amount or Booking ID required' });
     }
 
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(booking.totalPrice * 100), // in paise (since we'll use INR)
+      amount: amount, 
       currency: 'inr',
-      metadata: { bookingId: booking._id.toString(), userId: req.user._id.toString() },
+      metadata: { userId: req.user._id.toString(), bookingId: bookingId || 'new' },
     });
 
     res.status(201).json({

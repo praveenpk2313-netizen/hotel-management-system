@@ -17,6 +17,11 @@ const bookingSchema = mongoose.Schema(
       required: true,
       ref: 'Room',
     },
+    // Snapshot fields for permanent records
+    hotelName: { type: String, required: true },
+    location:  { type: String, required: true },
+    roomType:  { type: String, required: true },
+    
     checkInDate: {
       type: Date,
       required: true,
@@ -25,6 +30,18 @@ const bookingSchema = mongoose.Schema(
       type: Date,
       required: true,
     },
+    numGuests: {
+      type: Number,
+      default: 1,
+    },
+    nights: {
+      type: Number,
+      required: true
+    },
+    pricePerNight: {
+      type: Number,
+      required: true
+    },
     totalPrice: {
       type: Number,
       required: true,
@@ -32,16 +49,22 @@ const bookingSchema = mongoose.Schema(
     status: {
       type: String,
       enum: ['pending', 'confirmed', 'cancelled', 'completed'],
-      default: 'pending',
+      default: 'confirmed',
     },
     paymentStatus: {
       type: String,
       enum: ['unpaid', 'paid'],
-      default: 'unpaid',
+      default: 'paid',
     },
-    numGuests: {
-      type: Number,
-      default: 1,
+    paymentMethod: {
+      type: String,
+      required: true,
+      enum: ['Razorpay', 'Stripe', 'Mock']
+    },
+    transactionId: {
+      type: String,
+      required: true,
+      unique: true // Prevent duplicate bookings for same transaction
     },
     isReviewed: {
       type: Boolean,

@@ -61,6 +61,7 @@ export const deleteRoom  = (id)      => api.delete(`/rooms/${id}`);
 // ─── Bookings ─────────────────────────────────────────────────────────────────
 
 export const createBooking     = (data)          => api.post('/bookings', data);
+export const confirmBookingAfterPayment = (data) => api.post('/bookings/confirm-after-payment', data);
 export const fetchUserBookings = ()              => api.get('/bookings/user');
 export const modifyBooking     = (id, data)      => api.put(`/bookings/${id}`, data);
 export const cancelBooking     = (id)            => api.delete(`/bookings/${id}`);
