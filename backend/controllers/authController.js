@@ -132,19 +132,19 @@ const authUser = async (req, res) => {
 
     const user = await User.findOne({ email: email.toLowerCase().trim() });
     if (!user) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+      return res.status(401).json({ message: 'Account not found. Please register first.' });
     }
 
     // OAuth-only accounts don't have a local password
-    if (!user.password) {
+    if (!user.password && user.oauthProvider) {
       return res.status(401).json({
-        message: 'This account uses OAuth. Please sign in with Google or GitHub.',
+        message: 'This account was created via OAuth. Please sign in with Google or GitHub.',
       });
     }
 
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+      return res.status(401).json({ message: 'Incorrect password. Please try again.' });
     }
 
     if (!user.isActive) {
