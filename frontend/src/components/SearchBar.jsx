@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react';
-import { MapPin, Calendar, Users, ChevronDown, Search, Loader2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { MapPin, Calendar, Users, ChevronDown, Search, Loader2, X } from 'lucide-react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { fetchSuggestions } from '../services/api';
@@ -51,69 +51,65 @@ const SearchBar = ({ onSearch }) => {
 
   return (
     <div style={{
-      background: 'rgba(255, 255, 255, 0.25)',
-      backdropFilter: 'blur(20px)',
-      WebkitBackdropFilter: 'blur(20px)',
-      border: '1px solid rgba(255, 255, 255, 0.4)',
-      borderRadius: '24px',
-      padding: '0.8rem 1rem 0.8rem 2rem',
-      boxShadow: '0 15px 35px rgba(0,0,0,0.1)',
+      background: '#ffffff',
+      borderRadius: '100px',
+      padding: '0.5rem',
+      boxShadow: '0 10px 40px rgba(0,0,0,0.12)',
       width: '100%',
-      maxWidth: '1000px',
+      maxWidth: '950px',
       margin: '0 auto',
       position: 'relative',
-      zIndex: 10
+      zIndex: 100,
+      border: '1px solid #e2e8f0'
     }}>
-      <form className="search-wrap-container" onSubmit={handleSubmit} style={{
+      <form onSubmit={handleSubmit} style={{
         display: 'flex',
         width: '100%',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: window.innerWidth < 900 ? 'wrap' : 'nowrap',
-        gap: '1rem'
+        flexWrap: 'nowrap'
       }}>
         
-        {/* Location Section */}
-        <div className="search-item" style={{ flex: 1, display: 'flex', alignItems: 'center', position: 'relative', borderRight: '1px solid rgba(255,255,255,0.3)', paddingRight: '1rem' }}>
-          <div style={{ background: 'rgba(255,255,255,0.3)', borderRadius: '50%', padding: '10px', marginRight: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <MapPin size={20} color="white" />
-          </div>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <label style={{ fontSize: '0.9rem', fontWeight: '600', color: 'white', marginBottom: '0.1rem' }}>Location</label>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <input 
-                type="text" 
-                placeholder="Bradford, U.K." 
-                style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: '0.85rem', color: 'white', width: '100%', padding: 0 }}
-                value={query.location}
-                onChange={handleLocationChange}
-                onFocus={() => { if (query.location && suggestions.length > 0) setShowSuggestions(true); }}
-                onBlur={() => setTimeout(() => setShowSuggestions(false), 300)}
-                autoComplete="off"
-              />
-              {loadingSuggestions ? <Loader2 size={14} color="white" className="animate-spin" /> : <ChevronDown size={14} color="white" style={{ opacity: 0.8 }} />}
-            </div>
+        {/* 1. Location Section */}
+        <div className="search-section" style={{ 
+          flex: 1.5,
+          padding: '0.75rem 2rem',
+          borderRadius: '100px',
+          cursor: 'pointer',
+          position: 'relative',
+          transition: '0.2s'
+        }}
+        onMouseOver={e => e.currentTarget.style.background = '#f7f7f7'}
+        onMouseOut={e => e.currentTarget.style.background = 'transparent'}
+        >
+          <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '800', color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Location</label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.2rem' }}>
+            <input 
+              type="text" 
+              placeholder="Where are you going?" 
+              style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: '0.95rem', color: '#475569', width: '100%', fontWeight: '500' }}
+              value={query.location}
+              onChange={handleLocationChange}
+              onFocus={() => { if (query.location && suggestions.length > 0) setShowSuggestions(true); }}
+              onBlur={() => setTimeout(() => setShowSuggestions(false), 300)}
+              autoComplete="off"
+            />
+            {loadingSuggestions && <Loader2 size={14} className="animate-spin" color="#c5a059" />}
           </div>
           
           {showSuggestions && (suggestions.length > 0 || loadingSuggestions) && (
             <div style={{
-              position: 'absolute', top: '120%', left: 0, width: '100%', minWidth: '250px',
-              background: 'white', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)',
-              borderRadius: '16px', padding: '0.5rem 0', zIndex: 1000,
+              position: 'absolute', top: '110%', left: '0', width: '100%', minWidth: '320px',
+              background: 'white', boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
+              borderRadius: '24px', padding: '1rem 0', zIndex: 1000,
               border: '1px solid #f1f5f9'
             }}>
-              {loadingSuggestions ? (
-                <div style={{ padding: '1rem', textAlign: 'center', color: '#6b7280', fontSize: '0.85rem' }}>
-                   Searching...
-                </div>
-              ) : suggestions.map((text, idx) => (
-                <div 
-                  key={idx} onClick={() => handleSuggestionClick(text)}
-                  style={{ padding: '0.75rem 1.5rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#374151', fontSize: '0.95rem' }}
-                  onMouseOver={(e) => e.currentTarget.style.background = '#f3f4f6'}
+              {suggestions.map((text, idx) => (
+                <div key={idx} onClick={() => handleSuggestionClick(text)}
+                  style={{ padding: '0.8rem 1.5rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '1rem', color: '#1e293b', fontSize: '0.95rem', fontWeight: '500' }}
+                  onMouseOver={(e) => e.currentTarget.style.background = '#f8fafc'}
                   onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
                 >
-                  <MapPin size={16} color="#9ca3af" />
+                  <MapPin size={18} color="#94a3b8" />
                   {text}
                 </div>
               ))}
@@ -121,106 +117,139 @@ const SearchBar = ({ onSearch }) => {
           )}
         </div>
 
-        {/* Check In */}
-        <div className="search-item" style={{ flex: 1, display: 'flex', alignItems: 'center', borderRight: '1px solid rgba(255,255,255,0.3)', paddingRight: '1rem', paddingLeft: '0.5rem' }}>
-          <div style={{ background: 'rgba(255,255,255,0.3)', borderRadius: '50%', padding: '10px', marginRight: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Calendar size={20} color="white" />
-          </div>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <label style={{ fontSize: '0.9rem', fontWeight: '600', color: 'white', marginBottom: '0.1rem' }}>Check In</label>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <DatePicker
-                selected={startDate}
-                onChange={(date) => setDateRange([date, endDate])}
-                selectsStart
-                startDate={startDate}
-                endDate={endDate}
-                placeholderText="20 January"
-                customInput={<input style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: '0.85rem', color: 'white', width: '100%', padding: 0 }} />}
-              />
-              <ChevronDown size={14} color="white" style={{ opacity: 0.8, marginLeft: '-15px' }} />
-            </div>
+        <div style={{ width: '1px', height: '32px', background: '#e2e8f0' }}></div>
+
+        {/* 2. Check In */}
+        <div className="search-section" style={{ 
+          flex: 1,
+          padding: '0.75rem 1.5rem',
+          borderRadius: '100px',
+          cursor: 'pointer',
+          transition: '0.2s'
+        }}
+        onMouseOver={e => e.currentTarget.style.background = '#f7f7f7'}
+        onMouseOut={e => e.currentTarget.style.background = 'transparent'}
+        >
+          <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '800', color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Check In</label>
+          <div style={{ marginTop: '0.2rem' }}>
+            <DatePicker
+              selected={startDate}
+              onChange={(date) => setDateRange([date, endDate])}
+              selectsStart
+              startDate={startDate}
+              endDate={endDate}
+              minDate={new Date()}
+              placeholderText="Add date"
+              customInput={<input style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: '0.95rem', color: '#475569', width: '100%', fontWeight: '500', cursor: 'pointer' }} />}
+            />
           </div>
         </div>
 
-        {/* Check Out */}
-        <div className="search-item" style={{ flex: 1, display: 'flex', alignItems: 'center', borderRight: '1px solid rgba(255,255,255,0.3)', paddingRight: '1rem', paddingLeft: '0.5rem' }}>
-          <div style={{ background: 'rgba(255,255,255,0.3)', borderRadius: '50%', padding: '10px', marginRight: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Calendar size={20} color="white" />
-          </div>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <label style={{ fontSize: '0.9rem', fontWeight: '600', color: 'white', marginBottom: '0.1rem' }}>Check Out</label>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <DatePicker
-                selected={endDate}
-                onChange={(date) => setDateRange([startDate, date])}
-                selectsEnd
-                startDate={startDate}
-                endDate={endDate}
-                minDate={startDate || new Date()}
-                placeholderText="29 January"
-                customInput={<input style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: '0.85rem', color: 'white', width: '100%', padding: 0 }} />}
-              />
-              <ChevronDown size={14} color="white" style={{ opacity: 0.8, marginLeft: '-15px' }} />
-            </div>
+        <div style={{ width: '1px', height: '32px', background: '#e2e8f0' }}></div>
+
+        {/* 3. Check Out */}
+        <div className="search-section" style={{ 
+          flex: 1,
+          padding: '0.75rem 1.5rem',
+          borderRadius: '100px',
+          cursor: 'pointer',
+          transition: '0.2s'
+        }}
+        onMouseOver={e => e.currentTarget.style.background = '#f7f7f7'}
+        onMouseOut={e => e.currentTarget.style.background = 'transparent'}
+        >
+          <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '800', color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Check Out</label>
+          <div style={{ marginTop: '0.2rem' }}>
+            <DatePicker
+              selected={endDate}
+              onChange={(date) => setDateRange([startDate, date])}
+              selectsEnd
+              startDate={startDate}
+              endDate={endDate}
+              minDate={startDate || new Date()}
+              placeholderText="Add date"
+              customInput={<input style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: '0.95rem', color: '#475569', width: '100%', fontWeight: '500', cursor: 'pointer' }} />}
+            />
           </div>
         </div>
 
-        {/* Guests */}
-        <div className="search-item" style={{ flex: 1, display: 'flex', alignItems: 'center', paddingLeft: '0.5rem' }}>
-          <div style={{ background: 'rgba(255,255,255,0.3)', borderRadius: '50%', padding: '10px', marginRight: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-             <Users size={20} color="white" />
-          </div>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative' }}>
-            <label style={{ fontSize: '0.9rem', fontWeight: '600', color: 'white', marginBottom: '0.1rem' }}>Guests</label>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <select 
-                style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: '0.85rem', color: 'white', width: '100%', padding: 0, appearance: 'none', cursor: 'pointer' }}
-                value={query.guests}
-                onChange={(e) => setQuery({...query, guests: e.target.value})}
-              >
-                <option value={1} style={{ color: 'black' }}>1 Adult</option>
-                <option value={2} style={{ color: 'black' }}>2 Adults</option>
-                <option value={3} style={{ color: 'black' }}>2 Adults, 1 Child</option>
-                <option value={4} style={{ color: 'black' }}>2 Adults, 2 Children</option>
-                <option value={5} style={{ color: 'black' }}>3 Adults</option>
-              </select>
-              <ChevronDown size={14} color="white" style={{ opacity: 0.8, position: 'absolute', right: 0, pointerEvents: 'none' }} />
-            </div>
-          </div>
+        <div style={{ width: '1px', height: '32px', background: '#e2e8f0' }}></div>
+
+        {/* 4. Guests Section */}
+        <div className="search-section" style={{ 
+          flex: 1,
+          padding: '0.75rem 1.5rem',
+          borderRadius: '100px',
+          cursor: 'pointer',
+          transition: '0.2s',
+          display: 'flex',
+          flexDirection: 'column',
+          position: 'relative'
+        }}
+        onMouseOver={e => e.currentTarget.style.background = '#f7f7f7'}
+        onMouseOut={e => e.currentTarget.style.background = 'transparent'}
+        >
+          <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '800', color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Guests</label>
+          <select 
+            style={{ 
+              border: 'none', background: 'transparent', outline: 'none', fontSize: '0.95rem', color: '#475569', 
+              width: '100%', marginTop: '0.2rem', appearance: 'none', cursor: 'pointer', fontWeight: '500'
+            }}
+            value={query.guests}
+            onChange={(e) => setQuery({...query, guests: e.target.value})}
+          >
+            <option value={1}>1 Guest</option>
+            <option value={2}>2 Guests</option>
+            <option value={3}>3 Guests</option>
+            <option value={4}>4 Guests</option>
+            <option value={5}>5+ Guests</option>
+          </select>
         </div>
 
-        {/* Submit Button */}
-        <button className="search-button" type="submit" style={{
-          background: '#22d3ee', // Cyan
+        {/* Search Button */}
+        <button type="submit" style={{
+          background: '#c5a059',
           color: 'white',
           border: 'none',
-          borderRadius: '50px',
-          padding: '1rem 1.8rem',
-          fontWeight: '500',
-          fontSize: '0.95rem',
-          cursor: 'pointer',
-          transition: 'transform 0.2s',
-          marginLeft: '0.5rem',
+          borderRadius: '50%',
+          width: '56px',
+          height: '56px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: '0.5rem',
-          boxShadow: '0 4px 15px rgba(34, 211, 238, 0.4)'
+          cursor: 'pointer',
+          transition: '0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+          marginLeft: '0.5rem',
+          boxShadow: '0 8px 20px rgba(197, 160, 89, 0.3)',
+          flexShrink: 0
         }}
-        onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-        onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+        onMouseOver={(e) => {
+          e.currentTarget.style.transform = 'scale(1.1)';
+          e.currentTarget.style.background = '#1e293b';
+        }}
+        onMouseOut={(e) => {
+          e.currentTarget.style.transform = 'scale(1)';
+          e.currentTarget.style.background = '#c5a059';
+        }}
         >
-          Find Hotel <Search size={16} />
+          <Search size={24} strokeWidth={3} />
         </button>
 
       </form>
-      
+
       <style>{`
-        ::-webkit-input-placeholder { color: rgba(255,255,255,0.8); }
-        ::-moz-placeholder { color: rgba(255,255,255,0.8); }
-        :-ms-input-placeholder { color: rgba(255,255,255,0.8); }
-        :-moz-placeholder { color: rgba(255,255,255,0.8); }
+        .react-datepicker-wrapper { width: 100%; }
+        .react-datepicker__input-container input::placeholder { color: #94a3b8; }
+        .animate-spin { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        
+        @media (max-width: 900px) {
+          form { flex-direction: column !important; border-radius: 32px !important; padding: 1rem !important; }
+          .search-section { width: 100% !important; border-right: none !important; border-bottom: 1px solid #f1f5f9 !important; padding: 1rem !important; border-radius: 16px !important; }
+          div[style*="width: 1px"] { display: none !important; }
+          button[type="submit"] { width: 100% !important; border-radius: 16px !important; height: 50px !important; margin-top: 1rem !important; }
+          div[style*="borderRadius: 100px"] { border-radius: 32px !important; padding: 1rem !important; }
+        }
       `}</style>
     </div>
   );
