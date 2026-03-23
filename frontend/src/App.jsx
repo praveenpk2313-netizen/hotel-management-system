@@ -35,6 +35,9 @@ import AdminRegisterPage from './pages/AdminRegisterPage';
 import { useAuth } from './context/AuthContext';
 import { useSocket } from './hooks/useSocket';
 import RealTimeToast from './components/RealTimeToast';
+import VerifyEmail from './pages/VerifyEmail';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 // ─── Role → dashboard mapping ────────────────────────────────────────────────
 
@@ -113,6 +116,11 @@ function App() {
           {/* Hotel browsing */}
           <Route path="/hotel/:id" element={<HotelDetails />} />
           <Route path="/hotels"    element={<HotelListPage />} />
+
+          {/* New Auth Features */}
+          <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* ── Portals ────────────────────────────────────────────────────── */}
           

@@ -3,8 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useDispatch } from 'react-redux';
 import { loginStart, loginFailure } from '../redux/slices/authSlice';
-import { AlertCircle, Eye, EyeOff, CheckCircle2, X } from 'lucide-react';
-import { registerUser } from '../services/api';
+import { AlertCircle, Eye, EyeOff, CheckCircle2, X, User, Mail, Lock, ShieldCheck } from 'lucide-react';
+import api from '../services/api';
 
 const PASSWORD_RULES = [
   { test: (p) => p.length >= 6,          label: 'At least 6 characters'   },
@@ -15,8 +15,8 @@ const PASSWORD_RULES = [
 const Register = () => {
   const [formData, setFormData] = useState({ name:'', email:'', password:'', confirmPassword:'' });
   const [showPwd,   setShowPwd]  = useState(false);
-  const [showCPwd,  setShowCPwd] = useState(false);
   const [error,     setError]    = useState('');
+  const [success,   setSuccess]  = useState('');
   const [loading,   setLoading]  = useState(false);
 
   const { login }  = useAuth();
@@ -28,6 +28,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
 
     if (formData.password !== formData.confirmPassword) {
       return setError('Passwords do not match.');
@@ -37,16 +38,19 @@ const Register = () => {
     dispatch(loginStart());
 
     try {
-      const { data } = await registerUser({
+      const { data } = await api.post('/auth/register', {
         name:     formData.name,
         email:    formData.email,
         password: formData.password,
         role:     'customer',   
       });
-      login(data);
-      navigate('/customer/dashboard');
+      
+      setSuccess(data.message || 'Registration successful! Please check your email to verify.');
+      // After successfully registering, we don't automatically login if verification is required
+      // But the backend current returns a message.
+      
     } catch (err) {
-      const msg = err.response?.data?.message || 'Registration failed. Please try again.';
+      const msg = err.response?.data?.message || 'Registration failed.';
       setError(msg);
       dispatch(loginFailure(msg));
     } finally {
@@ -54,220 +58,240 @@ const Register = () => {
     }
   };
 
-  const strengthPassed = PASSWORD_RULES.filter((r) => r.test(formData.password)).length;
-
   return (
     <div style={{
       minHeight: '100vh',
       display: 'flex',
-      background: '#1a1a1a', 
+      background: '#f8fafc',
+      fontFamily: '"Inter", sans-serif'
     }}>
       <div style={{
-        width: '100%',
-        background: 'white',
         display: 'flex',
-        minHeight: '100vh',
-        position: 'relative',
+        width: '100%',
+        maxWidth: '1440px',
+        margin: '2rem auto',
+        padding: '1rem',
+        gap: '2rem'
       }}>
         
-        {/* Left Side - Image */}
-        <div className="image-panel" style={{
-          flex: 1.2,
+        {/* Visual Side */}
+        <div style={{
+          flex: 1,
           position: 'relative',
-          background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.1) 40%), url("https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=1200") center/cover no-repeat',
+          borderRadius: '32px',
+          overflow: 'hidden',
+          display: window.innerWidth < 900 ? 'none' : 'block',
+          boxShadow: '0 20px 50px rgba(0,0,0,0.1)'
         }}>
+          <img 
+            src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&q=80&w=1200" 
+            alt="Paradise Resort"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
           <div style={{
             position: 'absolute',
-            bottom: '3rem',
-            left: '3rem',
-            right: '2rem'
+            inset: 0,
+            background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 60%)',
+            padding: '4rem',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'flex-end'
           }}>
-            <h2 style={{ 
-              color: 'white', 
-              fontSize: '2.5rem', 
-              fontWeight: '400', 
-              fontFamily: '"Playfair Display", Georgia, serif', 
-              lineHeight: '1.2', 
-              margin: 0,
-              letterSpacing: '1px',
-              textTransform: 'uppercase'
-            }}>
-              Perfect Stay For<br/>Your Perfect Vacay
-            </h2>
+             <h2 style={{ 
+               color: 'white', 
+               fontSize: '3.5rem', 
+               fontWeight: '700', 
+               fontFamily: '"Playfair Display", serif',
+               lineHeight: '1.1',
+               marginBottom: '1rem'
+             }}>
+               Join The<br />Stay Savvy Club.
+             </h2>
+             <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '1.2rem', maxWidth: '500px' }}>
+               Create an account to start your journey towards exclusive stays and premium hospitality.
+             </p>
           </div>
         </div>
 
-        {/* Right Side - Form */}
-        <div className="form-panel" style={{
-          flex: 1,
-          padding: '4rem 4rem',
+        {/* Form Side */}
+        <div style={{
+          flex: 1.2,
           display: 'flex',
           flexDirection: 'column',
-          position: 'relative',
-          background: 'white'
+          justifyContent: 'center',
+          padding: '2rem',
+          maxWidth: '600px',
+          margin: 'auto'
         }}>
-           
-           <button onClick={() => navigate('/')} style={{ position: 'absolute', top: '2rem', right: '2rem', background: 'none', border: 'none', cursor: 'pointer', color: '#333' }}>
-             <X size={28} strokeWidth={1.5} />
-           </button>
-           
-           <h1 style={{ 
-             fontSize: '2.5rem', 
-             fontWeight: '400', 
-             fontFamily: '"Playfair Display", Georgia, serif', 
-             color: '#111', 
-             margin: '1.5rem 0 2.5rem 0',
-             textTransform: 'uppercase',
-             letterSpacing: '2px'
-           }}>
-             Sign Up
-           </h1>
+          <div style={{ marginBottom: '2.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1.5rem' }}>
+              <div style={{ background: '#1e1e1e', color: 'white', padding: '0.5rem', borderRadius: '12px' }}>
+                 <ShieldCheck size={28} />
+              </div>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '2px', margin: 0 }}>Stay Savvy</h3>
+            </div>
+            <h1 style={{ fontSize: '2.5rem', fontWeight: '700', color: '#1e293b', marginBottom: '0.8rem' }}>Create Account</h1>
+            <p style={{ color: '#64748b', fontSize: '1.1rem' }}>Step into a world of curated experiences.</p>
+          </div>
 
-           {/* Error */}
-           {error && (
-             <div style={{
-               display:'flex', alignItems:'center', gap:'0.65rem',
-               background:'#fef2f2', color:'#b91c1c', border: '1px solid #fecaca',
-               padding:'0.75rem 1rem', borderRadius:'4px',
-               marginBottom:'1.5rem', fontSize:'0.85rem'
+          {success && (
+             <div style={{ 
+               display:'flex', alignItems:'center', gap:'0.8rem', 
+               background:'#dcfce7', color:'#15803d', border: '1px solid #bcf0da',
+               padding:'1rem', borderRadius:'16px', marginBottom:'2rem', fontSize:'0.95rem', fontWeight: '600'
              }}>
-               <AlertCircle size={16} /> {error}
+               <CheckCircle2 size={24} /> {success}
              </div>
-           )}
+          )}
 
-           <form onSubmit={handleSubmit} style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                <label style={{ fontSize: '0.9rem', fontWeight: '600', color: '#111' }}>Name</label>
-                <input
-                  name="name"
-                  type="text"
-                  placeholder="Enter Your Full Name"
-                  className="clean-input"
-                  value={formData.name}
-                  onChange={onChange}
-                  required
-                />
-              </div>
+          {error && (
+            <div style={{ 
+              display:'flex', alignItems:'center', gap:'0.8rem', 
+              background:'#fef2f2', color:'#b91c1c', border: '1px solid #fecaca',
+              padding:'1rem', borderRadius:'16px', marginBottom:'2rem', fontSize:'0.9rem' 
+            }}>
+              <AlertCircle size={20} /> {error}
+            </div>
+          )}
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                <label style={{ fontSize: '0.9rem', fontWeight: '600', color: '#111' }}>Email</label>
-                <input
-                  name="email"
-                  type="email"
-                  placeholder="Enter Your Email"
-                  className="clean-input"
-                  value={formData.email}
-                  onChange={onChange}
-                  required
-                />
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                <label style={{ fontSize: '0.9rem', fontWeight: '600', color: '#111' }}>Password</label>
+          {!success && (
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label style={{ fontSize: '0.9rem', fontWeight: '600', color: '#1e293b' }}>Full Name</label>
                 <div style={{ position: 'relative' }}>
                   <input
-                    name="password"
-                    type={showPwd ? 'text' : 'password'}
-                    placeholder="Enter Your Password"
-                    className="clean-input"
-                    value={formData.password}
+                    name="name"
+                    type="text"
+                    placeholder="John Doe"
+                    className="modern-input"
+                    value={formData.name}
                     onChange={onChange}
                     required
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPwd(!showPwd)}
-                    style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', display: 'flex', padding: 0 }}
-                  >
-                    {showPwd ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
+                  <User size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
                 </div>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                <label style={{ fontSize: '0.9rem', fontWeight: '600', color: '#111' }}>Confirm Password</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label style={{ fontSize: '0.9rem', fontWeight: '600', color: '#1e293b' }}>Email Address</label>
                 <div style={{ position: 'relative' }}>
                   <input
-                    name="confirmPassword"
-                    type={showCPwd ? 'text' : 'password'}
-                    placeholder="Confirm Your Password"
-                    className="clean-input"
-                    value={formData.confirmPassword}
+                    name="email"
+                    type="email"
+                    placeholder="john@example.com"
+                    className="modern-input"
+                    value={formData.email}
                     onChange={onChange}
                     required
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowCPwd(!showCPwd)}
-                    style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', display: 'flex', padding: 0 }}
-                  >
-                    {showCPwd ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
+                  <Mail size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
                 </div>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
-                 <input type="checkbox" id="terms" required style={{ cursor: 'pointer' }} />
-                 <label htmlFor="terms" style={{ fontSize: '0.85rem', color: '#333', cursor: 'pointer' }}>
-                   I agree with the <span style={{ fontWeight: '600' }}>Terms of services</span> and <span style={{ fontWeight: '600' }}>Privacy Policy</span>
-                 </label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <label style={{ fontSize: '0.9rem', fontWeight: '600', color: '#1e293b' }}>Password</label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      name="password"
+                      type={showPwd ? 'text' : 'password'}
+                      placeholder="••••••••"
+                      className="modern-input"
+                      value={formData.password}
+                      onChange={onChange}
+                      required
+                    />
+                    <Lock size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                  </div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <label style={{ fontSize: '0.9rem', fontWeight: '600', color: '#1e293b' }}>Confirm</label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      name="confirmPassword"
+                      type={showPwd ? 'text' : 'password'}
+                      placeholder="••••••••"
+                      className="modern-input"
+                      value={formData.confirmPassword}
+                      onChange={onChange}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPwd(!showPwd)}
+                      style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
+                    >
+                      {showPwd ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ marginTop: '0.5rem' }}>
+                <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '0.8rem' }}>Password Strength:</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+                  {PASSWORD_RULES.map((rule, index) => {
+                    const passed = rule.test(formData.password);
+                    return (
+                      <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: passed ? '#10b981' : '#94a3b8', fontSize: '0.8rem', fontWeight: '500' }}>
+                        {passed ? <CheckCircle2 size={14} /> : <X size={14} />} {rule.label}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                style={{
-                  height: '52px',
-                  background: '#2d2d2d',
-                  color: 'white',
-                  borderRadius: '4px',
-                  border: 'none',
-                  fontWeight: '500',
-                  fontSize: '1rem',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  transition: 'background 0.2s',
-                  marginTop: '0.5rem'
-                }}
-                onMouseOver={(e) => !loading && (e.currentTarget.style.background = '#1a1a1a')}
-                onMouseOut={(e) => !loading && (e.currentTarget.style.background = '#2d2d2d')}
+                className="modern-submit"
               >
-                {loading ? 'Signing Up...' : 'Sign Up'}
+                {loading ? 'Creating Account...' : 'Continue'}
               </button>
-           </form>
+            </form>
+          )}
 
-           <div style={{ marginTop: '1.5rem', fontSize: '0.85rem', color: '#111', fontWeight: '500', textAlign: 'center' }}>
-             Already a user? <Link to="/login" style={{ color: '#111', textDecoration: 'underline', fontWeight: '700' }}>Sign In Now!</Link>
-           </div>
-
+          <p style={{ textAlign: 'center', marginTop: '2rem', color: '#64748b', fontSize: '0.95rem' }}>
+            Already have an account? <Link to="/login" style={{ color: '#111', fontWeight: '700', textDecoration: 'none', marginLeft: '0.4rem' }}>Log In</Link>
+          </p>
         </div>
       </div>
-      <style>{`
-         .clean-input {
-           width: 100%;
-           height: 48px;
-           padding: 0 1rem;
-           border-radius: 4px;
-           border: 1px solid #eaeaea;
-           background: #ffffff;
-           color: #111;
-           font-size: 0.95rem;
-           outline: none;
-           box-sizing: border-box;
-           transition: border-color 0.2s;
-         }
-         .clean-input:focus {
-           border-color: #111;
-           border-width: 1.5px;
-         }
-         .clean-input::placeholder {
-           color: #a0a0a0;
-         }
 
-         @media (max-width: 900px) {
-           .image-panel { display: none !important; }
-           .form-panel { padding: 3rem 2rem !important; }
-         }
+      <style>{`
+        .modern-input {
+          width: 100%;
+          height: 52px;
+          padding: 0 1rem 0 3rem;
+          border-radius: 12px;
+          border: 1px solid #e2e8f0;
+          background: #fff;
+          font-size: 1rem;
+          outline: none;
+          transition: all 0.2s;
+          box-sizing: border-box;
+        }
+        .modern-input:focus {
+          border-color: #1e1e1e;
+          box-shadow: 0 0 0 4px rgba(0,0,0,0.03);
+        }
+        .modern-submit {
+          height: 56px;
+          background: #1e1e1e;
+          color: white;
+          border-radius: 16px;
+          border: none;
+          font-weight: 700;
+          font-size: 1.1rem;
+          cursor: pointer;
+          transition: all 0.2s;
+          margin-top: 1.5rem;
+          box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .modern-submit:hover:not(:disabled) {
+          background: #333;
+          transform: translateY(-2px);
+          box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+        }
       `}</style>
     </div>
   );
