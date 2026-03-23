@@ -21,16 +21,37 @@ const generateToken = require('./utils/generateToken');
 const app = express();
 app.set('trust proxy', 1);
 
-// Frontend origin(s) handling
-const CLIENT_URLS = process.env.CLIENT_URL 
-  ? process.env.CLIENT_URL.split(',').map(url => url.trim())
-  : ['http://localhost:5173'];
+// Frontend origin(s) handling - handle multiple comma-separated URLs
+const getClientOrigins = () => {
+  const envUrl = process.env.CLIENT_URL;
+  const origins = envUrl 
+    ? envUrl.split(',').map(url => url.trim().replace(/\/$/, ""))
+    : ['http://localhost:5173', 'https://hotel-management-system-zeta-neon.vercel.app'];
+  
+  // Guarantee common deployment origins for the user
+  if (!origins.includes('https://hotel-management-system-zeta-neon.vercel.app')) {
+    origins.push('https://hotel-management-system-zeta-neon.vercel.app');
+  }
+  return origins;
+};
+
+const CLIENT_URLS = getClientOrigins();
 const PRIMARY_CLIENT_URL = CLIENT_URLS[0];
 
 // Update CORS to use the same allowed origins list for predictability
 app.use(cors({
-  origin: CLIENT_URLS,
-  credentials: true
+  origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (CLIENT_URLS.indexOf(origin) !== -1 || process.env.NODE_ENV !== 'production') {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
 }));
 
 app.use(express.json());
