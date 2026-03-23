@@ -66,8 +66,23 @@ app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
-app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'], prompt: 'select_account' }));
-app.get('/auth/google/callback', passport.authenticate('google', { session: false, failureRedirect: `${PRIMARY_CLIENT_URL}/oauth/callback?error=oauth_failed` }), (req, res) => {
+app.get('/auth/google', (req, res, next) => {
+  const dynamicCallback = `${req.protocol}://${req.get('host')}/auth/google/callback`;
+  passport.authenticate('google', { 
+    scope: ['profile', 'email'], 
+    prompt: 'select_account',
+    callbackURL: dynamicCallback
+  })(req, res, next);
+});
+
+app.get('/auth/google/callback', (req, res, next) => {
+  const dynamicCallback = `${req.protocol}://${req.get('host')}/auth/google/callback`;
+  passport.authenticate('google', { 
+    session: false, 
+    failureRedirect: `${PRIMARY_CLIENT_URL}/oauth/callback?error=oauth_failed`,
+    callbackURL: dynamicCallback 
+  })(req, res, next);
+}, (req, res) => {
   const token = generateToken(req.user._id, req.user.role);
   const userObj = {
     _id: req.user._id,
@@ -79,8 +94,22 @@ app.get('/auth/google/callback', passport.authenticate('google', { session: fals
   res.redirect(`${PRIMARY_CLIENT_URL}/oauth/callback?data=${encodeURIComponent(JSON.stringify(userObj))}`);
 });
 
-app.get('/auth/github', passport.authenticate('github', { scope: ['user:email'] }));
-app.get('/auth/github/callback', passport.authenticate('github', { session: false, failureRedirect: `${PRIMARY_CLIENT_URL}/oauth/callback?error=oauth_failed` }), (req, res) => {
+app.get('/auth/github', (req, res, next) => {
+  const dynamicCallback = `${req.protocol}://${req.get('host')}/auth/github/callback`;
+  passport.authenticate('github', { 
+    scope: ['user:email'],
+    callbackURL: dynamicCallback
+  })(req, res, next);
+});
+
+app.get('/auth/github/callback', (req, res, next) => {
+  const dynamicCallback = `${req.protocol}://${req.get('host')}/auth/github/callback`;
+  passport.authenticate('github', { 
+    session: false, 
+    failureRedirect: `${PRIMARY_CLIENT_URL}/oauth/callback?error=oauth_failed`,
+    callbackURL: dynamicCallback 
+  })(req, res, next);
+}, (req, res) => {
   const token = generateToken(req.user._id, req.user.role);
   const userObj = {
     _id: req.user._id,

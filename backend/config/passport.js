@@ -77,7 +77,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID || 'dummy-google-client-id',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'dummy-google-client-secret',
-      callbackURL: process.env.GOOGLE_CALLBACK_URL || "https://hotel-management-system-4g0p.onrender.com/auth/google/callback",
+      callbackURL: process.env.GOOGLE_CALLBACK_URL || (process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/auth/google/callback` : "https://hotel-management-system-4g0p.onrender.com/auth/google/callback"),
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
@@ -109,7 +109,7 @@ passport.use(
     {
       clientID: process.env.GITHUB_CLIENT_ID || 'dummy-github-client-id',
       clientSecret: process.env.GITHUB_CLIENT_SECRET || 'dummy-github-client-secret',
-      callbackURL: process.env.GITHUB_CALLBACK_URL || "http://localhost:5000/auth/github/callback",
+      callbackURL: process.env.GITHUB_CALLBACK_URL || (process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/auth/github/callback` : "http://localhost:5000/auth/github/callback"),
       scope: ['user:email'],
     },
     async (accessToken, refreshToken, profile, done) => {
