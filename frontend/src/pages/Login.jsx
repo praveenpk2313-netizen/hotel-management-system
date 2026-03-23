@@ -232,14 +232,7 @@ const Login = () => {
            <div style={{ marginTop: '1.5rem', fontSize: '0.85rem', color: '#111', fontWeight: '500', textAlign: 'center' }}>
              New user? <Link to="/register" style={{ color: '#111', textDecoration: 'underline', fontWeight: '700' }}>Sign Up Now!</Link>
            </div>
-           
-           <div style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: '#111', fontWeight: '500', textAlign: 'center' }}>
-             Are you a manager? <Link to="/manager/login" style={{ color: '#111', textDecoration: 'underline', fontWeight: '700' }}>Manager Login</Link>
-           </div>
-           
-           <div style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: '#111', fontWeight: '500', textAlign: 'center' }}>
-             Are you an admin? <Link to="/admin/login" style={{ color: '#111', textDecoration: 'underline', fontWeight: '700' }}>Admin Login</Link>
-           </div>
+
 
            {/* Divider */}
            <div style={{ display: 'flex', alignItems: 'center', width: '100%', margin: '2rem 0', gap: '0.75rem' }}>
