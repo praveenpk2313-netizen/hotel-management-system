@@ -53,7 +53,7 @@ const Login = () => {
   }, [login, navigate]);
 
   const openOAuthPopup = (provider) => {
-    const baseURL = (api.defaults.baseURL || 'http://localhost:5000/api').replace('/api', '');
+    const baseURL = api.API_BASE_URL;
     const url = `${baseURL}/auth/${provider}`;
     const w = 500, h = 600;
     const left = window.screenX + (window.outerWidth  - w) / 2;

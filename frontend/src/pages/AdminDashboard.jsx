@@ -287,7 +287,7 @@ const AdminDashboard = () => {
                     <td>{h.city}</td>
                     <td>
                       {h.images && h.images[0] ? (
-                        <img src={`http://localhost:5000${h.images[0]}`} alt={h.name} style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover' }} />
+                        <img src={`${api.API_BASE_URL}${h.images[0]}`} alt={h.name} style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover' }} />
                       ) : <div style={{ width: '40px', height: '40px', background: '#f1f5f9', borderRadius: '8px' }}></div>}
                     </td>
                     <td>

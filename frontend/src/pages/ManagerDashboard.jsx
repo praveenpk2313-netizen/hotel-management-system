@@ -175,7 +175,7 @@ const ManagerDashboard = () => {
               <td>{h.city}</td>
               <td>
                 {h.images && h.images[0] ? (
-                  <img src={`http://localhost:5000${h.images[0]}`} alt={h.name} style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover' }} />
+                  <img src={`${api.API_BASE_URL}${h.images[0]}`} alt={h.name} style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover' }} />
                 ) : <div style={{ width: '40px', height: '40px', background: '#f1f5f9', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><HotelIcon size={16} /></div>}
               </td>
               <td>{h.amenities?.slice(0, 2).join(', ')}...</td>
@@ -229,7 +229,7 @@ const ManagerDashboard = () => {
               <td>{r.type}</td>
               <td>
                 {r.images && r.images[0] ? (
-                  <img src={`http://localhost:5000${r.images[0]}`} alt={r.type} style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover' }} />
+                  <img src={`${api.API_BASE_URL}${r.images[0]}`} alt={r.type} style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover' }} />
                 ) : <div style={{ width: '40px', height: '40px', background: '#f1f5f9', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={16} /></div>}
               </td>
               <td>{r.capacity} Persons</td>
@@ -502,7 +502,7 @@ const ManagerDashboard = () => {
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
                       {hotelImageUrls.map((url, idx) => (
                         <div key={idx} style={{ position: 'relative', width: 'fit-content' }}>
-                          <img src={`http://localhost:5000${url}`} alt="Preview" style={{ width: '80px', height: '60px', borderRadius: '8px', objectFit: 'cover' }} />
+                          <img src={`${api.API_BASE_URL}${url}`} alt="Preview" style={{ width: '80px', height: '60px', borderRadius: '8px', objectFit: 'cover' }} />
                           <button 
                             type="button"
                             onClick={() => removeImage(url, setHotelImageUrls)} 
@@ -610,7 +610,7 @@ const ManagerDashboard = () => {
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
                       {roomImageUrls.map((url, idx) => (
                         <div key={idx} style={{ position: 'relative', width: 'fit-content' }}>
-                          <img src={`http://localhost:5000${url}`} alt="Preview" style={{ width: '80px', height: '60px', borderRadius: '8px', objectFit: 'cover' }} />
+                          <img src={`${api.API_BASE_URL}${url}`} alt="Preview" style={{ width: '80px', height: '60px', borderRadius: '8px', objectFit: 'cover' }} />
                           <button 
                             type="button"
                             onClick={() => removeImage(url, setRoomImageUrls)} 

@@ -6,10 +6,15 @@ let io;
 const connectedUsers = new Map(); // userId -> socketId
 
 const initSocket = (server) => {
+  const allowedOrigins = process.env.CLIENT_URL 
+    ? process.env.CLIENT_URL.split(',').map(url => url.trim())
+    : ["http://localhost:5173", "https://hotel-management-system-zeta-neon.vercel.app"];
+
   io = new Server(server, {
     cors: {
-      origin: process.env.CLIENT_URL || "http://localhost:5173",
-      methods: ["GET", "POST"]
+      origin: allowedOrigins,
+      methods: ["GET", "POST"],
+      credentials: true
     }
   });
 

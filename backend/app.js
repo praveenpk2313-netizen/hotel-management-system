@@ -21,7 +21,18 @@ const generateToken = require('./utils/generateToken');
 const app = express();
 app.set('trust proxy', 1);
 
-app.use(cors());
+// Frontend origin(s) handling
+const CLIENT_URLS = process.env.CLIENT_URL 
+  ? process.env.CLIENT_URL.split(',').map(url => url.trim())
+  : ['http://localhost:5173'];
+const PRIMARY_CLIENT_URL = CLIENT_URLS[0];
+
+// Update CORS to use the same allowed origins list for predictability
+app.use(cors({
+  origin: CLIENT_URLS,
+  credentials: true
+}));
+
 app.use(express.json());
 app.use(passport.initialize());
 
@@ -29,11 +40,8 @@ app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
-// Direct OAuth Routes matching User's registered Google Console redirect config
-const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
-
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-app.get('/auth/google/callback', passport.authenticate('google', { session: false, failureRedirect: `${CLIENT_URL}/oauth/callback?error=oauth_failed` }), (req, res) => {
+app.get('/auth/google/callback', passport.authenticate('google', { session: false, failureRedirect: `${PRIMARY_CLIENT_URL}/oauth/callback?error=oauth_failed` }), (req, res) => {
   const token = generateToken(req.user._id, req.user.role);
   const userObj = {
     _id: req.user._id,
@@ -42,11 +50,11 @@ app.get('/auth/google/callback', passport.authenticate('google', { session: fals
     role: req.user.role,
     token
   };
-  res.redirect(`${CLIENT_URL}/oauth/callback?data=${encodeURIComponent(JSON.stringify(userObj))}`);
+  res.redirect(`${PRIMARY_CLIENT_URL}/oauth/callback?data=${encodeURIComponent(JSON.stringify(userObj))}`);
 });
 
 app.get('/auth/github', passport.authenticate('github', { scope: ['user:email'] }));
-app.get('/auth/github/callback', passport.authenticate('github', { session: false, failureRedirect: `${CLIENT_URL}/oauth/callback?error=oauth_failed` }), (req, res) => {
+app.get('/auth/github/callback', passport.authenticate('github', { session: false, failureRedirect: `${PRIMARY_CLIENT_URL}/oauth/callback?error=oauth_failed` }), (req, res) => {
   const token = generateToken(req.user._id, req.user.role);
   const userObj = {
     _id: req.user._id,
@@ -55,7 +63,7 @@ app.get('/auth/github/callback', passport.authenticate('github', { session: fals
     role: req.user.role,
     token
   };
-  res.redirect(`${CLIENT_URL}/oauth/callback?data=${encodeURIComponent(JSON.stringify(userObj))}`);
+  res.redirect(`${PRIMARY_CLIENT_URL}/oauth/callback?data=${encodeURIComponent(JSON.stringify(userObj))}`);
 });
 
 app.use('/api/auth', authRoutes);
