@@ -152,9 +152,11 @@ const authUser = async (req, res) => {
       return res.status(401).json({ message: 'Account not found. Please register first.' });
     }
 
+    /* Temporarily commenting out verification while debugging email connection
     if (!user.isVerified) {
        return res.status(401).json({ message: 'Please verify your email address before logging in.' });
     }
+    */
 
     if (!user.password && user.oauthProvider) {
       return res.status(401).json({
