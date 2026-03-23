@@ -1,7 +1,20 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const GitHubStrategy = require('passport-github2').Strategy;
 const User = require('../models/User');
+
+/**
+ * Validates that required environment variables are present.
+ */
+const validateEnv = () => {
+  const required = ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'];
+  const missing = required.filter(key => !process.env[key]);
+  
+  if (missing.length > 0) {
+    console.error(`ERROR: Missing required OAuth environment variables: ${missing.join(', ')}`);
+    return false;
+  }
+  return true;
+};
 
 // ─── Role resolution from email allow-lists ──────────────────────────────────
 const getRoleForEmail = (email) => {
@@ -23,11 +36,9 @@ const getRoleForEmail = (email) => {
 
 // ─── Shared upsert helper ─────────────────────────────────────────────────────
 const findOrCreateOAuthUser = async ({ email, name, avatar, provider, oauthId }) => {
-  // 1. Try to find by email (existing account)
   let user = await User.findOne({ email: email.toLowerCase() });
 
   if (user) {
-    // Update OAuth info if not already linked
     let needsSave = false;
     if (!user.oauthProvider) {
       user.oauthProvider = provider;
@@ -38,30 +49,27 @@ const findOrCreateOAuthUser = async ({ email, name, avatar, provider, oauthId })
       user.avatar = avatar;
       needsSave = true;
     }
-    // Promote role if email is in allow-list
+    
     const expectedRole = getRoleForEmail(email);
     if (expectedRole !== 'customer' && user.role === 'customer') {
       user.role = expectedRole;
       needsSave = true;
     }
+    
     if (needsSave) {
-      user.lastLogin = new Date();
-      await user.save({ validateBeforeSave: false });
-    } else {
       user.lastLogin = new Date();
       await user.save({ validateBeforeSave: false });
     }
     return user;
   }
 
-  // 2. Create new OAuth user
-  const randomPwd = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
+  const randomPwd = Math.random().toString(36).slice(-8);
   user = await User.create({
     name: name || email.split('@')[0],
     email: email.toLowerCase(),
     password: randomPwd,
     role: getRoleForEmail(email),
-    isVerified: true, // OAuth users are already verified by provider
+    isVerified: true,
     oauthProvider: provider,
     oauthId: oauthId,
     avatar: avatar || null,
@@ -71,78 +79,42 @@ const findOrCreateOAuthUser = async ({ email, name, avatar, provider, oauthId })
   return user;
 };
 
-// ─── Google Strategy ──────────────────────────────────────────────────────────
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: process.env.GOOGLE_CLIENT_ID || 'dummy-google-client-id',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'dummy-google-client-secret',
-      callbackURL: process.env.GOOGLE_CALLBACK_URL || (process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/auth/google/callback` : "https://hotel-management-system-4g0p.onrender.com/auth/google/callback"),
-    },
-    async (accessToken, refreshToken, profile, done) => {
-      try {
-        const email = profile.emails?.[0]?.value;
-        if (!email) {
-          return done(new Error('No email received from Google'), null);
+// Initialize Google Strategy ONLY if credentials are available
+if (validateEnv()) {
+  passport.use(
+    new GoogleStrategy(
+      {
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        // The callbackURL will be dynamically overridden in app.js routes to ensure production safety
+        callbackURL: "/auth/google/callback", 
+        passReqToCallback: true
+      },
+      async (req, accessToken, refreshToken, profile, done) => {
+        try {
+          const email = profile.emails?.[0]?.value;
+          if (!email) {
+            return done(new Error('No email received from Google'), null);
+          }
+
+          const user = await findOrCreateOAuthUser({
+            email,
+            name: profile.displayName,
+            avatar: profile.photos?.[0]?.value || null,
+            provider: 'google',
+            oauthId: profile.id,
+          });
+
+          return done(null, user);
+        } catch (err) {
+          console.error('Google OAuth error:', err);
+          return done(err, null);
         }
-
-        const user = await findOrCreateOAuthUser({
-          email,
-          name: profile.displayName,
-          avatar: profile.photos?.[0]?.value || null,
-          provider: 'google',
-          oauthId: profile.id,
-        });
-
-        return done(null, user);
-      } catch (err) {
-        console.error('Google OAuth error:', err);
-        return done(err, null);
       }
-    }
-  )
-);
-
-// ─── GitHub Strategy ──────────────────────────────────────────────────────────
-passport.use(
-  new GitHubStrategy(
-    {
-      clientID: process.env.GITHUB_CLIENT_ID || 'dummy-github-client-id',
-      clientSecret: process.env.GITHUB_CLIENT_SECRET || 'dummy-github-client-secret',
-      callbackURL: process.env.GITHUB_CALLBACK_URL || (process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/auth/github/callback` : "http://localhost:5000/auth/github/callback"),
-      scope: ['user:email'],
-    },
-    async (accessToken, refreshToken, profile, done) => {
-      try {
-        // GitHub may return null for private emails; fallback to synthetic email
-        let email =
-          profile.emails?.find((e) => e.primary)?.value ||
-          profile.emails?.[0]?.value ||
-          null;
-
-        if (!email && profile.username) {
-          email = `${profile.username}@github.com`;
-        }
-
-        if (!email) {
-          return done(new Error('No email received from GitHub'), null);
-        }
-
-        const user = await findOrCreateOAuthUser({
-          email,
-          name: profile.displayName || profile.username,
-          avatar: profile.photos?.[0]?.value || null,
-          provider: 'github',
-          oauthId: profile.id,
-        });
-
-        return done(null, user);
-      } catch (err) {
-        console.error('GitHub OAuth error:', err);
-        return done(err, null);
-      }
-    }
-  )
-);
+    )
+  );
+} else {
+  console.warn('WARNING: Passport Google OAuth strategy NOT initialized due to missing credentials.');
+}
 
 module.exports = passport;

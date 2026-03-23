@@ -41,7 +41,20 @@ const getClientOrigins = () => {
 };
 
 const CLIENT_URLS = getClientOrigins();
-const PRIMARY_CLIENT_URL = CLIENT_URLS[0];
+
+/**
+ * Helper to determine which frontend URL to redirect back to.
+ * It prioritizes the origin of the request if it matches our allowed list.
+ */
+const getTargetClientUrl = (req) => {
+  const referer = req.get('referer');
+  const origin = req.get('origin');
+  
+  const source = origin || referer || '';
+  const matched = CLIENT_URLS.find(url => source.includes(url));
+  
+  return matched || CLIENT_URLS[0]; // Fallback to primary
+};
 
 // Update CORS to use the same allowed origins list for predictability
 app.use(cors({
@@ -77,9 +90,10 @@ app.get('/auth/google', (req, res, next) => {
 
 app.get('/auth/google/callback', (req, res, next) => {
   const dynamicCallback = `${req.protocol}://${req.get('host')}/auth/google/callback`;
+  const targetUrl = getTargetClientUrl(req);
   passport.authenticate('google', { 
     session: false, 
-    failureRedirect: `${PRIMARY_CLIENT_URL}/oauth/callback?error=oauth_failed`,
+    failureRedirect: `${targetUrl}/oauth/callback?error=oauth_failed`,
     callbackURL: dynamicCallback 
   })(req, res, next);
 }, (req, res) => {
@@ -91,35 +105,11 @@ app.get('/auth/google/callback', (req, res, next) => {
     role: req.user.role,
     token
   };
-  res.redirect(`${PRIMARY_CLIENT_URL}/oauth/callback?data=${encodeURIComponent(JSON.stringify(userObj))}`);
+  const targetUrl = getTargetClientUrl(req);
+  res.redirect(`${targetUrl}/oauth/callback?data=${encodeURIComponent(JSON.stringify(userObj))}`);
 });
 
-app.get('/auth/github', (req, res, next) => {
-  const dynamicCallback = `${req.protocol}://${req.get('host')}/auth/github/callback`;
-  passport.authenticate('github', { 
-    scope: ['user:email'],
-    callbackURL: dynamicCallback
-  })(req, res, next);
-});
-
-app.get('/auth/github/callback', (req, res, next) => {
-  const dynamicCallback = `${req.protocol}://${req.get('host')}/auth/github/callback`;
-  passport.authenticate('github', { 
-    session: false, 
-    failureRedirect: `${PRIMARY_CLIENT_URL}/oauth/callback?error=oauth_failed`,
-    callbackURL: dynamicCallback 
-  })(req, res, next);
-}, (req, res) => {
-  const token = generateToken(req.user._id, req.user.role);
-  const userObj = {
-    _id: req.user._id,
-    name: req.user.name,
-    email: req.user.email,
-    role: req.user.role,
-    token
-  };
-  res.redirect(`${PRIMARY_CLIENT_URL}/oauth/callback?data=${encodeURIComponent(JSON.stringify(userObj))}`);
-});
+// ... Google routes above ...
 
 app.use('/api/auth', authRoutes);
 app.use('/api/hotels', hotelRoutes);
