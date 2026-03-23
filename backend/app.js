@@ -66,7 +66,7 @@ app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
-app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'], prompt: 'select_account' }));
 app.get('/auth/google/callback', passport.authenticate('google', { session: false, failureRedirect: `${PRIMARY_CLIENT_URL}/oauth/callback?error=oauth_failed` }), (req, res) => {
   const token = generateToken(req.user._id, req.user.role);
   const userObj = {
