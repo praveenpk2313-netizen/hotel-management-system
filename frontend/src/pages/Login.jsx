@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-do
 import { useAuth } from '../context/AuthContext';
 import { useDispatch } from 'react-redux';
 import { loginStart, loginFailure } from '../redux/slices/authSlice';
-import { AlertCircle, Eye, EyeOff, Github, X, ShieldCheck, Mail, Lock } from 'lucide-react';
+import { AlertCircle, Eye, EyeOff, Github, Mail, Lock, CheckCircle2 } from 'lucide-react';
 import api from '../services/api';
 
 const Login = () => {
@@ -85,149 +85,145 @@ const Login = () => {
     <div style={{
       minHeight: '100vh',
       display: 'flex',
-      background: '#f8fafc',
-      fontFamily: '"Inter", sans-serif'
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: '#fcfaf7', // Soft off-white
+      padding: '2rem'
     }}>
       <div style={{
         display: 'flex',
         width: '100%',
-        maxWidth: '1440px',
-        margin: '2rem auto',
-        padding: '1rem',
-        gap: '2rem'
+        maxWidth: '1200px',
+        minHeight: '750px',
+        background: 'white',
+        borderRadius: '40px',
+        overflow: 'hidden',
+        boxShadow: '0 40px 100px rgba(0,0,0,0.08)',
+        border: '1px solid #f1f5f9'
       }}>
-        {/* Visual Side */}
+        
+        {/* Left Visual Panel */}
         <div style={{
-          flex: 1.2,
+          flex: 1.1,
           position: 'relative',
-          borderRadius: '32px',
-          overflow: 'hidden',
-          display: window.innerWidth < 900 ? 'none' : 'block',
-          boxShadow: '0 20px 50px rgba(0,0,0,0.1)'
+          display: window.innerWidth < 1000 ? 'none' : 'block'
         }}>
           <img 
-            src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=1200" 
-            alt="Luxury Hotel"
+            src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80&w=1200" 
+            alt="StayNow Experience"
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
           <div style={{
             position: 'absolute',
             inset: 0,
-            background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 60%)',
+            background: 'linear-gradient(to top, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.2) 60%)',
             padding: '4rem',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'flex-end'
           }}>
+             <div style={{ display: 'flex', gap: '8px', marginBottom: '2rem' }}>
+                {[1,2,3,4,5].map(i => <CheckCircle2 key={i} size={18} color="#c5a059" fill="#c5a059" />)}
+             </div>
              <h2 style={{ 
                color: 'white', 
-               fontSize: '3.5rem', 
-               fontWeight: '700', 
+               fontSize: '4rem', 
+               fontWeight: '400', 
                fontFamily: '"Playfair Display", serif',
                lineHeight: '1.1',
-               marginBottom: '1rem'
+               marginBottom: '1.5rem',
+               letterSpacing: '-1px'
              }}>
-               Experience<br />The Extraordinary.
+               Step Into<br />Excellence.
              </h2>
-             <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '1.2rem', maxWidth: '500px' }}>
-               Welcome back to StayNow. Your journey towards a perfect stay continues here.
+             <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '1.1rem', maxWidth: '450px', lineHeight: '1.7', fontWeight: '300' }}>
+               "Your gateway to the world's most curated stays. Login to continue your journey of premium hospitality."
              </p>
           </div>
         </div>
 
-        {/* Form Side */}
+        {/* Right Form Panel */}
         <div style={{
           flex: 1,
+          padding: '4rem',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
-          padding: '2rem',
-          maxWidth: '550px',
-          margin: 'auto'
+          background: 'white'
         }}>
-          <div style={{ marginBottom: '3rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1.5rem' }}>
-              <div style={{ background: '#1e1e1e', color: 'white', padding: '0.5rem', borderRadius: '12px' }}>
-                 <ShieldCheck size={28} />
-              </div>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '2px', margin: 0 }}>StayNow</h3>
+          <div style={{ marginBottom: '3.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2.5rem' }}>
+              <img src="/logo.png" style={{ width: '40px', height: '40px', objectFit: 'contain' }} alt="StayNow" />
+              <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#0f172a', margin: 0, letterSpacing: '1px' }}>StayNow</h3>
             </div>
-            <h1 style={{ fontSize: '2.5rem', fontWeight: '700', color: '#1e293b', marginBottom: '0.8rem' }}>Welcome Back</h1>
-            <p style={{ color: '#64748b', fontSize: '1.1rem' }}>Enter your details to access your account.</p>
+            <h1 style={{ fontSize: '3rem', fontWeight: '400', color: '#0f172a', marginBottom: '0.75rem', fontFamily: '"Playfair Display", serif' }}>Welcome Back</h1>
+            <p style={{ color: '#94a3b8', fontSize: '1rem', fontWeight: '500' }}>Please enter your credentials to access your portal.</p>
           </div>
 
           {error && (
             <div style={{ 
               display:'flex', alignItems:'center', gap:'0.8rem', 
-              background:'#fef2f2', color:'#b91c1c', border: '1px solid #fecaca',
-              padding:'1rem', borderRadius:'16px', marginBottom:'2rem', fontSize:'0.9rem' 
+              background:'#fff1f2', color:'#e11d48', border: '1px solid #ffe4e6',
+              padding:'1.2rem', borderRadius:'20px', marginBottom:'2.5rem', fontSize:'0.95rem', fontWeight: '600'
             }}>
               <AlertCircle size={20} /> {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-              <label style={{ fontSize: '0.95rem', fontWeight: '600', color: '#1e293b' }}>Email Address</label>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
+            <div className="input-group">
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '800', color: '#0f172a', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.75rem' }}>Email Address</label>
               <div style={{ position: 'relative' }}>
                 <input
                   type="email"
-                  placeholder="name@example.com"
-                  className="modern-input"
+                  placeholder="e.g. jason@staysnow.com"
+                  className="login-input"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
-                <Mail size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                <Mail size={18} className="input-icon" />
               </div>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <label style={{ fontSize: '0.95rem', fontWeight: '600', color: '#1e293b' }}>Password</label>
-                <Link to="/forgot-password" style={{ fontSize: '0.85rem', color: '#111', fontWeight: '600', textDecoration: 'none' }}>Forgot Password?</Link>
+            <div className="input-group">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: '800', color: '#0f172a', textTransform: 'uppercase', letterSpacing: '1px' }}>Password</label>
+                <Link to="/forgot-password" style={{ fontSize: '0.85rem', color: '#c5a059', fontWeight: '800', textDecoration: 'none' }}>Reset?</Link>
               </div>
               <div style={{ position: 'relative' }}>
                 <input
                   type={showPwd ? 'text' : 'password'}
                   placeholder="••••••••"
-                  className="modern-input"
+                  className="login-input"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
-                <Lock size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                <Lock size={18} className="input-icon" />
                 <button
                   type="button"
                   onClick={() => setShowPwd(!showPwd)}
-                  style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
+                  style={{ position: 'absolute', right: '1.25rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
                 >
                   {showPwd ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="modern-submit"
-            >
-              {loading ? 'Authenticating...' : 'Sign In'}
+            <button type="submit" disabled={loading} className="login-submit">
+              {loading ? 'Authenticating...' : 'Sign In To Account'}
             </button>
           </form>
 
-          <p style={{ textAlign: 'center', marginTop: '2rem', color: '#64748b', fontSize: '0.95rem' }}>
-            Don't have an account? <Link to="/register" style={{ color: '#111', fontWeight: '700', textDecoration: 'none', marginLeft: '0.4rem' }}>Create Account</Link>
-          </p>
-
-          <div style={{ margin: '2.5rem 0', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }}></div>
-            <span style={{ fontSize: '0.8rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: '600' }}>Or continue with</span>
-            <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }}></div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', margin: '3rem 0' }}>
+            <div style={{ flex: 1, height: '1px', background: '#f1f5f9' }}></div>
+            <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px' }}>Social Login</span>
+            <div style={{ flex: 1, height: '1px', background: '#f1f5f9' }}></div>
           </div>
 
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <button onClick={() => openOAuthPopup('google')} className="social-btn">
+          <div style={{ display: 'flex', gap: '1.25rem' }}>
+            <button onClick={() => openOAuthPopup('google')} className="social-login-btn">
                <svg width="20" height="20" viewBox="0 0 24 24">
                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -235,70 +231,91 @@ const Login = () => {
                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                </svg> Google
             </button>
-            <button onClick={() => openOAuthPopup('github')} className="social-btn">
+            <button onClick={() => openOAuthPopup('github')} className="social-login-btn">
                <Github size={20} /> GitHub
             </button>
           </div>
+
+          <p style={{ textAlign: 'center', marginTop: '3.5rem', color: '#94a3b8', fontSize: '0.95rem', fontWeight: '500' }}>
+            New to StayNow? <Link to="/register" style={{ color: '#0f172a', fontWeight: '800', textDecoration: 'none', marginLeft: '0.4rem', borderBottom: '2px solid #c5a059' }}>Create Account</Link>
+          </p>
         </div>
       </div>
 
       <style>{`
-        .modern-input {
+        .login-input {
           width: 100%;
-          height: 54px;
-          padding: 0 1rem 0 3rem;
-          border-radius: 16px;
-          border: 1px solid #e2e8f0;
-          background: #fff;
+          height: 60px;
+          padding: 0 1.5rem 0 3.5rem;
+          border-radius: 20px;
+          border: 1.5px solid #f1f5f9;
+          background: #f8fafc;
           font-size: 1rem;
           outline: none;
-          transition: all 0.2s;
+          transition: 0.3s;
           box-sizing: border-box;
+          color: #0f172a;
+          font-weight: 500;
         }
-        .modern-input:focus {
-          border-color: #1e1e1e;
-          box-shadow: 0 0 0 4px rgba(0,0,0,0.03);
+        .login-input:focus {
+          border-color: #c5a059;
+          background: white;
+          box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.1);
         }
-        .modern-submit {
-          height: 56px;
-          background: #1e1e1e;
+        .input-icon {
+          position: absolute;
+          left: 1.25rem;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #94a3b8;
+          transition: 0.3s;
+        }
+        .login-input:focus + .input-icon {
+          color: #c5a059;
+        }
+        .login-submit {
+          height: 64px;
+          background: #0f172a;
           color: white;
-          border-radius: 16px;
+          border-radius: 20px;
           border: none;
-          font-weight: 700;
-          font-size: 1.1rem;
+          font-weight: 800;
+          font-size: 1.05rem;
           cursor: pointer;
-          transition: all 0.2s;
+          transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
           margin-top: 1rem;
-          box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+          box-shadow: 0 15px 30px rgba(15, 23, 42, 0.2);
         }
-        .modern-submit:hover:not(:disabled) {
-          background: #333;
-          transform: translateY(-2px);
-          box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+        .login-submit:hover:not(:disabled) {
+          transform: translateY(-3px);
+          box-shadow: 0 20px 40px rgba(15, 23, 42, 0.3);
+          background: #1e293b;
         }
-        .modern-submit:active {
-          transform: translateY(0);
-        }
-        .social-btn {
+        .login-submit:disabled { opacity: 0.7; cursor: not-allowed; }
+        .social-login-btn {
           flex: 1;
-          height: 54px;
-          border-radius: 16px;
-          border: 1px solid #e2e8f0;
+          height: 58px;
+          border-radius: 20px;
+          border: 1.5px solid #f1f5f9;
           background: white;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 0.8rem;
-          font-weight: 600;
+          gap: 0.75rem;
+          font-weight: 700;
           color: #1e293b;
           cursor: pointer;
-          transition: all 0.2s;
+          transition: 0.3s;
         }
-        .social-btn:hover {
+        .social-login-btn:hover {
           background: #f8fafc;
           border-color: #cbd5e1;
-          transform: translateY(-1px);
+          transform: scale(1.02);
+        }
+
+        @media (max-width: 1000px) {
+          .login-page-container { padding: 1rem; }
+          .login-form-panel { padding: 3rem !important; }
         }
       `}</style>
     </div>
