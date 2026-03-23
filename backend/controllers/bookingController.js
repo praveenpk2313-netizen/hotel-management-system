@@ -2,7 +2,6 @@ const Booking = require('../models/Booking');
 const Room = require('../models/Room');
 const Hotel = require('../models/Hotel');
 const User = require('../models/User');
-const Payment = require('../models/Payment');
 const { sendEmail, getBookingTemplate, getCancellationTemplate } = require('../utils/emailService');
 const { generateInvoice } = require('../utils/pdfService');
 const { sendNotification } = require('../utils/socket');
@@ -18,145 +17,105 @@ const checkAvailability = async (roomId, checkIn, checkOut, excludeBookingId = n
       { checkInDate: { $lte: checkIn }, checkOutDate: { $gte: checkOut } }
     ]
   };
-
   if (excludeBookingId) query._id = { $ne: excludeBookingId };
-
-  const existingBookingsCount = await Booking.countDocuments(query);
+  const existingCount = await Booking.countDocuments(query);
   const room = await Room.findById(roomId);
-  
-  if (!room) return false;
-  return existingBookingsCount < (room.totalRooms || 1);
+  return room ? existingCount < (room.totalRooms || 1) : false;
 };
 
 // @desc    Create new booking
 const createBooking = async (req, res) => {
   try {
-    const { hotelId, roomId, checkInDate, checkOutDate, totalPrice, numGuests, status, paymentStatus } = req.body;
+    const { hotelId, roomId, checkInDate, checkOutDate, totalPrice, numGuests } = req.body;
+    const checkIn = new Date(checkInDate);
+    const checkOut = new Date(checkOutDate);
+
+    if (!await checkAvailability(roomId, checkIn, checkOut)) {
+      return res.status(400).json({ message: 'Room not available for selected dates' });
+    }
+
+    const booking = await Booking.create({
+      userId: req.user._id,
+      hotelId, roomId, checkInDate: checkIn, checkOutDate: checkOut,
+      totalPrice, numGuests, status: 'confirmed'
+    });
+
+    // Notifications
+    setTimeout(async () => {
+      try {
+        const full = await Booking.findById(booking._id).populate('hotelId').populate('roomId').populate('userId');
+        if (full) {
+          const invoice = await generateInvoice(full);
+          const html = getBookingTemplate({ userName: full.userId.name, hotelName: full.hotelId.name, roomType: full.roomId.type, checkIn: full.checkInDate.toLocaleDateString(), checkOut: full.checkOutDate.toLocaleDateString(), totalPrice: full.totalPrice, bookingId: full._id });
+          await sendEmail(full.userId.email, "Booking Confirmed! 🎉", html, full.userId._id, 'booking', [{ filename: `invoice-${full._id}.pdf`, content: invoice }]);
+          await sendNotification({ userId: full.userId._id, title: "Booking Confirmed!", message: `Stay at ${full.hotelId.name} confirmed.`, type: 'booking', metaData: { bookingId: full._id } });
+        }
+      } catch (err) { console.error('Notification error:', err); }
+    }, 100);
+
+    res.status(201).json(booking);
+  } catch (err) { res.status(500).json({ message: 'Booking failed' }); }
+};
+
+// @desc    Get user bookings
+const getUserBookings = async (req, res) => {
+  const bookings = await Booking.find({ userId: req.user._id }).populate('hotelId').populate('roomId').sort('-createdAt');
+  res.json({ bookings, count: bookings.length });
+};
+
+// @desc    Update booking
+const updateBooking = async (req, res) => {
+  try {
+    const { checkInDate, checkOutDate, totalPrice } = req.body;
+    const booking = await Booking.findById(req.params.id);
+    if (!booking) return res.status(404).json({ message: 'Not found' });
 
     const checkIn = new Date(checkInDate);
     const checkOut = new Date(checkOutDate);
-    
-    const isAvailable = await checkAvailability(roomId, checkIn, checkOut);
-    if (!isAvailable) {
-      return res.status(400).json({ message: 'Room is not available for these dates' });
+    if (!await checkAvailability(booking.roomId, checkIn, checkOut, booking._id)) {
+      return res.status(400).json({ message: 'Dates taken' });
     }
-
-    const booking = new Booking({
-      userId: req.user._id,
-      hotelId,
-      roomId,
-      checkInDate: checkIn,
-      checkOutDate: checkOut,
-      totalPrice,
-      numGuests,
-      status: status || 'confirmed', // Auto confirm if possible or set to pending
-      paymentStatus: paymentStatus || 'unpaid'
-    });
-
-    const createdBooking = await booking.save();
-
-    // Notify user immediately via real-time
-    try {
-      const fullBooking = await Booking.findById(createdBooking._id)
-        .populate('hotelId', 'name')
-        .populate('roomId', 'type')
-        .populate('userId', 'name email');
-
-      if (fullBooking) {
-        // 1. Send Confirmation Email
-        const invoiceBuffer = await generateInvoice(fullBooking);
-        const html = getBookingTemplate({
-          userName: fullBooking.userId.name,
-          hotelName: fullBooking.hotelId.name,
-          roomType: fullBooking.roomId.type,
-          checkIn: fullBooking.checkInDate.toLocaleDateString(),
-          checkOut: fullBooking.checkOutDate.toLocaleDateString(),
-          totalPrice: fullBooking.totalPrice,
-          bookingId: fullBooking._id
-        });
-
-        await sendEmail(
-          fullBooking.userId.email,
-          "Booking Confirmed 🎉",
-          html,
-          fullBooking.userId._id,
-          'booking',
-          [{ filename: `invoice-${fullBooking._id}.pdf`, content: invoiceBuffer }]
-        );
-
-        // 2. Local Notification
-        await sendNotification({
-          userId: fullBooking.userId._id,
-          title: "Booking Confirmed! 🏨",
-          message: `Your stay at ${fullBooking.hotelId.name} has been confirmed.`,
-          type: 'booking',
-          metaData: { bookingId: fullBooking._id }
-        });
-
-        // 3. Notify Manager
-        const hotel = await Hotel.findById(fullBooking.hotelId._id);
-        if (hotel && hotel.managerId) {
-          await sendNotification({
-            userId: hotel.managerId,
-            title: "New Booking Received!",
-            message: `New reservation for ${fullBooking.roomId.type} at ${hotel.name}.`,
-            type: 'booking',
-            metaData: { bookingId: fullBooking._id }
-          });
-        }
-      }
-    } catch (err) {
-      console.error('Post-booking notification failed:', err);
-    }
-
-    res.status(201).json(createdBooking);
-  } catch (error) {
-    console.error('Booking Error:', error);
-    res.status(500).json({ message: 'Server error during booking' });
-  }
+    booking.checkInDate = checkIn;
+    booking.checkOutDate = checkOut;
+    if (totalPrice) booking.totalPrice = totalPrice;
+    const updated = await booking.save();
+    res.json(updated);
+  } catch (err) { res.status(500).json({ message: 'Update failed' }); }
 };
 
-const getUserBookings = async (req, res) => {
-  try {
-    const bookings = await Booking.find({ userId: req.user._id })
-      .populate('hotelId', 'name location city images')
-      .populate('roomId', 'type price')
-      .sort('-createdAt');
-    res.json({ bookings, count: bookings.length });
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching bookings' });
-  }
-};
-
+// @desc    Cancel booking
 const cancelBooking = async (req, res) => {
   try {
     const booking = await Booking.findById(req.params.id);
-    if (!booking) return res.status(404).json({ message: 'Booking not found' });
-
+    if (!booking) return res.status(404).json({ message: 'Not found' });
     booking.status = 'cancelled';
     await booking.save();
+    res.json({ message: 'Cancelled' });
+  } catch (err) { res.status(500).json({ message: 'Cancel failed' }); }
+};
 
-    res.json({ message: 'Booking cancelled successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Error cancelling booking' });
-  }
+// @desc    Update status
+const updateBookingStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const booking = await Booking.findById(req.params.id);
+    if (!booking) return res.status(404).json({ message: 'Not found' });
+    booking.status = status;
+    const updated = await booking.save();
+    res.json(updated);
+  } catch (err) { res.status(500).json({ message: 'Status update failed' }); }
 };
 
 const getAllBookings = async (req, res) => {
-  try {
-    const bookings = await Booking.find({})
-      .populate('userId', 'name email')
-      .populate('hotelId', 'name')
-      .populate('roomId', 'type');
-    res.json(bookings);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching bookings' });
-  }
+  const all = await Booking.find({}).populate('userId').populate('hotelId');
+  res.json(all);
 };
 
 module.exports = { 
   createBooking, 
   getUserBookings, 
+  updateBooking, 
   cancelBooking, 
-  getAllBookings
+  getAllBookings,
+  updateBookingStatus
 };
