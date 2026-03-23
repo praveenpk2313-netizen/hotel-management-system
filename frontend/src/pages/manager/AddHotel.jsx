@@ -146,7 +146,7 @@ const AddHotel = () => {
 
           <div style={{ marginTop: '3rem' }}>
             <label className="label-custom" style={{ marginBottom: '1.5rem', display: 'block' }}>Key Amenities & Services</label>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '1rem' }}>
+            <div className="amenities-grid-custom">
               {AMENITIES_LIST.map((item) => (
                 <div 
                   key={item.name}
@@ -232,6 +232,23 @@ const AddHotel = () => {
         .input-custom { padding: 1.1rem 1.4rem; border: 1.5px solid #e2e8f0; border-radius: 16px; outline: none; transition: 0.3s; font-size: 1rem; width: 100%; box-sizing: border-box; }
         .input-custom:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.1); }
         .image-upload-btn:hover { border-color: var(--primary); background: #fdfcfb; color: var(--primary); }
+        .amenities-grid-custom { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; }
+
+        @media (max-width: 900px) {
+          .glass-panel { padding: 2rem !important; }
+          .luxury-font { font-size: 2.2rem !important; }
+        }
+
+        @media (max-width: 640px) {
+          .glass-panel { padding: 1.5rem !important; border-radius: 20px !important; }
+          .input-custom { padding: 0.9rem 1.1rem !important; }
+          .amenities-grid-custom { grid-template-columns: 1fr 1fr !important; }
+        }
+
+        @media (max-width: 480px) {
+          .amenities-grid-custom { grid-template-columns: 1fr !important; }
+          .luxury-font { font-size: 1.8rem !important; }
+        }
       `}</style>
     </div>
   );
