@@ -77,7 +77,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID || 'dummy-google-client-id',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'dummy-google-client-secret',
-      callbackURL: process.env.GOOGLE_CALLBACK_URL || "http://localhost:5000/auth/google/callback",
+      callbackURL: process.env.GOOGLE_CALLBACK_URL || "https://hotel-management-system-4g0p.onrender.com/auth/google/callback",
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
