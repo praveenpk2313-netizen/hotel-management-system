@@ -1,64 +1,80 @@
-import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
-import { loginSuccess, logout as reduxLogout } from '../redux/slices/authSlice';
+import { loginSuccess, logout as logoutAction } from '../redux/slices/authSlice';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem('user');
-    const savedRole = localStorage.getItem('role');
-    let parsedUser = saved && saved !== 'undefined' ? JSON.parse(saved) : null;
-    if (parsedUser && savedRole) {
-      parsedUser.role = savedRole;
-    }
-    return parsedUser;
-  });
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
 
-  // Sync Redux on mount and finish loading
+  // 1. Initial rehydration from localStorage
   useEffect(() => {
-    const savedToken = localStorage.getItem('token');
-    const savedRole  = localStorage.getItem('role');
-    
-    if (user && savedToken) {
-      dispatch(loginSuccess({ ...user, token: savedToken, role: savedRole || user.role }));
-    }
-    setLoading(false);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    const initAuth = () => {
+      try {
+        const savedUser = localStorage.getItem('user');
+        const savedToken = localStorage.getItem('token');
+        const savedRole = localStorage.getItem('role');
 
-  /**
-   * Call after a successful login / OAuth callback.
-   * Persists to localStorage AND syncs Redux.
-   */
-  const login = useCallback((userData) => {
-    const { token, ...rest } = userData;
-    setUser(userData);
+        if (savedUser && savedToken && savedUser !== 'undefined') {
+          const parsed = JSON.parse(savedUser);
+          const userData = { ...parsed, token: savedToken, role: savedRole || parsed.role };
+          
+          setUser(userData);
+          dispatch(loginSuccess(userData));
+        }
+      } catch (err) {
+        console.error('Auth rehydration failed:', err);
+        localStorage.clear();
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    // --- localStorage ---
-    localStorage.setItem('user',  JSON.stringify(rest));
-    localStorage.setItem('token', token);
-    localStorage.setItem('role',  userData.role || '');
-
-    // --- Redux ---
-    dispatch(loginSuccess({ ...rest, token, role: userData.role }));
+    initAuth();
   }, [dispatch]);
 
-  /**
-   * Clear everything on logout.
-   */
-  const logout = useCallback(() => {
-    setUser(null);
+  const login = useCallback((userData) => {
+    // Ensure we start with a clean slate to avoid role leakage
     localStorage.removeItem('user');
     localStorage.removeItem('token');
     localStorage.removeItem('role');
-    dispatch(reduxLogout());
+
+    const { token, role, ...rest } = userData;
+    
+    // Save to localStorage
+    localStorage.setItem('user', JSON.stringify(rest));
+    localStorage.setItem('token', token);
+    localStorage.setItem('role', role || '');
+    
+    // Update internal state
+    const cleanUser = { ...rest, token, role };
+    setUser(cleanUser);
+    
+    // Sync with Redux
+    dispatch(loginSuccess(cleanUser));
   }, [dispatch]);
 
+  const logout = useCallback(() => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    setUser(null);
+    dispatch(logoutAction());
+  }, [dispatch]);
+
+  const updateUser = useCallback((updatedData) => {
+    setUser(prev => {
+      const newUser = { ...prev, ...updatedData };
+      localStorage.setItem('user', JSON.stringify(newUser));
+      return newUser;
+    });
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
-      {!loading && children}
+    <AuthContext.Provider value={{ user, loading, login, logout, updateUser }}>
+      {children}
     </AuthContext.Provider>
   );
 };
