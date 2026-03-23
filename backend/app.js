@@ -80,23 +80,32 @@ app.get('/', (req, res) => {
 });
 
 app.get('/auth/google', (req, res, next) => {
+  const from = req.query.from || '';
+  const state = from ? Buffer.from(JSON.stringify({ from })).toString('base64') : undefined;
+  
   const dynamicCallback = `${req.protocol}://${req.get('host')}/auth/google/callback`;
   passport.authenticate('google', { 
     scope: ['profile', 'email'], 
     prompt: 'select_account',
-    callbackURL: dynamicCallback
+    callbackURL: dynamicCallback,
+    state: state
   })(req, res, next);
 });
 
 app.get('/auth/google/callback', (req, res, next) => {
+  const stateVal = req.query.state ? JSON.parse(Buffer.from(req.query.state, 'base64').toString()) : {};
+  const targetUrl = stateVal.from || getTargetClientUrl(req);
+  
   const dynamicCallback = `${req.protocol}://${req.get('host')}/auth/google/callback`;
-  const targetUrl = getTargetClientUrl(req);
   passport.authenticate('google', { 
     session: false, 
     failureRedirect: `${targetUrl}/oauth/callback?error=oauth_failed`,
     callbackURL: dynamicCallback 
   })(req, res, next);
 }, (req, res) => {
+  const stateVal = req.query.state ? JSON.parse(Buffer.from(req.query.state, 'base64').toString()) : {};
+  const targetUrl = stateVal.from || getTargetClientUrl(req);
+  
   const token = generateToken(req.user._id, req.user.role);
   const userObj = {
     _id: req.user._id,
@@ -105,7 +114,6 @@ app.get('/auth/google/callback', (req, res, next) => {
     role: req.user.role,
     token
   };
-  const targetUrl = getTargetClientUrl(req);
   res.redirect(`${targetUrl}/oauth/callback?data=${encodeURIComponent(JSON.stringify(userObj))}`);
 });
 

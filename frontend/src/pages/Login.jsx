@@ -49,7 +49,8 @@ const Login = () => {
   }, [login, navigate]);
 
   const openOAuthPopup = (provider) => {
-    const url = `${API_BASE_URL}/auth/${provider}`;
+    const origin = window.location.origin;
+    const url = `${API_BASE_URL}/auth/${provider}?from=${encodeURIComponent(origin)}`;
     const w = 500, h = 600;
     const left = window.screenX + (window.outerWidth  - w) / 2;
     const top  = window.screenY + (window.outerHeight - h) / 2;
