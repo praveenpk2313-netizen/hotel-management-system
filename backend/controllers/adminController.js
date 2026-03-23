@@ -236,7 +236,16 @@ const sendPromotion = async (req, res) => {
       sendEmail(user.email, title, html, user._id, 'promotion')
     );
 
-    await Promise.all(emailPromises);
+    const notificationPromises = users.map(user => 
+      sendNotification({
+        userId: user._id,
+        title: title || "New Promotion Alert 🎁",
+        message: content.substring(0, 80) + (content.length > 80 ? '...' : ''),
+        type: 'promotion'
+      })
+    );
+
+    await Promise.all([...emailPromises, ...notificationPromises]);
     res.json({ message: `Promotion sent to ${users.length} users.` });
   } catch (error) {
     res.status(500).json({ message: error.message });

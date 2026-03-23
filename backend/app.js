@@ -17,6 +17,8 @@ const uploadRoutes = require('./routes/uploadRoutes');
 const passport = require('./config/passport');
 const path = require('path');
 const generateToken = require('./utils/generateToken');
+const { sendNotification } = require('./utils/socket');
+const { sendEmail, getLoginTemplate } = require('./utils/emailService');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -114,6 +116,23 @@ app.get('/auth/google/callback', (req, res, next) => {
     role: req.user.role,
     token
   };
+
+  // ─── Post-Login Notifications (OAuth) ──────────────────────────────────
+  setTimeout(async () => {
+    try {
+      const time = new Date().toLocaleString();
+      const device = req.headers['user-agent'] || 'Unknown Device (OAuth)';
+      const html = getLoginTemplate({ name: req.user.name, time, device });
+      await sendEmail(req.user.email, 'New Login Detected 🔐', html, req.user._id, 'system');
+      await sendNotification({
+        userId: req.user._id,
+        title: "Social Login Successful 🔐",
+        message: `Your account was logged in via Google at ${time}.`,
+        type: 'system'
+      });
+    } catch (err) { console.error('OAuth login notify fail:', err); }
+  }, 100);
+
   res.redirect(`${targetUrl}/oauth/callback?data=${encodeURIComponent(JSON.stringify(userObj))}`);
 });
 

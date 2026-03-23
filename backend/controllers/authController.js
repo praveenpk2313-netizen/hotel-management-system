@@ -2,7 +2,7 @@ const crypto                           = require('crypto');
 const User                             = require('../models/User');
 const generateToken                    = require('../utils/generateToken');
 const { sendNotification }             = require('../utils/socket');
-const { sendVerificationEmail, sendPasswordResetEmail } = require('../utils/emailService');
+const { sendVerificationEmail, sendPasswordResetEmail, sendEmail, getLoginTemplate } = require('../utils/emailService');
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -179,6 +179,28 @@ const authUser = async (req, res) => {
 
     user.lastLogin = new Date();
     await user.save({ validateBeforeSave: false });
+
+    // ─── Post-Login Notifications ───────────────────────────────────────────
+    setTimeout(async () => {
+      try {
+        const time = new Date().toLocaleString();
+        const device = req.headers['user-agent'] || 'Unknown Device';
+        
+        // 1. Send Email
+        const html = getLoginTemplate({ name: user.name, time, device });
+        await sendEmail(user.email, 'New Login Detected 🔐', html, user._id, 'system');
+
+        // 2. Send Real-time Notification
+        await sendNotification({
+          userId: user._id,
+          title: "New Login Detected 🔐",
+          message: `Your account was logged in at ${time}.`,
+          type: 'system'
+        });
+      } catch (err) {
+        console.error('Post-login notification failed:', err);
+      }
+    }, 100);
 
     const token = generateToken(user._id, user.role);
     return res.json({ ...buildUserResponse(user), token });
