@@ -24,13 +24,18 @@ app.set('trust proxy', 1);
 // Frontend origin(s) handling - handle multiple comma-separated URLs
 const getClientOrigins = () => {
   const envUrl = process.env.CLIENT_URL;
-  const origins = envUrl 
-    ? envUrl.split(',').map(url => url.trim().replace(/\/$/, ""))
-    : ['http://localhost:5173', 'https://hotel-management-system-zeta-neon.vercel.app'];
+  let origins = [];
   
-  // Guarantee common deployment origins for the user
-  if (!origins.includes('https://hotel-management-system-zeta-neon.vercel.app')) {
-    origins.push('https://hotel-management-system-zeta-neon.vercel.app');
+  if (envUrl) {
+    origins = envUrl.split(',').map(url => url.trim().replace(/\/$/, ""));
+  } else {
+    origins = ['http://localhost:5173', 'https://hotel-management-system-zeta-neon.vercel.app'];
+  }
+  
+  // Always include the Vercel URL to avoid any environment misconfiguration
+  const vercelApp = 'https://hotel-management-system-zeta-neon.vercel.app';
+  if (!origins.includes(vercelApp)) {
+    origins.push(vercelApp);
   }
   return origins;
 };

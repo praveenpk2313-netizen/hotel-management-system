@@ -6,7 +6,19 @@ export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:50
 
 const api = axios.create({
   baseURL: `${API_BASE_URL}/api`,
+  timeout: 10000, // 10 second timeout
 });
+
+// Response interceptor to handle common errors like timeouts
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.code === 'ECONNABORTED') {
+      console.error('API Error: Request timed out');
+    }
+    return Promise.reject(error);
+  }
+);
 
 // Attach JWT to every request automatically
 api.interceptors.request.use((config) => {
