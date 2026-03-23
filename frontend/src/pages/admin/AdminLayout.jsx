@@ -97,7 +97,7 @@ const AdminLayout = () => {
           {isSidebarOpen && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <ShieldCheck size={24} color="#38bdf8" />
-              <h2 className="luxury-font" style={{ fontSize: '1.5rem', margin: 0, color: 'white' }}>PK UrbanStay Admin</h2>
+              <h2 className="luxury-font" style={{ fontSize: '1.5rem', margin: 0, color: 'white' }}>StayNow Admin</h2>
             </div>
           )}
           <button 

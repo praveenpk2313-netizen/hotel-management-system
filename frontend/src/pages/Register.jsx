@@ -105,7 +105,7 @@ const Register = () => {
                lineHeight: '1.1',
                marginBottom: '1rem'
              }}>
-               Join The<br />Stay Savvy Club.
+               Join The<br />StayNow Club.
              </h2>
              <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '1.2rem', maxWidth: '500px' }}>
                Create an account to start your journey towards exclusive stays and premium hospitality.
@@ -128,7 +128,7 @@ const Register = () => {
               <div style={{ background: '#1e1e1e', color: 'white', padding: '0.5rem', borderRadius: '12px' }}>
                  <ShieldCheck size={28} />
               </div>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '2px', margin: 0 }}>Stay Savvy</h3>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '2px', margin: 0 }}>StayNow</h3>
             </div>
             <h1 style={{ fontSize: '2.5rem', fontWeight: '700', color: '#1e293b', marginBottom: '0.8rem' }}>Create Account</h1>
             <p style={{ color: '#64748b', fontSize: '1.1rem' }}>Step into a world of curated experiences.</p>

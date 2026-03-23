@@ -88,7 +88,7 @@ const ManagerLayout = () => {
         zIndex: 100
       }}>
         <div style={{ padding: '2rem 1.5rem', display: 'flex', alignItems: 'center', justifyContent: isSidebarOpen ? 'space-between' : 'center' }}>
-          {isSidebarOpen && <h2 className="luxury-font" style={{ fontSize: '1.25rem', margin: 0, color: '#c5a059' }}>PK UrbanStay Manager</h2>}
+          {isSidebarOpen && <h2 className="luxury-font" style={{ fontSize: '1.25rem', margin: 0, color: '#c5a059' }}>StayNow Manager</h2>}
           <button 
             onClick={() => setSidebarOpen(!isSidebarOpen)}
             style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
