@@ -5,7 +5,11 @@ import {
   createManagerHotel, 
   updateManagerHotel, 
   deleteManagerHotel,
-  uploadImage
+  uploadImage,
+  fetchRooms, 
+  createManagerRoom, 
+  updateManagerRoom, 
+  deleteManagerRoom 
 } from '../../services/api';
 import { 
   Plus, 
@@ -21,10 +25,28 @@ import {
   ChevronRight,
   ArrowLeft,
   Users,
-  Bed
+  Bed,
+  Check
 } from 'lucide-react';
-import { fetchRooms, createManagerRoom, updateManagerRoom, deleteManagerRoom } from '../../services/api';
 import { formatCurrency } from '../../utils/helpers';
+
+const AMENITIES_LIST = [
+  { id: 'wifi', name: 'Free Wi-Fi', icon: '📶' },
+  { id: 'front-desk', name: '24/7 Front Desk', icon: '🛎️' },
+  { id: 'ac', name: 'Air Conditioning', icon: '❄️' },
+  { id: 'room-service', name: 'Room Service', icon: '🍽️' },
+  { id: 'housekeeping', name: 'Daily Housekeeping', icon: '🧹' },
+  { id: 'power', name: 'Power Backup', icon: '🔌' },
+  { id: 'restaurant', name: 'Restaurant', icon: '🍴' },
+  { id: 'breakfast', name: 'Complimentary Breakfast', icon: '🥐' },
+  { id: 'pool', name: 'Swimming Pool', icon: '🏊' },
+  { id: 'gym', name: 'Gym / Fitness Center', icon: '🏋️' },
+  { id: 'spa', name: 'Spa & Wellness', icon: '💆' },
+  { id: 'lounge', name: 'Lounge Area', icon: '🛋️' },
+  { id: 'parking', name: 'Free Parking', icon: '🅿️' },
+  { id: 'pickup', name: 'Airport Pickup/Drop', icon: '🚖' },
+  { id: 'travel', name: 'Travel Desk', icon: '🧳' }
+];
 
 const ManagerHotels = () => {
   const navigate = useNavigate();
@@ -38,7 +60,7 @@ const ManagerHotels = () => {
     description: '',
     address: '',
     city: '',
-    amenities: '',
+    amenities: [],
     images: []
   });
   const [submitting, setSubmitting] = useState(false);
@@ -80,7 +102,7 @@ const ManagerHotels = () => {
       setEditingHotel(hotel);
       setForm({
         ...hotel,
-        amenities: hotel.amenities.join(', ')
+        amenities: Array.isArray(hotel.amenities) ? hotel.amenities : []
       });
     } else {
       setEditingHotel(null);
@@ -90,11 +112,20 @@ const ManagerHotels = () => {
         description: '',
         address: '',
         city: '',
-        amenities: '',
+        amenities: [],
         images: []
       });
     }
     setShowModal(true);
+  };
+
+  const toggleAmenity = (name) => {
+    setForm(prev => ({
+      ...prev,
+      amenities: prev.amenities.includes(name)
+        ? prev.amenities.filter(a => a !== name)
+        : [...prev.amenities, name]
+    }));
   };
 
   const handleImageUpload = async (e) => {
@@ -120,16 +151,11 @@ const ManagerHotels = () => {
     setSubmitting(true);
     setError('');
 
-    const hotelData = {
-      ...form,
-      amenities: form.amenities.split(',').map(a => a.trim()).filter(a => a)
-    };
-
     try {
       if (editingHotel) {
-        await updateManagerHotel(editingHotel._id, hotelData);
+        await updateManagerHotel(editingHotel._id, form);
       } else {
-        await createManagerHotel(hotelData);
+        await createManagerHotel(form);
       }
       setShowModal(false);
       loadHotels();
@@ -304,8 +330,6 @@ const ManagerHotels = () => {
                       transition: '0.2s',
                       marginTop: '1.5rem'
                     }}
-                    onMouseOver={(e) => e.currentTarget.style.background = '#334155'}
-                    onMouseOut={(e) => e.currentTarget.style.background = '#1e293b'}
                   >
                     <BedDouble size={20} /> Manage Rooms <ChevronRight size={18} />
                   </button>
@@ -483,7 +507,7 @@ const ManagerHotels = () => {
           <div className="animate-fade" style={{ 
             background: 'white', 
             width: '100%', 
-            maxWidth: '720px', 
+            maxWidth: '1000px', 
             maxHeight: '90vh',
             borderRadius: '24px', 
             display: 'flex', 
@@ -507,7 +531,6 @@ const ManagerHotels = () => {
               )}
 
               <form id="hotelForm" onSubmit={handleSubmit}>
-                {/* Row 1: Name + Location */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem', marginBottom: '1.25rem' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     <label className="form-label">Hotel Name</label>
@@ -519,7 +542,6 @@ const ManagerHotels = () => {
                   </div>
                 </div>
 
-                {/* Row 2: City + Address */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem', marginBottom: '1.25rem' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     <label className="form-label">City</label>
@@ -531,19 +553,44 @@ const ManagerHotels = () => {
                   </div>
                 </div>
 
-                {/* Row 3: Description */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.25rem' }}>
                   <label className="form-label">Description</label>
                   <textarea required rows="3" value={form.description} onChange={e => setForm({...form, description: e.target.value})} className="form-input" style={{ resize: 'vertical' }}></textarea>
                 </div>
 
-                {/* Row 4: Amenities */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.25rem' }}>
-                  <label className="form-label">Amenities (comma separated)</label>
-                  <input required type="text" value={form.amenities} onChange={e => setForm({...form, amenities: e.target.value})} className="form-input" placeholder="WiFi, Pool, Spa, Breakfast" />
+                {/* Amenities Grid */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.5rem' }}>
+                  <label className="form-label">Amenities & Services</label>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '0.75rem' }}>
+                    {AMENITIES_LIST.map((item) => (
+                      <div 
+                        key={item.name}
+                        onClick={() => toggleAmenity(item.name)}
+                        style={{
+                          padding: '0.75rem 1rem',
+                          borderRadius: '12px',
+                          border: `2px solid ${form.amenities.includes(item.name) ? 'var(--primary)' : '#f1f5f9'}`,
+                          background: form.amenities.includes(item.name) ? 'rgba(197, 160, 89, 0.05)' : '#f8fafc',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.75rem',
+                          transition: '0.2s',
+                          position: 'relative'
+                        }}
+                      >
+                        <span style={{ fontSize: '1.2rem' }}>{item.icon}</span>
+                        <span style={{ fontSize: '0.8rem', fontWeight: '600' }}>{item.name}</span>
+                        {form.amenities.includes(item.name) && (
+                          <div style={{ position: 'absolute', top: '-5px', right: '-5px', background: 'var(--primary)', color: 'white', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Check size={12} strokeWidth={4} />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
-                {/* Row 5: Images */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                   <label className="form-label">Hotel Images</label>
                   <div className="image-upload-grid">
@@ -563,7 +610,6 @@ const ManagerHotels = () => {
               </form>
             </div>
 
-            {/* Modal Footer */}
             <div style={{ padding: '1.25rem 2rem', borderTop: '1px solid #f1f5f9', display: 'flex', gap: '1rem', background: '#fdfcfb', flexShrink: 0 }}>
               <button type="button" onClick={() => setShowModal(false)} className="btn-cancel" style={{ padding: '0.75rem 1.5rem', fontSize: '0.95rem' }}>Cancel</button>
               <button type="submit" form="hotelForm" disabled={submitting} className="btn-primary" style={{ flex: 1, padding: '0.75rem 1.5rem', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontSize: '0.95rem' }}>
@@ -571,68 +617,21 @@ const ManagerHotels = () => {
                 {editingHotel ? 'Update Hotel' : 'Add Hotel'}
               </button>
             </div>
-
           </div>
         </div>
       )}
 
       <style>{`
-        .hotel-form {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 1.5rem;
-        }
-        
-        .form-group {
-          display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
-        }
-
-        .full-width {
-          grid-column: span 2;
-        }
-
-        .form-label {
-          font-weight: 700;
-          font-size: 0.9rem;
-          color: #1e293b;
-        }
-
-        .form-input { 
-          padding: 0.8rem 1rem; 
-          border: 1px solid #e2e8f0; 
-          border-radius: 10px; 
-          outline: none; 
-          transition: 0.2s; 
-          font-family: inherit;
-        }
+        .hotel-form { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .form-group { display: flex; flexDirection: column; gap: 0.5rem; }
+        .full-width { grid-column: span 2; }
+        .form-label { font-weight: 700; font-size: 0.9rem; color: #1e293b; }
+        .form-input { padding: 0.8rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px; outline: none; transition: 0.2s; font-family: inherit; }
         .form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.1); }
-
-        .image-upload-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-          gap: 1rem;
-          margin-top: 0.5rem;
-        }
-
-        .btn-cancel {
-          flex: 1;
-          padding: 1rem;
-          border-radius: 10px;
-          background: #f1f5f9;
-          border: none;
-          font-weight: 700;
-          color: #475569;
-          cursor: pointer;
-          transition: 0.2s;
-        }
+        .image-upload-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 1rem; margin-top: 0.5rem; }
+        .btn-cancel { flex: 1; padding: 1rem; border-radius: 10px; background: #f1f5f9; border: none; font-weight: 700; color: #475569; cursor: pointer; transition: 0.2s; }
         .btn-cancel:hover { background: #e2e8f0; }
-
-        @media (max-width: 768px) {
-          .hotel-form { grid-template-columns: 1fr; }
-          .full-width { grid-column: span 1; }
-        }
+        @media (max-width: 768px) { .hotel-form { grid-template-columns: 1fr; } .full-width { grid-column: span 1; } }
       `}</style>
     </div>
   );
