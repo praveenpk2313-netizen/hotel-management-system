@@ -118,9 +118,9 @@ function App() {
           
           {/* Manager Portal */}
           <Route path="/manager">
-            <Route index element={user ? <Navigate to="dashboard" replace /> : <ManagerLoginPage />} />
-            <Route path="login" element={user ? <Navigate to="dashboard" replace /> : <ManagerLoginPage />} />
-            <Route path="register" element={user ? <Navigate to="dashboard" replace /> : <ManagerRegisterPage />} />
+            <Route index element={user?.role === 'manager' || user?.role === 'admin' ? <Navigate to="dashboard" replace /> : <ManagerLoginPage />} />
+            <Route path="login" element={user?.role === 'manager' || user?.role === 'admin' ? <Navigate to="dashboard" replace /> : <ManagerLoginPage />} />
+            <Route path="register" element={user?.role === 'manager' || user?.role === 'admin' ? <Navigate to="dashboard" replace /> : <ManagerRegisterPage />} />
             
             <Route element={<ProtectedRoute allowedRoles={['manager', 'admin']} redirectTo="/manager/login"><ManagerLayout /></ProtectedRoute>}>
               <Route path="dashboard" element={<ManagerDashboardPage />} />
@@ -135,9 +135,9 @@ function App() {
 
           {/* Admin Portal */}
           <Route path="/admin">
-            <Route index element={user ? <Navigate to="dashboard" replace /> : <AdminLoginPage />} />
-            <Route path="login" element={user ? <Navigate to="dashboard" replace /> : <AdminLoginPage />} />
-            <Route path="register" element={user ? <Navigate to="dashboard" replace /> : <AdminRegisterPage />} />
+            <Route index element={user?.role === 'admin' ? <Navigate to="dashboard" replace /> : <AdminLoginPage />} />
+            <Route path="login" element={user?.role === 'admin' ? <Navigate to="dashboard" replace /> : <AdminLoginPage />} />
+            <Route path="register" element={user?.role === 'admin' ? <Navigate to="dashboard" replace /> : <AdminRegisterPage />} />
             
             <Route element={<ProtectedRoute allowedRoles={['admin']} redirectTo="/admin/login"><AdminLayout /></ProtectedRoute>}>
               <Route path="dashboard" element={<AdminDashboardPage />} />
