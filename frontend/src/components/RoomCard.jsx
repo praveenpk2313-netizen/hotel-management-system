@@ -18,12 +18,22 @@ const RoomCard = ({ room, hotelId, hotelName, hotel }) => {
   const navigate = useNavigate();
 
   const handleBookNow = () => {
+    const checkInDate = new Date().toISOString();
+    const checkOutDate = new Date(Date.now() + 86400000).toISOString(); // +1 day
+
     navigate('/payment', { 
       state: { 
-        room, 
-        hotelId, 
-        hotelName, 
-        hotelImage: hotel?.images?.[0] 
+        selectedRoom: room,
+        hotel: hotel || { _id: hotelId, name: hotelName },
+        bookingData: {
+          hotel: hotelId,
+          room: room._id,
+          checkInDate,
+          checkOutDate,
+          numGuests: 2, // Default
+          totalPrice: room.price,
+          userName: 'Guest'
+        }
       } 
     });
   };

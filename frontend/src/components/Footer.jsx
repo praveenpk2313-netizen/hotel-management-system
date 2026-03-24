@@ -11,7 +11,7 @@ import {
 
 const Footer = () => {
   return (
-    <footer className="bg-booking-blue text-white pt-16 pb-12 mt-auto">
+    <footer id="about" className="bg-booking-blue text-white pt-16 pb-12 mt-auto">
       <div className="container-booking space-y-12">
         
         {/* Upper Footer: Simplified Links */}

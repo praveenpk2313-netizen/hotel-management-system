@@ -41,7 +41,7 @@ const Navbar = () => {
       <div className="desktop-menu" style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
         <Link to="/" className="nav-link">Home</Link>
         <Link to="/hotels" className="nav-link">Hotels</Link>
-        <Link to="/" className="nav-link">Deals</Link>
+        <a href="/#deals" className="nav-link">Deals</a>
         {user ? (
           <>
             {user.role === 'admin' && <Link to="/admin" className="nav-link">Admin</Link>}
@@ -50,9 +50,9 @@ const Navbar = () => {
           </>
         ) : (
           <>
-            <Link to="/" className="nav-link">About Us</Link>
-            <Link to="/" className="nav-link">Contact Us</Link>
-            <Link to="/" className="nav-link">Help</Link>
+            <a href="/#about" className="nav-link">About Us</a>
+            <a href="/#contact" className="nav-link">Contact Us</a>
+            <a href="/#help" className="nav-link">Help</a>
           </>
         )}
       </div>

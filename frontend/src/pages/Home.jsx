@@ -99,7 +99,7 @@ const Home = () => {
       </section>
 
       {/* Popular Hotels Section */}
-      <section style={{ marginTop: '5rem', padding: '0 4%' }}>
+      <section id="deals" style={{ marginTop: '5rem', padding: '0 4%' }}>
         <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
            <h2 style={{ fontSize: '2rem', fontWeight: '800', color: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}>
              <span style={{ height: '3px', width: '40px', background: 'linear-gradient(90deg, transparent, #22d3ee)' }}></span>
