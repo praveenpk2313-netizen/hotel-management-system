@@ -18,15 +18,27 @@ export const AuthProvider = ({ children }) => {
         const savedRole = localStorage.getItem('role');
 
         if (savedUser && savedToken && savedUser !== 'undefined') {
-          const parsed = JSON.parse(savedUser);
+          let parsed;
+          try {
+            parsed = JSON.parse(savedUser);
+          } catch (parseErr) {
+            // Only clear the corrupted key — keep the token and role intact
+            console.warn('Corrupted user data in localStorage, clearing only user key');
+            localStorage.removeItem('user');
+            setLoading(false);
+            return;
+          }
+
           const userData = { ...parsed, token: savedToken, role: savedRole || parsed.role };
-          
           setUser(userData);
           dispatch(loginSuccess(userData));
         }
       } catch (err) {
         console.error('Auth rehydration failed:', err);
-        localStorage.clear();
+        // Only remove individual keys — never use localStorage.clear() which wipes everything
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
       } finally {
         setLoading(false);
       }
@@ -42,16 +54,19 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('role');
 
     const { token, role, ...rest } = userData;
-    
+
+    // Include role in the stored user object as a fallback for rehydration
+    const userToStore = { ...rest, role };
+
     // Save to localStorage
-    localStorage.setItem('user', JSON.stringify(rest));
+    localStorage.setItem('user', JSON.stringify(userToStore));
     localStorage.setItem('token', token);
     localStorage.setItem('role', role || '');
-    
-    // Update internal state
-    const cleanUser = { ...rest, token, role };
+
+    // Update internal state (include token for in-memory use)
+    const cleanUser = { ...userToStore, token };
     setUser(cleanUser);
-    
+
     // Sync with Redux
     dispatch(loginSuccess(cleanUser));
   }, [dispatch]);
@@ -63,6 +78,17 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     dispatch(logoutAction());
   }, [dispatch]);
+
+  // 2. Listen for global auth failure events emitted by the axios interceptor
+  //    (fired when any API call receives a 401 with an auth-failure message)
+  useEffect(() => {
+    const handleForcedLogout = (e) => {
+      console.warn('Session invalidated by server:', e.detail?.reason);
+      logout();
+    };
+    window.addEventListener('auth:logout', handleForcedLogout);
+    return () => window.removeEventListener('auth:logout', handleForcedLogout);
+  }, [logout]);
 
   const updateUser = useCallback((updatedData) => {
     setUser(prev => {

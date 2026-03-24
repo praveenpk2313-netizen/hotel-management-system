@@ -49,12 +49,12 @@ const authSlice = createSlice({
       const { token, role, ...rest } = action.payload;
       state.loading = false;
       state.error   = null;
-      state.user    = rest;
+      state.user    = { ...rest, role };  // include role in user object for convenience
       state.token   = token;
       state.role    = role;
 
       // localStorage is the single source of truth for page-refresh rehydration
-      localStorage.setItem('user',  JSON.stringify(rest));
+      localStorage.setItem('user',  JSON.stringify({ ...rest, role }));
       localStorage.setItem('token', token);
       localStorage.setItem('role',  role || '');
     },

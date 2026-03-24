@@ -9,13 +9,30 @@ const api = axios.create({
   timeout: 10000, // 10 second timeout
 });
 
-// Response interceptor to handle common errors like timeouts
+// Response interceptor — handles timeouts and unauthorised responses globally
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.code === 'ECONNABORTED') {
       console.error('API Error: Request timed out');
     }
+
+    // If the server says the token is invalid / expired, fire a global logout event.
+    // AuthContext listens for this event and clears the session — no circular imports needed.
+    if (error.response?.status === 401) {
+      const msg = error.response?.data?.message || '';
+      // Only auto-logout on hard auth failures (not role-mismatch 401s from login attempts)
+      const isAuthFailure =
+        msg.includes('Session expired') ||
+        msg.includes('Invalid token') ||
+        msg.includes('Not authorized') ||
+        msg.includes('no token');
+
+      if (isAuthFailure) {
+        window.dispatchEvent(new CustomEvent('auth:logout', { detail: { reason: msg } }));
+      }
+    }
+
     return Promise.reject(error);
   }
 );

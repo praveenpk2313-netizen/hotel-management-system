@@ -6,7 +6,7 @@ export const getManagerStats = createAsyncThunk('manager/getStats', async (_, { 
     const { data } = await api.fetchManagerStats();
     return data;
   } catch (err) {
-    return rejectWithValue(err.response.data);
+    return rejectWithValue(err.response?.data || { message: 'Network error — could not fetch stats' });
   }
 });
 
@@ -15,7 +15,7 @@ export const getManagerAnalytics = createAsyncThunk('manager/getAnalytics', asyn
     const { data } = await api.fetchManagerAnalytics();
     return data;
   } catch (err) {
-    return rejectWithValue(err.response.data);
+    return rejectWithValue(err.response?.data || { message: 'Network error — could not fetch analytics' });
   }
 });
 
@@ -36,6 +36,7 @@ const managerSlice = createSlice({
     builder
       .addCase(getManagerStats.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(getManagerStats.fulfilled, (state, action) => {
         state.loading = false;
@@ -45,8 +46,15 @@ const managerSlice = createSlice({
         state.loading = false;
         state.error = action.payload?.message || 'Failed to fetch manager stats';
       })
+      .addCase(getManagerAnalytics.pending, (state) => {
+        // No loading flag needed — analytics loads independently
+      })
       .addCase(getManagerAnalytics.fulfilled, (state, action) => {
         state.analytics = action.payload;
+      })
+      .addCase(getManagerAnalytics.rejected, (state, action) => {
+        // Analytics failure is non-critical — just log it
+        console.warn('Analytics fetch failed:', action.payload?.message);
       });
   },
 });

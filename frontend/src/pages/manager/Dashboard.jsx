@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useAuth } from '../../context/AuthContext';
 import { getManagerStats, getManagerAnalytics } from '../../redux/slices/managerSlice';
 import { 
   TrendingUp, 
@@ -24,7 +25,8 @@ import { formatCurrency, formatDate } from '../../utils/helpers';
 
 const ManagerDashboard = () => {
   const dispatch = useDispatch();
-  const { stats, analytics, loading } = useSelector((state) => state.manager);
+  const { stats, analytics, loading, error } = useSelector((state) => state.manager);
+  const { user } = useAuth();
 
   useEffect(() => {
     dispatch(getManagerStats());
@@ -44,10 +46,24 @@ const ManagerDashboard = () => {
     </div>
   );
 
+  if (error && !stats) return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '8rem 2rem', gap: '1.5rem' }}>
+      <div style={{ fontSize: '3rem' }}>⚠️</div>
+      <h2 style={{ margin: 0, color: '#1e293b' }}>Could not load dashboard</h2>
+      <p style={{ color: '#64748b', margin: 0 }}>{error}</p>
+      <button
+        onClick={() => { dispatch(getManagerStats()); dispatch(getManagerAnalytics()); }}
+        style={{ background: '#c5a059', color: 'white', border: 'none', padding: '0.75rem 2rem', borderRadius: '10px', fontWeight: '700', cursor: 'pointer', fontSize: '0.95rem' }}
+      >
+        Retry
+      </button>
+    </div>
+  );
+
   return (
     <div className="animate-fade">
       <div style={{ marginBottom: '2.5rem' }}>
-        <h1 className="luxury-font" style={{ fontSize: '2.2rem', margin: '0 0 0.5rem 0' }}>Welcome back, Manager</h1>
+        <h1 className="luxury-font" style={{ fontSize: '2.2rem', margin: '0 0 0.5rem 0' }}>Welcome back, {user?.name || 'Manager'}</h1>
         <p style={{ color: '#64748b' }}>Here's what's happening with your properties today.</p>
       </div>
 
@@ -118,6 +134,11 @@ const ManagerDashboard = () => {
         </div>
         
         <div style={{ overflowX: 'auto' }}>
+          {(!stats?.recentBookings || stats.recentBookings.length === 0) ? (
+            <div style={{ padding: '3rem', textAlign: 'center', color: '#94a3b8' }}>
+              <p style={{ margin: 0, fontSize: '0.95rem' }}>No recent reservations yet.</p>
+            </div>
+          ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid #f1f5f9', textAlign: 'left' }}>
@@ -129,7 +150,7 @@ const ManagerDashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {stats?.recentBookings.map((booking) => (
+              {stats.recentBookings.map((booking) => (
                 <tr key={booking._id} style={{ borderBottom: '1px solid #f8fafc' }}>
                   <td style={{ padding: '1.25rem 1rem' }}>
                     <p style={{ margin: 0, fontWeight: '700', fontSize: '0.9rem' }}>{booking.userId?.name}</p>
@@ -157,6 +178,7 @@ const ManagerDashboard = () => {
               ))}
             </tbody>
           </table>
+          )}
         </div>
       </div>
     </div>
