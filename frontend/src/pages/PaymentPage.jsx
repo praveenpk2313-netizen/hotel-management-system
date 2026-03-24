@@ -80,32 +80,39 @@ const PaymentPage = () => {
     setError('');
 
     try {
+      const handlePaymentSuccess = (finalBooking) => {
+        setLoading(false);
+        navigate('/booking-success', { state: { booking: finalBooking } });
+      };
+
+      const handlePaymentError = (err, customHeader = 'Payment failed') => {
+        setLoading(false);
+        const data = err.response?.data;
+        if (data?.code === 'DATES_UNAVAILABLE' || err.response?.status === 400) {
+          const errMsg = data?.message || 'Selected dates are no longer available.';
+          setError(errMsg);
+          // Auto-redirect after some delay so they can read the error
+          setTimeout(() => {
+            navigate(`/hotel/${hotel._id}`, { state: { error: errMsg, initialData: bookingData } });
+          }, 3000);
+          return;
+        }
+        setError(data?.message || customHeader);
+      };
+
       if (MOCK_PAYMENT) {
         const bookingPayload = {
           ...bookingData,
-          paymentMethod:  'Mock/Razorpay',
-          transactionId:  razorpayTxnRef.current
+          paymentMethod: 'Mock/Pay',
+          transactionId: paymentMethod === 'stripe' ? stripeTxnRef.current : razorpayTxnRef.current
         };
         try {
           const { data: finalBooking } = await confirmBookingAfterPayment(bookingPayload);
-          setLoading(false);
-          navigate('/booking-success', { state: { booking: finalBooking } });
-          return;
+          handlePaymentSuccess(finalBooking);
         } catch (err) {
-          // Bypassing Render deployment lag where backend still rejects duplicate testing dates
-          if (err.response?.status === 400) {
-             const future1 = new Date(); future1.setFullYear(2035 + Math.floor(Math.random()*10));
-             const future2 = new Date(future1); future2.setDate(future2.getDate() + 1);
-             bookingPayload.checkInDate = future1.toISOString();
-             bookingPayload.checkOutDate = future2.toISOString();
-             bookingPayload.transactionId = razorpayTxnRef.current + 'retry';
-             const { data: finalBooking } = await confirmBookingAfterPayment(bookingPayload);
-             setLoading(false);
-             navigate('/booking-success', { state: { booking: finalBooking } });
-             return;
-          }
-          throw err;
+          handlePaymentError(err);
         }
+        return;
       }
 
       const { data: orderData } = await createRazorpayOrder({ amount: bookingData.totalPrice });
@@ -125,10 +132,9 @@ const PaymentPage = () => {
               transactionId: response.razorpay_payment_id,
               razorpayData: response
             });
-            navigate('/booking-success', { state: { booking: finalBooking } });
+            handlePaymentSuccess(finalBooking);
           } catch (err) {
-            setError(err.response?.data?.message || 'Verification failed. Contact support with Payment ID: ' + response.razorpay_payment_id);
-            setLoading(false);
+            handlePaymentError(err, 'Verification failed. Contact support with PID: ' + response.razorpay_payment_id);
           }
         },
         prefill: { name: user?.name, email: user?.email },
@@ -137,7 +143,7 @@ const PaymentPage = () => {
       };
 
       if (!window.Razorpay) {
-        setError('Payment gateway (Razorpay) failed to load. Please disable AdBlockers.');
+        setError('Payment gateway failed to load. Please check AdBlockers.');
         setLoading(false);
         return;
       }
@@ -371,6 +377,20 @@ const StripeCheckoutForm = ({ bookingData, stripeTxnId, navigate, onSuccess, onE
     setLoading(true);
     onError('');
 
+    const handleStripeError = (err) => {
+      setLoading(false);
+      const data = err.response?.data;
+      if (data?.code === 'DATES_UNAVAILABLE' || err.response?.status === 400) {
+        const errMsg = data?.message || 'Selected dates are no longer available.';
+        onError(errMsg);
+        setTimeout(() => {
+          navigate(`/hotel/${bookingData.hotelId}`, { state: { error: errMsg, initialData: bookingData } });
+        }, 3000);
+        return;
+      }
+      onError(data?.message || 'Payment processing failed.');
+    };
+
     try {
       if (MOCK_PAYMENT) {
         const payload = {
@@ -382,21 +402,10 @@ const StripeCheckoutForm = ({ bookingData, stripeTxnId, navigate, onSuccess, onE
            const { data: finalBooking } = await confirmBookingAfterPayment(payload);
            setLoading(false);
            navigate('/booking-success', { state: { booking: finalBooking } });
-           return;
         } catch (err) {
-           if (err.response?.status === 400) {
-              const future1 = new Date(); future1.setFullYear(2035 + Math.floor(Math.random()*10));
-              const future2 = new Date(future1); future2.setDate(future2.getDate() + 1);
-              payload.checkInDate = future1.toISOString();
-              payload.checkOutDate = future2.toISOString();
-              payload.transactionId = stripeTxnId + '_retry';
-              const { data: finalBooking } = await confirmBookingAfterPayment(payload);
-              setLoading(false);
-              navigate('/booking-success', { state: { booking: finalBooking } });
-              return;
-           }
-           throw err;
+           handleStripeError(err);
         }
+        return;
       }
 
       if (!stripe || !elements) return;
@@ -413,16 +422,19 @@ const StripeCheckoutForm = ({ bookingData, stripeTxnId, navigate, onSuccess, onE
          onError(result.error.message);
          setLoading(false);
       } else if (result.paymentIntent.status === 'succeeded') {
-         const { data: finalBooking } = await confirmBookingAfterPayment({
-           ...bookingData,
-           paymentMethod: 'Stripe',
-           transactionId: result.paymentIntent.id
-         });
-         navigate('/booking-success', { state: { booking: finalBooking } });
+         try {
+           const { data: finalBooking } = await confirmBookingAfterPayment({
+             ...bookingData,
+             paymentMethod: 'Stripe',
+             transactionId: result.paymentIntent.id
+           });
+           navigate('/booking-success', { state: { booking: finalBooking } });
+         } catch (err) {
+           handleStripeError(err);
+         }
       }
     } catch (err) {
-      onError(err.response?.data?.message || 'Payment system error. Please try again.');
-      setLoading(false);
+      handleStripeError(err);
     }
   };
 

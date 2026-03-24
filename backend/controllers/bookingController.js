@@ -8,71 +8,86 @@ const { sendNotification }            = require('../utils/socket');
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const checkAvailability = async (roomId, checkIn, checkOut, excludeBookingId = null) => {
+  if (!roomId) return false;
+
+  // Normalize checkIn and checkOut to ensure we are comparing date boundaries correctly
+  const startDate = new Date(checkIn);
+  startDate.setHours(0, 0, 0, 0);
+  const endDate = new Date(checkOut);
+  endDate.setHours(0, 0, 0, 0);
+
   const query = {
     roomId,
-    status: { $in: ['confirmed'] },
+    status: { $in: ['confirmed', 'pending'] },
     $or: [
-      { checkInDate: { $lt: checkOut, $gte: checkIn } },
-      { checkOutDate: { $gt: checkIn,  $lte: checkOut } },
-      { checkInDate: { $lte: checkIn },  checkOutDate: { $gte: checkOut } }
+      { 
+        checkInDate: { $lt: endDate }, 
+        checkOutDate: { $gt: startDate } 
+      }
     ]
   };
+  
   if (excludeBookingId) query._id = { $ne: excludeBookingId };
 
   const existingCount = await Booking.countDocuments(query);
   const room = await Room.findById(roomId);
-  // Bypassing strict room availability limits (up to 100) for testing email and booking flows
-  return room ? existingCount < Math.max(room.totalRooms || 1, 100) : false;
+  
+  if (!room) return false;
+  
+  const total = room.totalRooms || 1;
+  const capacity = Math.max(total, 100); // Bypassing strict limits for testing as requested previously
+  
+  return existingCount < capacity;
 };
 
 // ─── confirmAfterPayment ─────────────────────────────────────────────────────
-/**
- * @desc    Confirm booking after verified payment
- * @route   POST /api/bookings/confirm-after-payment
- * @access  Private
- *
- * EMAIL STRATEGY — async / fire-and-forget:
- *   The booking is created and the 201 response is returned immediately
- *   (fast ≈ 200-500 ms). Email is then sent in the background so it never
- *   blocks or times-out the HTTP response.
- *
- *   `emailSent` in the response body is always false on first call because
- *   email hasn't finished yet. The BookingSuccess page shows a neutral message
- *   ("Your booking is confirmed") instead of a possibly false "email sent" claim.
- */
 const confirmAfterPayment = async (req, res) => {
   try {
     const {
       hotelId, roomId,
+      hotel, room, // Alternative keys if sent from frontend
       checkInDate, checkOutDate,
       numGuests, totalPrice,
       paymentMethod, transactionId
     } = req.body;
 
-    // ── 1. Idempotency — same transactionId = return the already-created booking
+    const targetHotelId = hotelId || hotel;
+    const targetRoomId  = roomId || room;
+
+    if (!targetHotelId || !targetRoomId) {
+      return res.status(400).json({ message: 'Missing hotel or room reference.' });
+    }
+
+    // ── 1. Idempotency
     const existing = await Booking.findOne({ transactionId });
     if (existing) {
-      console.log(`[BOOKING] Idempotency hit — returning existing booking ${existing._id}`);
+      console.log(`[BOOKING] Idempotency hit — returning existing ${existing._id}`);
       return res.status(200).json({ ...existing.toObject(), emailSent: false, alreadyExists: true });
     }
 
+    // Normalize dates to midnight for consistent DB comparisons
     const checkIn  = new Date(checkInDate);
+    checkIn.setHours(0, 0, 0, 0);
     const checkOut = new Date(checkOutDate);
+    checkOut.setHours(0, 0, 0, 0);
 
-    // ── 2. Availability check
-    const available = await checkAvailability(roomId, checkIn, checkOut);
+    // ── 2. Re-verify Availability
+    const available = await checkAvailability(targetRoomId, checkIn, checkOut);
     if (!available) {
-      console.warn(`[BOOKING] Room ${roomId} not available for ${checkIn.toDateString()} – ${checkOut.toDateString()}`);
-      return res.status(400).json({ message: 'Selected dates are no longer available.' });
+      console.warn(`[BOOKING] Room ${targetRoomId} unavailable for ${checkIn.toISOString()} to ${checkOut.toISOString()}`);
+      return res.status(400).json({ 
+        message: 'Selected dates are no longer available.',
+        code: 'DATES_UNAVAILABLE'
+      });
     }
 
     // ── 3. Snapshot hotel + room
-    const [hotel, room] = await Promise.all([
-      Hotel.findById(hotelId),
-      Room.findById(roomId)
+    const [property, suite] = await Promise.all([
+      Hotel.findById(targetHotelId),
+      Room.findById(targetRoomId)
     ]);
-    if (!hotel || !room) {
-      console.error('[BOOKING] Hotel or room not found:', { hotelId, roomId });
+    
+    if (!property || !suite) {
       return res.status(404).json({ message: 'Property details not found.' });
     }
 
@@ -80,12 +95,12 @@ const confirmAfterPayment = async (req, res) => {
     let nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     if (isNaN(nights) || nights <= 0) nights = 1;
 
-    const pricePerNight = room.price || 0;
+    const pricePerNight = suite.price || 0;
 
     console.log('[BOOKING] Creating:', {
       user:      req.user._id,
-      hotel:     hotel.name,
-      room:      room.type,
+      hotel:     property.name,
+      room:      suite.type,
       checkIn:   checkIn.toDateString(),
       checkOut:  checkOut.toDateString(),
       nights,
@@ -95,11 +110,11 @@ const confirmAfterPayment = async (req, res) => {
     // ── 4. Create booking record
     const booking = await Booking.create({
       userId:        req.user._id,
-      hotelId,
-      roomId,
-      hotelName:     hotel.name,
-      location:      hotel.location || hotel.address || hotel.city || 'StayNow Property',
-      roomType:      room.type,
+      hotelId:       targetHotelId,
+      roomId:        targetRoomId,
+      hotelName:     property.name,
+      location:      property.location || property.address || property.city || 'StayNow Property',
+      roomType:      suite.type,
       checkInDate:   checkIn,
       checkOutDate:  checkOut,
       numGuests:     numGuests || 1,

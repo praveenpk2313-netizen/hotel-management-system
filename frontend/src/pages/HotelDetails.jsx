@@ -46,6 +46,20 @@ const HotelDetails = () => {
   const [dateError, setDateError] = useState('');
   const [selectedRoomId, setSelectedRoomId] = useState('');
 
+  // ── Handle incoming state (errors or pre-fills from payment page redirect)
+  useEffect(() => {
+    if (location.state?.error) {
+      setDateError(location.state.error);
+    }
+    if (location.state?.initialData) {
+      const data = location.state.initialData;
+      if (data.checkInDate)  setCheckIn(new Date(data.checkInDate));
+      if (data.checkOutDate) setCheckOut(new Date(data.checkOutDate));
+      if (data.numGuests)    setGuests(data.numGuests);
+      if (data.roomId)       setSelectedRoomId(data.roomId);
+    }
+  }, [location.state]);
+
   useEffect(() => {
     if (rooms.length > 0 && !selectedRoomId) {
        setSelectedRoomId(rooms[0]._id);
@@ -67,10 +81,10 @@ const HotelDetails = () => {
         selectedRoom: rooms.find(r => r._id === bookingDetails.roomId),
         hotel: hotel,
         bookingData: {
-          hotel: id,
-          room: bookingDetails.roomId,
-          checkInDate: bookingDetails.checkInDate.toISOString(),
-          checkOutDate: bookingDetails.checkOutDate.toISOString(),
+          hotelId: id,
+          roomId: bookingDetails.roomId,
+          checkInDate: new Date(bookingDetails.checkInDate.setHours(0,0,0,0)).toISOString(),
+          checkOutDate: new Date(bookingDetails.checkOutDate.setHours(0,0,0,0)).toISOString(),
           numGuests: bookingDetails.numGuests,
           totalPrice: bookingDetails.totalPrice,
           userName: user?.name || 'Guest'
@@ -283,6 +297,7 @@ const HotelDetails = () => {
                     initialCheckOut={checkOut}
                     initialGuests={guests}
                     initialRoomId={selectedRoomId}
+                    initialError={dateError}
                   />
 
                   {/* Trust Factors */}

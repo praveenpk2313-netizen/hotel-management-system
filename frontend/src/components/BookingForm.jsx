@@ -4,13 +4,13 @@ import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { formatCurrency } from '../utils/helpers';
 
-const BookingForm = ({ hotel, rooms, onSubmit, initialCheckIn, initialCheckOut, initialGuests, initialRoomId }) => {
+const BookingForm = ({ hotel, rooms, onSubmit, initialCheckIn, initialCheckOut, initialGuests, initialRoomId, initialError }) => {
   const [startDate, setStartDate] = useState(initialCheckIn || null);
   const [endDate, setEndDate] = useState(initialCheckOut || null);
   const [selectedRoomId, setSelectedRoomId] = useState(initialRoomId || '');
   const [numGuests, setNumGuests] = useState(initialGuests || 1);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState(initialError || '');
   const [isRoomDropdownOpen, setIsRoomDropdownOpen] = useState(false);
 
   // Auto-select first room if available
@@ -23,11 +23,20 @@ const BookingForm = ({ hotel, rooms, onSubmit, initialCheckIn, initialCheckOut, 
 
   // Sync with props if they change
   useEffect(() => {
+    if (initialError) setError(initialError);
+  }, [initialError]);
+
+  // Sync with props if they change
+  useEffect(() => {
     if (initialCheckIn) setStartDate(initialCheckIn);
     if (initialCheckOut) setEndDate(initialCheckOut);
     if (initialGuests) setNumGuests(initialGuests);
     if (initialRoomId) setSelectedRoomId(initialRoomId);
   }, [initialCheckIn, initialCheckOut, initialGuests, initialRoomId]);
+
+  useEffect(() => {
+    if (error) setError('');
+  }, [startDate, endDate]);
 
   const selectedRoom = rooms?.find(r => r._id === selectedRoomId);
 
