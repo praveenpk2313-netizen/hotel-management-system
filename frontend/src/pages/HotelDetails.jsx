@@ -27,7 +27,6 @@ import { useAuth } from '../context/AuthContext';
 import RoomCard from '../components/RoomCard';
 import BookingForm from '../components/BookingForm';
 import DatePicker from 'react-datepicker';
-import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 
 const HotelDetails = () => {
