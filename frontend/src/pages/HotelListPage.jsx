@@ -22,10 +22,9 @@ import {
   Filter,
   ArrowUpDown,
   CheckCircle2,
-  Clock
+  Clock,
+  Shield
 } from 'lucide-react';
-import DatePicker from 'react-datepicker';
-import "react-datepicker/dist/react-datepicker.css";
 import { formatCurrency } from '../utils/helpers';
 
 const AMENITIES_OPTIONS = [
@@ -105,7 +104,7 @@ const HotelListPage = () => {
   };
 
   return (
-    <div className="bg-background-light min-h-screen pb-24 pt-6 px-4 md:px-0">
+    <div className="bg-background-light min-h-screen pb-24 pt-32 lg:pt-40 px-4 md:px-0">
       <div className="max-w-7xl mx-auto space-y-12 animate-fade-in">
         
         {/* Header Terminal */}
@@ -320,7 +319,7 @@ const HotelListPage = () => {
                     <h3 className="text-4xl font-serif text-secondary-dark font-black tracking-tight">Scope Not Found</h3>
                     <p className="text-gray-400 font-medium max-w-sm mx-auto leading-relaxed italic">
                        The specified coordinates do not echo with any current heritage properties. Adjust your logic or view the full ledger.
-                    </p>
+                     </p>
                  </div>
                  <button onClick={clearFilters} className="btn-gold px-12 h-16 inline-flex items-center gap-3 shadow-xl">
                     Full Portfolio Access <ArrowRight size={20} />
@@ -329,7 +328,7 @@ const HotelListPage = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-12 animate-slide-up">
                 {hotels.map(hotel => (
-                  <HotelCard key={hotel._id} hotel={hotel} />
+                  <HotelCard key={hotel._id || hotel.id} hotel={hotel} />
                 ))}
               </div>
             )}

@@ -3,96 +3,98 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --primary: 197 160 89; /* #c5a059 */
+    --secondary-dark: 2 6 23; /* #020617 */
+    --background: 253 252 251; /* #fdfcfb */
+  }
+
   body {
-    @apply font-sans antialiased text-secondary bg-background;
+    @apply font-sans antialiased text-secondary-dark bg-background m-0 p-0;
+    overflow-x: hidden;
+  }
+
+  /* Standardizing interactive elements */
+  button, a {
+    @apply transition-all duration-300;
+  }
+
+  /* Consistent scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary/20 rounded-full hover:bg-primary/40;
   }
 }
 
-/* Custom UI Components & Utilities */
 @layer components {
-  /* Premium Button - Gold Theme */
+  /* Ultra-Premium Design Tokens */
+  .container-luxury {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
   .btn-gold {
-    @apply px-8 py-4 bg-gradient-to-r from-primary to-primary-light text-white font-bold rounded-2xl 
-           shadow-gold hover:shadow-xl hover:-translate-y-0.5 transition-all duration-500 active:scale-95;
+    @apply px-8 py-4 bg-primary text-white font-bold rounded-2xl 
+           shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 
+           hover:-translate-y-0.5 active:scale-95 flex items-center justify-center gap-2;
   }
-  
-  /* Premium Card - Glassmorphism */
-  .glass-card {
-    @apply bg-white/80 backdrop-blur-xl border border-white/20 shadow-premium rounded-[2.5rem];
+
+  .glass-header {
+    @apply bg-white/80 backdrop-blur-2xl border-b border-white/20 shadow-sm;
   }
-  
-  /* Premium Input Field */
-  .input-premium {
+
+  .luxury-card {
+    @apply bg-white rounded-[2.5rem] border border-gray-100 shadow-premium hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 overflow-hidden;
+  }
+
+  .input-luxury {
     @apply w-full px-6 py-4 bg-gray-50 border-2 border-transparent rounded-2xl text-sm font-bold 
-           focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 transition-all outline-none;
+           focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none;
+  }
+
+  /* Typography Hierarchy */
+  .h1-hero {
+    @apply font-serif text-5xl md:text-7xl lg:text-9xl text-white font-black tracking-tighter leading-[0.85];
+  }
+
+  .h2-luxury {
+    @apply font-serif text-3xl md:text-5xl lg:text-6xl text-secondary-dark font-black tracking-tight leading-tight;
+  }
+}
+
+@layer utilities {
+  .shadow-premium {
+    box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08), 0 5px 15px -5px rgba(0,0,0,0.04);
   }
   
-  /* Typography Scale */
-  .luxury-h1 {
-    @apply font-serif text-5xl md:text-6xl lg:text-7xl text-secondary-dark font-black tracking-tight leading-[1.1];
-  }
-
-  .luxury-h2 {
-    @apply font-serif text-3xl md:text-4xl lg:text-5xl text-secondary-dark font-black tracking-tighter;
-  }
-
-  /* Status Badges */
-  .badge-premium {
-    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border shadow-sm text-[10px] font-black uppercase tracking-widest;
-  }
-}
-
-/* Animations */
-@layer utilities {
-  @keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .animate-slide-up {
-    animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-
-  @keyframes slideRight {
-    from { opacity: 0; transform: translateX(-20px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-  .animate-slide-right {
-    animation: slideRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
   .animate-fade-in {
-    animation: fadeIn 0.6s ease-out forwards;
+    @apply animate-[fadeIn_0.8s_ease-out_forwards];
   }
-
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    20%, 60% { transform: translateX(-5px); }
-    40%, 80% { transform: translateX(5px); }
-  }
-  .animate-shake {
-    animation: shake 0.4s ease-in-out;
+  
+  .animate-slide-up {
+    @apply animate-[slideUp_0.8s_ease-out_forwards];
   }
 }
 
-/* Scrollbar Customization */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  @apply bg-transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  @apply bg-gray-200 rounded-full hover:bg-primary transition-colors;
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-/* Hide default search icons */
-input[type="search"]::-webkit-search-decoration,
-input[type="search"]::-webkit-search-cancel-button,
-input[type="search"]::-webkit-search-results-button,
-input[type="search"]::-webkit-search-results-decoration {
-  display: none;
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
 }

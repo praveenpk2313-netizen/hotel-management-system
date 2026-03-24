@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, Menu, X, Bell, User, Layout, History, MapPin, Sparkles, ShieldCheck, ChevronDown, ArrowRight } from 'lucide-react';
+import { 
+  LogOut, 
+  Menu, 
+  X, 
+  User, 
+  Layout, 
+  Sparkles, 
+  ShieldCheck, 
+  ChevronDown,
+  ArrowRight
+} from 'lucide-react';
 import NotificationBell from './NotificationBell';
 
 const Navbar = () => {
@@ -19,204 +29,161 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
-    setIsMenuOpen(false);
+    navigate('/');
   };
 
-  const isHome = location.pathname === '/';
-
-  const scrollToSection = (id) => {
-    if (isHome) {
-      const element = document.getElementById(id);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-      }
-    } else {
-      navigate(`/#${id}`);
-    }
-    setIsMenuOpen(false);
-  };
+  const menuLinks = [
+    { name: 'Properties', to: '/hotels' },
+    { name: 'Exclusive Deals', to: '/#deals' },
+    { name: 'Heritage Portal', to: '/#about-us' },
+  ];
 
   return (
-    <nav className={`fixed top-0 inset-x-0 z-[1000] transition-all duration-500 px-4 md:px-10 py-4 ${
-      scrolled ? 'bg-white/80 backdrop-blur-xl shadow-premium py-3' : 'bg-transparent py-6'
+    <nav className={`fixed top-0 left-0 w-full z-[2000] px-4 md:px-6 lg:px-10 py-4 transition-all duration-500 ease-in-out ${
+      scrolled ? 'translate-y-0' : 'translate-y-2'
     }`}>
-      <div className="max-w-7xl mx-auto flex justify-between items-center bg-white/10 backdrop-blur-md rounded-[2.5rem] border border-white/20 p-2 md:p-3 shadow-2xl relative overflow-hidden group">
+      <div className={`max-w-7xl mx-auto flex items-center justify-between rounded-[2.5rem] px-6 py-3 transition-all duration-500 ${
+        scrolled 
+          ? 'bg-white/90 backdrop-blur-2xl shadow-xl shadow-black/5 h-20 border border-white/20' 
+          : 'bg-white/10 backdrop-blur-md h-24 border border-white/10'
+      }`}>
         
-        {/* Navigation Decoration */}
-        {scrolled && <div className="absolute inset-0 bg-white opacity-95 transition-opacity" />}
-        
-        {/* Logo Section */}
-        <Link to="/" className="flex items-center gap-4 group/logo relative z-10 pl-4 py-2">
-          <div className="w-12 h-12 bg-secondary-dark rounded-2xl flex items-center justify-center p-2 group-hover/logo:rotate-12 transition-transform shadow-lg">
-             <img src="/logo.png" className="w-[32px] h-[32px] object-contain" alt="PK UrbanStay" />
+        {/* Brand Identity */}
+        <Link to="/" className="flex items-center gap-4 group flex-shrink-0">
+          <div className="w-12 h-12 bg-secondary-dark rounded-2xl flex items-center justify-center p-2 shadow-lg group-hover:rotate-12 transition-transform">
+             <img 
+               src="/logo.png" 
+               style={{ width: '32px', height: '32px' }} 
+               className="object-contain" 
+               alt="PK UrbanStay" 
+             />
           </div>
           <div className="hidden sm:block">
-             <h2 className={`text-2xl font-serif font-black italic tracking-tight leading-none transition-colors ${scrolled ? 'text-secondary-dark' : 'text-white'}`}>
+             <h2 className={`text-xl font-serif font-black italic tracking-tighter transition-colors leading-none ${
+               scrolled ? 'text-secondary-dark' : 'text-white'
+             }`}>
                 PK UrbanStay
              </h2>
-             <p className="text-[9px] font-black text-primary uppercase tracking-[3px] mt-1">Heritage Hospitality</p>
+             <p className="text-[8px] font-black text-primary uppercase tracking-[3px] mt-1">Hospitality Group</p>
           </div>
         </Link>
 
-        {/* Desktop Interface: Center Links */}
-        <div className="hidden lg:flex items-center gap-10 relative z-10 px-6">
-          {['home', 'hotels', 'deals', 'about-us', 'contact-us'].map((link) => (
-            <button 
-              key={link}
-              onClick={() => scrollToSection(link)}
-              className={`text-[10px] font-black uppercase tracking-[3px] transition-all relative group py-2 ${
-                scrolled ? 'text-gray-400 hover:text-secondary-dark' : 'text-white/70 hover:text-white'
-              }`}
-            >
-              {link.replace('-', ' ')}
-              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
-            </button>
-          ))}
+        {/* Desktop Navigation Hub */}
+        <div className="hidden lg:flex items-center gap-10">
+           {menuLinks.map((link) => (
+             <Link 
+               key={link.name}
+               to={link.to}
+               className={`text-[10px] font-black uppercase tracking-[3px] transition-all hover:text-primary relative group ${
+                 scrolled ? 'text-secondary-dark/60' : 'text-white/70'
+               }`}
+             >
+                {link.name}
+                <span className="absolute -bottom-1.5 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
+             </Link>
+           ))}
         </div>
 
-        {/* Right Interface: Identity & Auth */}
-        <div className="flex items-center gap-4 relative z-10 pr-2">
-          {user ? (
-            <div className="flex items-center gap-6">
-              <div className="hidden md:flex items-center gap-4 px-4 py-2 bg-gray-50/10 rounded-2xl border border-white/5 group hover:bg-white/80 transition-all cursor-pointer">
-                 <NotificationBell scrollMode={scrolled} />
-                 <div className="w-px h-6 bg-white/20" />
-                 <div className="text-right flex flex-col items-end">
-                    <span className={`text-[10px] font-black uppercase tracking-widest ${scrolled ? 'text-secondary-dark' : 'text-white'}`}>{user.name}</span>
-                    <span className="text-[8px] font-bold text-primary uppercase tracking-[2px]">{user.role}</span>
-                 </div>
-                 <div className="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-sm">
-                    {user.role === 'manager' ? <Layout size={18} /> : <User size={18} />}
-                 </div>
-              </div>
+        {/* Action Hub */}
+        <div className="flex items-center gap-4">
+           {user ? (
+             <>
+               <div className={`hidden md:flex items-center gap-4 px-4 py-2 rounded-2xl border transition-all ${
+                 scrolled ? 'bg-gray-50 border-gray-100' : 'bg-white/10 border-white/10'
+                }`}>
+                  <NotificationBell scrollMode={scrolled} />
+                  <div className={`w-px h-6 ${scrolled ? 'bg-gray-200' : 'bg-white/20'}`} />
+                  <Link to={user.role === 'manager' ? '/manager/dashboard' : '/customer/dashboard'} className="flex items-center gap-3 group">
+                    <div className="text-right">
+                       <p className={`text-[10px] font-black uppercase tracking-widest leading-none ${scrolled ? 'text-secondary-dark' : 'text-white'}`}>{user.name}</p>
+                       <p className="text-[8px] font-bold text-primary uppercase tracking-[2px] mt-1">{user.role}</p>
+                    </div>
+                    <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform">
+                       {user.role === 'manager' ? <Layout size={18} /> : <User size={18} />}
+                    </div>
+                  </Link>
+               </div>
 
-              {/* Action Dropdown Alternative for Small Screens */}
-              <div className="flex md:hidden items-center gap-2">
-                 <NotificationBell scrollMode={scrolled} />
-                 <button onClick={() => setIsMenuOpen(!isMenuOpen)} className={`w-12 h-12 rounded-2xl flex items-center justify-center ${scrolled ? 'bg-secondary-dark text-white' : 'bg-white text-secondary-dark shadow-xl'}`}>
-                    {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
-                 </button>
-              </div>
+               <button 
+                 onClick={handleLogout}
+                 className={`hidden md:flex items-center gap-2 h-12 px-6 rounded-[1.25rem] font-black text-[10px] uppercase tracking-[2px] transition-all active:scale-95 ${
+                   scrolled 
+                     ? 'bg-secondary-dark text-white hover:bg-rose-500 shadow-lg shadow-black/10' 
+                     : 'bg-white text-secondary-dark hover:bg-rose-500 hover:text-white shadow-xl shadow-black/20'
+                 }`}
+               >
+                 <LogOut size={16} /> Logout
+               </button>
+             </>
+           ) : (
+             <div className="flex items-center gap-3">
+               <Link 
+                 to="/login" 
+                 className={`hidden sm:block text-[10px] font-black uppercase tracking-[3px] px-4 transition-all hover:text-primary ${
+                   scrolled ? 'text-secondary-dark' : 'text-white'
+                 }`}
+               >
+                  Sign In
+               </Link>
+               <Link 
+                 to="/register" 
+                 className="flex items-center gap-3 h-12 px-8 rounded-[1.25rem] bg-primary text-white font-black text-[10px] uppercase tracking-[3px] shadow-xl shadow-primary/30 hover:scale-105 active:scale-95 transition-all"
+               >
+                  Join Us <ArrowRight size={14} />
+               </Link>
+             </div>
+           )}
 
-              <button 
-                onClick={handleLogout}
-                className={`hidden md:flex items-center gap-3 h-12 px-6 rounded-2xl font-black text-[10px] uppercase tracking-[2px] transition-all active:scale-95 ${
-                  scrolled ? 'bg-secondary-dark text-white hover:bg-primary shadow-lg shadow-black/10' : 'bg-white text-secondary-dark hover:bg-primary hover:text-white shadow-2xl shadow-black/20'
-                }`}
-              >
-                <LogOut size={16} /> Logout
-              </button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-4">
-              <Link to="/login" className={`text-[10px] font-black uppercase tracking-[3px] px-4 transition-all ${scrolled ? 'text-gray-400 hover:text-secondary-dark' : 'text-white/70 hover:text-white'}`}>
-                 Access
-              </Link>
-              <Link 
-                to="/register" 
-                className={`flex items-center gap-3 h-12 px-8 rounded-2xl font-black text-[10px] uppercase tracking-[3px] transition-all active:scale-95 ${
-                  scrolled ? 'bg-secondary-dark text-white hover:bg-primary shadow-lg shadow-black/10' : 'bg-primary text-white hover:bg-white hover:text-secondary-dark shadow-xl shadow-primary/30'
-                }`}
-              >
-                 Covenant <ArrowRight size={14} className="animate-pulse" />
-              </Link>
-              <button 
-                onClick={() => setIsMenuOpen(!isMenuOpen)} 
-                className={`lg:hidden w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${scrolled ? 'bg-gray-50 text-secondary-dark border border-gray-100' : 'bg-white/10 text-white border border-white/20'}`}
-              >
-                {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-              </button>
-            </div>
-          )}
+           {/* Mobile Menu Icon */}
+           <button 
+             onClick={() => setIsMenuOpen(!isMenuOpen)} 
+             className={`lg:hidden w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${
+               scrolled ? 'bg-gray-100 text-secondary-dark' : 'bg-white/10 text-white border border-white/20'
+             }`}
+           >
+             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+           </button>
         </div>
       </div>
 
-      {/* Global Mobile Menu Overlay */}
+      {/* Modern Full-Screen Mobile Drawer */}
       {isMenuOpen && (
-        <div className="fixed inset-0 z-[2000] lg:hidden animate-fade-in">
+        <div className="fixed inset-0 z-[5000] lg:hidden animate-fade-in">
            <div className="absolute inset-0 bg-secondary-dark/95 backdrop-blur-2xl" onClick={() => setIsMenuOpen(false)} />
-           <div className="relative w-full h-full flex flex-col p-8 space-y-12">
-              <div className="flex justify-between items-center pb-10 border-b border-white/5">
-                 <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 bg-primary text-white rounded-[1.5rem] flex items-center justify-center shadow-xl shadow-primary/30">
-                       <Sparkles size={28} />
-                    </div>
-                    <div>
-                       <h2 className="text-2xl font-serif font-black italic text-white leading-none">PK UrbanStay</h2>
-                       <p className="text-[10px] font-black text-primary uppercase tracking-[3px] mt-1">Heritage Hospitality</p>
-                    </div>
-                 </div>
-                 <button onClick={() => setIsMenuOpen(false)} className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-white border border-white/10 active:scale-95 transition-all shadow-inner">
-                    <X size={28} />
-                 </button>
-              </div>
-
-              <div className="flex-1 flex flex-col gap-8 justify-center items-center">
-                 {['home', 'hotels', 'deals', 'about-us', 'contact-us'].map((link) => (
-                   <button 
-                     key={link}
-                     onClick={() => scrollToSection(link)}
-                     className="text-4xl font-serif font-black text-white italic hover:text-primary transition-all transform hover:scale-105 active:scale-95 flex items-center gap-4 capitalize"
+           <div className="relative w-full h-full flex flex-col p-8 pt-24 space-y-12">
+              <div className="flex flex-col gap-6 items-center text-center">
+                 {menuLinks.map((link) => (
+                   <Link 
+                     key={link.name}
+                     to={link.to}
+                     onClick={() => setIsMenuOpen(false)}
+                     className="text-4xl font-serif font-black italic text-white hover:text-primary transition-all capitalize"
                    >
-                      {link.replace('-', ' ')} <ChevronDown size={28} className="-rotate-90 opacity-20" />
-                   </button>
+                      {link.name}
+                   </Link>
                  ))}
               </div>
-
-              <div className="pt-10 border-t border-white/5 space-y-6">
-                 {user ? (
-                   <div className="flex flex-col gap-6">
-                      <div className="flex items-center justify-between bg-white/5 p-6 rounded-[2rem] border border-white/10">
-                         <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 bg-primary text-white rounded-2xl flex items-center justify-center shadow-lg">
-                               <User size={28} />
-                            </div>
-                            <div>
-                               <p className="text-xl font-bold text-white">{user.name}</p>
-                               <p className="text-[10px] font-black text-primary uppercase tracking-[2px]">{user.role} Index</p>
-                            </div>
-                         </div>
-                         <NotificationBell scrollMode={false} />
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                         <button 
-                            onClick={() => { navigate(user.role === 'manager' ? '/manager/dashboard' : '/customer/dashboard'); setIsMenuOpen(false); }}
-                            className="h-16 bg-white text-secondary-dark rounded-[1.25rem] font-black text-[10px] uppercase tracking-[3px] flex items-center justify-center gap-3 shadow-lg"
-                         >
-                            Dashboard <Layout size={18} className="text-primary" />
-                         </button>
-                         <button 
-                            onClick={handleLogout}
-                            className="h-16 bg-rose-500/10 text-rose-500 border-2 border-rose-500/20 rounded-[1.25rem] font-black text-[10px] uppercase tracking-[3px] flex items-center justify-center gap-3 shadow-lg"
-                         >
-                            Logout <LogOut size={18} />
-                         </button>
-                      </div>
-                   </div>
-                 ) : (
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Link to="/login" onClick={() => setIsMenuOpen(false)} className="h-20 bg-white/5 border-2 border-white/10 text-white rounded-[1.5rem] flex items-center justify-center gap-4 font-black uppercase text-[10px] tracking-[4px] hover:border-primary transition-all uppercase">
-                         Access Lounge <User size={20} className="text-primary" />
-                      </Link>
-                      <Link to="/register" onClick={() => setIsMenuOpen(false)} className="h-20 bg-primary text-white rounded-[1.5rem] flex items-center justify-center gap-4 font-black uppercase text-[10px] tracking-[4px] shadow-2xl shadow-primary/40 hover:scale-[1.02] transition-all uppercase">
-                         Secure Covenant <ShieldCheck size={20} />
-                      </Link>
-                   </div>
+              
+              <div className="mt-auto pb-10 flex flex-col gap-6">
+                 {!user && (
+                   <>
+                     <Link to="/login" onClick={() => setIsMenuOpen(false)} className="h-20 bg-white/5 border border-white/10 text-white rounded-[1.5rem] flex items-center justify-center gap-4 font-black uppercase text-[10px] tracking-[4px]">
+                        Access Lounge <User size={20} className="text-primary" />
+                     </Link>
+                     <Link to="/register" onClick={() => setIsMenuOpen(false)} className="h-20 bg-primary text-white rounded-[1.5rem] flex items-center justify-center gap-4 font-black uppercase text-[10px] tracking-[4px]">
+                        Secure Covenant <ShieldCheck size={20} />
+                     </Link>
+                   </>
                  )}
-              </div>
-
-              <div className="text-center pt-6">
-                 <p className="text-[9px] font-black text-gray-600 uppercase tracking-[3px] italic">© {new Date().getFullYear()} PK UrbanStay Hospitality. Universal Covenants Apply.</p>
+                 {user && (
+                   <button onClick={handleLogout} className="h-20 bg-rose-500 text-white rounded-[1.5rem] flex items-center justify-center gap-4 font-black uppercase text-[10px] tracking-[4px]">
+                      Terminate Session <LogOut size={20} />
+                   </button>
+                 )}
               </div>
            </div>
         </div>
       )}
-
-      <style>{`
-        @keyframes fade-in { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in { animation: fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-      `}</style>
     </nav>
   );
 };

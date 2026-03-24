@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import Navbar from './components/Navbar';
@@ -41,12 +41,8 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import BookingSuccess from './pages/BookingSuccess';
 import api from './services/api';
-import { useState, useEffect } from 'react';
 
 // ─── Server Wake-Up Banner ─────────────────────────────────────────────────────
-// Render free tier spins down after 15 min. This pings the backend on first load
-// and shows a friendly banner while it's waking up.
-
 const ServerWakeUpBanner = () => {
   const [status, setStatus] = useState('checking'); // checking | ready | error
 
@@ -67,136 +63,75 @@ const ServerWakeUpBanner = () => {
   if (status === 'ready') return null;
 
   return (
-    <div style={{
-      position: 'fixed',
-      bottom: '1.5rem',
-      left: '50%',
-      transform: 'translateX(-50%)',
-      zIndex: 9999,
-      background: status === 'error' ? '#fef2f2' : '#fffbeb',
-      border: `1px solid ${status === 'error' ? '#fecaca' : '#fde68a'}`,
-      color: status === 'error' ? '#b91c1c' : '#92400e',
-      padding: '0.75rem 1.5rem',
-      borderRadius: '50px',
-      fontSize: '0.85rem',
-      fontWeight: '600',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '0.75rem',
-      boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-      whiteSpace: 'nowrap',
-      animation: 'slideUpFade 0.4s ease-out'
-    }}>
+    <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] px-6 py-3 rounded-full text-sm font-bold shadow-xl animate-fade-in flex items-center gap-3 border ${
+      status === 'error' ? 'bg-rose-50 border-rose-100 text-rose-600' : 'bg-amber-50 border-amber-100 text-amber-700'
+    }`}>
       {status === 'checking' ? (
         <>
-          <span style={{ display: 'inline-block', width: '14px', height: '14px', border: '2px solid #f59e0b', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-          Server warming up — first request may take up to 30 seconds&hellip;
+          <Loader2 size={16} className="animate-spin text-amber-500" />
+          Server warming up... please wait about 30 seconds
         </>
       ) : (
-        <>⚠️ Server connection issue — please refresh the page</>
+        <>⚠️ Connection issue — please refresh the page</>
       )}
     </div>
   );
 };
 
-// ─── Role → dashboard mapping ────────────────────────────────────────────────
-
-const ROLE_HOME = {
-  admin:    '/admin/dashboard',
-  manager:  '/manager/dashboard',
-  customer: '/customer/dashboard',
-};
-
-const roleDashboard = (role) => ROLE_HOME[role] || '/';
-
-// ─── Protected Route ─────────────────────────────────────────────────────────
-
-/**
- * Renders children only when the user is authenticated and (optionally) has
- * one of the required roles.  Otherwise redirects to the appropriate page.
- *
- * Props:
- *   allowedRoles  – string[] of permitted roles; omit to allow any logged-in user
- *   redirectTo    – fallback redirect when unauthenticated (default: '/login')
- */
 const ProtectedRoute = ({ children, allowedRoles, redirectTo = '/login' }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
 
-  // Wait for rehydration to finish
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-background">
        <Loader2 size={40} className="animate-spin text-primary" />
     </div>
   );
 
-  // Not logged in → send to login, preserving the state
   if (!user) {
-    return <Navigate to={redirectTo} state={{ from: location.pathname, ...location.state }} replace />;
+    return <Navigate to={redirectTo} state={{ from: location.pathname }} replace />;
   }
 
-  // Wrong role → redirect to their home
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    console.warn(`Access denied: User role '${user.role}' not permitted for this route.`);
-    return <Navigate to={roleDashboard(user.role)} replace />;
+    const dashboard = user.role === 'admin' ? '/admin/dashboard' : user.role === 'manager' ? '/manager/dashboard' : '/customer/dashboard';
+    return <Navigate to={dashboard} replace />;
   }
 
   return children;
 };
-
-// ─── App ─────────────────────────────────────────────────────────────────────
 
 function App() {
   const { user } = useAuth();
   useSocket();
   const location = useLocation();
 
-  // Hide Navbar / Footer inside dashboard pages
   const isDashboard =
     location.pathname.startsWith('/admin') ||
     location.pathname.startsWith('/manager') ||
     location.pathname.startsWith('/dashboard');
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <div className="min-h-screen flex flex-col bg-background selection:bg-primary/20 selection:text-primary">
       <ServerWakeUpBanner />
       {!isDashboard && <Navbar />}
 
-      <main style={{ flexGrow: 1 }}>
+      <main className="flex-grow">
         <Routes>
-          {/* ── Public ──────────────────────────────────────────────────────── */}
           <Route path="/" element={<Home />} />
-
-          <Route
-            path="/login"
-            element={user ? <Navigate to={roleDashboard(user.role)} replace /> : <Login />}
-          />
-          <Route
-            path="/register"
-            element={user ? <Navigate to={roleDashboard(user.role)} replace /> : <Register />}
-          />
-
-          {/* OAuth callback — handles popup messaging + redirect */}
+          <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
+          <Route path="/register" element={user ? <Navigate to="/" replace /> : <Register />} />
           <Route path="/oauth/callback" element={<OAuthCallback />} />
-
-          {/* Hotel browsing */}
           <Route path="/hotel/:id" element={<HotelDetails />} />
-          <Route path="/hotels"    element={<HotelListPage />} />
-
-          {/* New Auth Features */}
+          <Route path="/hotels" element={<HotelListPage />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
 
-          {/* ── Portals ────────────────────────────────────────────────────── */}
-          
           {/* Manager Portal */}
           <Route path="/manager">
-            {/* Index/Login routes: check specific role to avoid manager/admin leakage */}
-            <Route index element={user?.role === 'manager' ? <Navigate to="dashboard" replace /> : <ManagerLoginPage />} />
-            <Route path="login" element={user?.role === 'manager' ? <Navigate to="dashboard" replace /> : <ManagerLoginPage />} />
-            <Route path="register" element={user?.role === 'manager' ? <Navigate to="dashboard" replace /> : <ManagerRegisterPage />} />
-            
+            <Route index element={<ManagerLoginPage />} />
+            <Route path="login" element={<ManagerLoginPage />} />
+            <Route path="register" element={<ManagerRegisterPage />} />
             <Route element={<ProtectedRoute allowedRoles={['manager']} redirectTo="/manager/login"><ManagerLayout /></ProtectedRoute>}>
               <Route path="dashboard" element={<ManagerDashboardPage />} />
               <Route path="hotels" element={<ManagerHotels />} />
@@ -210,10 +145,9 @@ function App() {
 
           {/* Admin Portal */}
           <Route path="/admin">
-            <Route index element={user?.role === 'admin' ? <Navigate to="dashboard" replace /> : <AdminLoginPage />} />
-            <Route path="login" element={user?.role === 'admin' ? <Navigate to="dashboard" replace /> : <AdminLoginPage />} />
-            <Route path="register" element={user?.role === 'admin' ? <Navigate to="dashboard" replace /> : <AdminRegisterPage />} />
-            
+            <Route index element={<AdminLoginPage />} />
+            <Route path="login" element={<AdminLoginPage />} />
+            <Route path="register" element={<AdminRegisterPage />} />
             <Route element={<ProtectedRoute allowedRoles={['admin']} redirectTo="/admin/login"><AdminLayout /></ProtectedRoute>}>
               <Route path="dashboard" element={<AdminDashboardPage />} />
               <Route path="users" element={<UserManagement />} />
@@ -225,59 +159,12 @@ function App() {
             </Route>
           </Route>
 
-          {/* ── Customer dashboard ──────────────────────────────────────────── */}
-          <Route
-            path="/customer/dashboard"
-            element={
-              <ProtectedRoute allowedRoles={['customer', 'manager', 'admin']}>
-                <BookingHistory />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Generic /dashboard → role-based redirect */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Navigate to={roleDashboard(user?.role)} replace />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Booking / Payment (Any logged-in user can book) */}
-          <Route
-            path="/payment"
-            element={
-              <ProtectedRoute>
-                <PaymentPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/booking-success"
-            element={
-              <ProtectedRoute>
-                <BookingSuccess />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/booking-history"
-            element={
-              <ProtectedRoute allowedRoles={['customer', 'manager', 'admin']}>
-                <BookingHistory />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/notifications"
-            element={
-              <ProtectedRoute>
-                <NotificationsPage />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/customer/dashboard" element={<ProtectedRoute><BookingHistory /></ProtectedRoute>} />
+          <Route path="/payment" element={<ProtectedRoute><PaymentPage /></ProtectedRoute>} />
+          <Route path="/booking-success" element={<ProtectedRoute><BookingSuccess /></ProtectedRoute>} />
+          <Route path="/booking-history" element={<ProtectedRoute><BookingHistory /></ProtectedRoute>} />
+          <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
 

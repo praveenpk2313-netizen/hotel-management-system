@@ -3,12 +3,12 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { 
   Search,
   Menu,
-  Bell,
   User,
   Loader2,
   MapPin,
   CheckCircle2,
-  ChevronDown
+  ChevronDown,
+  X
 } from 'lucide-react';
 import Sidebar from '../../components/Sidebar';
 import NotificationBell from '../../components/NotificationBell';
@@ -68,8 +68,9 @@ const ManagerLayout = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-background font-sans">
-      {/* Sidebar Component */}
+    <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
+      
+      {/* ─── SIDEBAR ARCHITECTURE ─────────────────────────────────────────── */}
       <Sidebar 
         isOpen={isSidebarOpen} 
         activeSection={activeSection} 
@@ -77,51 +78,53 @@ const ManagerLayout = () => {
         onClose={() => setSidebarOpen(false)}
       />
 
-      {/* Main Content Area */}
-      <main className="flex-1 flex flex-col min-w-0 transition-all duration-300 lg:ml-0">
+      {/* ─── MAIN CANVAS WORKSPACE ─────────────────────────────────────────── */}
+      <main className="flex-1 flex flex-col min-w-0 transition-all duration-300 lg:pl-72">
         
-        {/* Top Header */}
-        <header className="h-20 lg:h-24 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-6 md:px-10 sticky top-0 z-[90]">
+        {/* Top Intelligence Hub */}
+        <header className="h-24 bg-white/80 backdrop-blur-2xl border-b border-gray-100 flex items-center justify-between px-6 lg:px-10 sticky top-0 z-[500] flex-shrink-0">
           
-          {/* Left: Search & Mobile Toggle */}
+          {/* Search Hub & Mobile Toggle */}
           <div className="flex items-center gap-6 flex-1 max-w-2xl">
             <button 
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2.5 bg-gray-50 rounded-xl text-secondary hover:bg-gray-100 transition-colors"
+              className="lg:hidden p-3 bg-gray-50 rounded-2xl text-secondary-dark hover:bg-gray-100 transition-colors"
             >
               <Menu size={24} />
             </button>
 
             <div className="hidden md:flex relative flex-1 group">
-               <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors">
+               <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors">
                   <Search size={20} />
                </div>
                <input 
                  type="text" 
-                 placeholder="Search guest, booking, or city..." 
+                 placeholder="Audit guest, booking, or property data..." 
                  value={searchTerm}
                  onChange={handleSearchChange}
-                 className="w-full h-12 pl-12 pr-12 bg-gray-50 border-2 border-transparent rounded-[14px] text-sm font-medium focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 transition-all outline-none"
+                 className="w-full h-14 pl-14 pr-12 bg-gray-50 border-2 border-transparent rounded-[1.25rem] text-[13px] font-bold focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 transition-all outline-none text-secondary-dark placeholder:text-gray-400 placeholder:font-medium placeholder:uppercase placeholder:tracking-widest placeholder:text-[10px]"
+                 onFocus={() => { if (searchTerm && suggestions.length > 0) setShowSuggestions(true); }}
+                 onBlur={() => setTimeout(() => setShowSuggestions(false), 300)}
                />
                {loadingSuggestions && (
-                 <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                 <div className="absolute right-5 top-1/2 -translate-y-1/2">
                     <Loader2 size={16} className="animate-spin text-primary" />
                  </div>
                )}
 
-               {/* Suggestions Dropdown */}
+               {/* Suggestions Dropdown Engine */}
                {showSuggestions && (suggestions.length > 0) && (
-                 <div className="absolute top-[120%] left-0 w-full bg-white rounded-2xl shadow-premium border border-gray-100 py-2 z-[100] animate-fade-in">
+                 <div className="absolute top-[120%] left-0 w-full bg-white rounded-2xl shadow-premium border border-gray-100 py-3 z-[1000] animate-slide-up">
                     {suggestions.map((text, idx) => (
                       <button 
                         key={idx} 
                         onClick={() => handleSuggestionClick(text)}
-                        className="w-full px-5 py-3.5 text-left flex items-center gap-3 hover:bg-gray-50 transition-colors text-sm font-600 text-secondary"
+                        className="w-full px-6 py-4 text-left flex items-center gap-4 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-none"
                       >
-                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                           <MapPin size={16} />
+                        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                           <MapPin size={18} />
                         </div>
-                        {text}
+                        <span className="text-xs font-black uppercase tracking-widest text-secondary-dark">{text}</span>
                       </button>
                     ))}
                  </div>
@@ -129,71 +132,59 @@ const ManagerLayout = () => {
             </div>
           </div>
 
-          {/* Right: Actions & Profile */}
-          <div className="flex items-center gap-4 md:gap-7">
-             <div className="flex items-center gap-2">
-                <NotificationBell />
-             </div>
-             
-             <div className="h-10 w-[1px] bg-gray-100 hidden sm:block" />
+          {/* User Intelligence Controls */}
+          <div className="flex items-center gap-6">
+             <NotificationBell />
+             <div className="h-10 w-px bg-gray-100 hidden sm:block" />
 
-             <div className="flex items-center gap-3 pl-2 group cursor-pointer">
+             <div className="flex items-center gap-4 group cursor-pointer transition-transform active:scale-95">
                 <div className="text-right hidden sm:block">
-                   <p className="text-sm font-black text-secondary-dark leading-none mb-1">{user?.name || 'Manager'}</p>
-                   <div className="flex items-center justify-end gap-1.5 opacity-60">
-                      <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />
-                      <p className="text-[10px] font-black uppercase tracking-wider text-primary">Live Session</p>
-                   </div>
+                   <p className="text-[10px] font-black uppercase tracking-[2px] leading-none text-secondary-dark">{user?.name || 'Partner'}</p>
+                   <p className="text-[8px] font-bold text-primary uppercase tracking-[2px] mt-1.5 opacity-80">Managing Principal</p>
                 </div>
-                <div className="relative group">
-                   <div className="w-11 h-11 rounded-2xl bg-gray-100 flex items-center justify-center text-secondary border-2 border-transparent group-hover:border-primary/30 transition-all overflow-hidden">
-                      {user?.avatar ? (
-                        <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
-                      ) : (
-                        <User size={22} className="opacity-50" />
-                      )}
-                   </div>
+                <div className="w-12 h-12 rounded-[0.95rem] bg-secondary-dark text-white flex items-center justify-center font-black text-xs shadow-xl border-2 border-primary/20 group-hover:rotate-6 transition-transform overflow-hidden">
+                   {user?.avatar ? (
+                     <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
+                   ) : (
+                     <User size={22} className="opacity-80" />
+                   )}
                 </div>
-                <ChevronDown size={16} className="text-gray-400 group-hover:text-secondary transition-colors" />
+                <ChevronDown size={14} className="text-gray-300 group-hover:text-primary transition-colors" />
              </div>
           </div>
         </header>
 
-        {/* Dynamic Page Content Area */}
-        <div className="p-6 md:p-10 lg:p-12 max-w-[1600px] mx-auto w-full flex-1">
-          {/* Section Breadcrumb/Title */}
-          <div className="mb-10 animate-slide-up">
-             <div className="flex items-center gap-2 text-xs font-black text-primary uppercase tracking-[2px] mb-2">
-                <CheckCircle2 size={12} /> Partner Central
-             </div>
-             <h1 className="text-4xl lg:text-5xl font-serif text-secondary-dark capitalize font-bold leading-tight">
-                Manage your <span className="text-primary italic">{activeSection}</span>
-             </h1>
-          </div>
-          
-          <Outlet />
+        {/* Workspace Canvas Area */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden pt-10 pb-32 custom-scrollbar">
+           <div className="max-w-[1600px] mx-auto px-6 lg:px-10">
+              {/* Dynamic Header Badge/Breadcrumb */}
+              <div className="mb-12 animate-slide-up">
+                 <div className="flex items-center gap-3 text-[9px] font-black text-primary uppercase tracking-[4px] mb-3">
+                    <CheckCircle2 size={12} className="animate-pulse" /> Verified Intelligence Stream 2026
+                 </div>
+                 <h1 className="text-5xl lg:text-6xl font-serif text-secondary-dark font-black tracking-tighter leading-none">
+                    Audit your <span className="text-primary italic">{activeSection}</span>
+                 </h1>
+              </div>
+              
+              <div className="animate-fade-in">
+                 <Outlet />
+              </div>
+           </div>
         </div>
 
-        {/* Footer info */}
-        <footer className="px-10 py-6 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
-           <p className="text-xs font-bold text-gray-400 uppercase tracking-widest leading-none">
-              &copy; 2026 PK UrbanStay Luxury Collection
+        {/* Management Protocol Footer */}
+        <footer className="h-16 px-10 border-t border-gray-50 bg-white flex flex-col md:flex-row justify-between items-center gap-4 flex-shrink-0 animate-fade-in">
+           <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest italic leading-none">
+              © {new Date().getFullYear()} PK UrbanStay Hospitality Group International.
            </p>
-           <div className="flex gap-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">
-              <a href="#" className="hover:text-primary transition-colors">Documentation</a>
-              <a href="#" className="hover:text-primary transition-colors">Privacy</a>
-              <a href="#" className="hover:text-primary transition-colors">Support</a>
+           <div className="flex gap-8">
+              {['Documentation', 'Security', 'Privacy Covenants'].map((link) => (
+                <a key={link} href="#" className="text-[9px] font-black text-gray-400 uppercase tracking-widest hover:text-primary transition-colors">{link}</a>
+              ))}
            </div>
         </footer>
       </main>
-
-      <style>{`
-        @keyframes slideUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-slide-up { animation: slideUp 0.6s ease-out forwards; }
-      `}</style>
     </div>
   );
 };
