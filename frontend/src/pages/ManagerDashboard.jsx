@@ -1,42 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Users, 
-  Hotel as HotelIcon, 
-  Calendar, 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Search,
-  CheckCircle,
-  Menu,
-  Clock,
-  ArrowUpRight,
-  UserSquare2,
+  Building2, 
+  BedDouble, 
+  BookOpen, 
+  IndianRupee, 
+  LogOut, 
+  Bell, 
+  LayoutDashboard, 
+  MessageSquare,
+  Hotel,
+  Plus,
+  Trash2,
   X,
-  Upload,
+  Search,
   Save,
-  Check,
-  MoreVertical,
-  ChevronRight
+  Menu
 } from 'lucide-react';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer, 
-} from 'recharts';
-import Sidebar from '../components/Sidebar';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import * as api from '../services/api';
-
-const occupancyData = [
-  { name: 'Week 1', value: 65 },
-  { name: 'Week 2', value: 72 },
-  { name: 'Week 3', value: 85 },
-  { name: 'Week 4', value: 78 },
-];
 
 const AMENITIES_LIST = [
   { id: 'wifi', label: 'Free Wi-Fi', icon: '📶' },
@@ -45,60 +27,29 @@ const AMENITIES_LIST = [
   { id: 'lift', label: 'Lift / Elevator', icon: '🛗' },
   { id: 'parking', label: 'Free Parking', icon: '🅿️' },
   { id: 'reception', label: '24-hour Reception', icon: '🏪' },
-  { id: 'tv', label: 'Smart TV', icon: '📺' },
-  { id: 'bathroom', label: 'Attached Bathroom', icon: '🚿' },
-  { id: 'geyser', label: 'Geyser (Hot Water)', icon: '🌡️' },
-  { id: 'kettle', label: 'Electric Kettle', icon: '☕' },
-  { id: 'desk', label: 'Study / Work Desk', icon: '💻' },
-  { id: 'wardrobe', label: 'Wardrobe / Cupboard', icon: '🧺' },
-  { id: 'heater', label: 'Room Heater', icon: '♨️' },
+  { id: 'tv', label: 'Smart TV', icon: '📺' }
 ];
 
 const ManagerDashboard = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('hotels');
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [activeSection, setActiveSection] = useState('dashboard');
+  
   const [hotels, setHotels] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
-  
-  // Modals
+
+  // Modals & Forms
   const [showAddHotel, setShowAddHotel] = useState(false);
   const [showAddRoom, setShowAddRoom] = useState(false);
   const [selectedHotel, setSelectedHotel] = useState(null);
   const [selectedAmenities, setSelectedAmenities] = useState([]);
-  const [uploading, setUploading] = useState(false);
   const [hotelImageUrls, setHotelImageUrls] = useState([]);
   const [roomImageUrls, setRoomImageUrls] = useState([]);
-
-  const toggleAmenity = (label) => {
-    setSelectedAmenities(prev => 
-      prev.includes(label) ? prev.filter(a => a !== label) : [...prev, label]
-    );
-  };
-
-  const uploadFileHandler = async (e, setImageUrls) => {
-    const files = e.target.files;
-    const formData = new FormData();
-    for (let i = 0; i < files.length; i++) {
-      formData.append('images', files[i]);
-    }
-    setUploading(true);
-
-    try {
-      const { data } = await api.uploadImage(formData);
-      // data is an array of paths
-      setImageUrls(prev => [...prev, ...data]);
-      setUploading(false);
-    } catch (error) {
-      console.error(error);
-      setUploading(false);
-    }
-  };
-
-  const removeImage = (url, setImageUrls) => {
-    setImageUrls(prev => prev.filter(item => item !== url));
-  };
+  const [uploading, setUploading] = useState(false);
+  
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     loadDashboardData();
@@ -133,307 +84,400 @@ const ManagerDashboard = () => {
     }
   };
 
-  const handleUpdateBookingStatus = async (id, status) => {
+  const handleLogout = () => {
+    logout();
+    navigate('/manager/login');
+  };
+
+  const toggleAmenity = (label) => {
+    setSelectedAmenities(prev => 
+      prev.includes(label) ? prev.filter(a => a !== label) : [...prev, label]
+    );
+  };
+
+  const uploadFileHandler = async (e, setImageUrls) => {
+    const files = e.target.files;
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      formData.append('images', files[i]);
+    }
+    setUploading(true);
     try {
-      await api.updateBookingStatus(id, status);
-      loadDashboardData();
-    } catch (err) {
-      alert('Failed to update status');
+      const { data } = await api.uploadImage(formData);
+      setImageUrls(prev => [...prev, ...data]);
+      setUploading(false);
+    } catch (error) {
+      console.error(error);
+      setUploading(false);
     }
   };
 
-  const renderOverview = () => (
-    <>
-    </>
+  const removeImage = (url, setImageUrls) => {
+    setImageUrls(prev => prev.filter(item => item !== url));
+  };
+
+  // Calculate stats
+  const totalHotels = hotels.length;
+  const totalRooms = rooms.length;
+  const today = new Date().toISOString().split('T')[0];
+  const bookingsToday = bookings.filter(b => b.createdAt && b.createdAt.startsWith(today)).length;
+  const revenue = bookings.reduce((acc, curr) => acc + (curr.totalPrice || 0), 0);
+
+  // --- Render Sections ---
+  const renderDashboard = () => (
+    <div style={{ padding: '2rem 3rem' }}>
+      <h2 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#111827', marginBottom: '2rem' }}>Overview</h2>
+      
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
+        {/* Total Hotels */}
+        <div style={{ background: '#ffffff', borderRadius: '16px', padding: '1.5rem', boxShadow: '0 4px 15px rgba(0,0,0,0.03)', display: 'flex', flexDirection: 'column', gap: '1rem', border: '1px solid #f3f4f6' }}>
+          <div style={{ width: '48px', height: '48px', background: '#eff6ff', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Building2 size={24} color="#3b82f6" />
+          </div>
+          <div>
+            <p style={{ color: '#6b7280', fontSize: '0.875rem', fontWeight: '600', marginBottom: '0.25rem' }}>Total Hotels</p>
+            <h3 style={{ fontSize: '1.75rem', fontWeight: '800', color: '#111827' }}>{totalHotels}</h3>
+          </div>
+        </div>
+
+        {/* Total Rooms */}
+        <div style={{ background: '#ffffff', borderRadius: '16px', padding: '1.5rem', boxShadow: '0 4px 15px rgba(0,0,0,0.03)', display: 'flex', flexDirection: 'column', gap: '1rem', border: '1px solid #f3f4f6' }}>
+          <div style={{ width: '48px', height: '48px', background: '#fff7ed', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <BedDouble size={24} color="#f97316" />
+          </div>
+          <div>
+            <p style={{ color: '#6b7280', fontSize: '0.875rem', fontWeight: '600', marginBottom: '0.25rem' }}>Total Rooms</p>
+            <h3 style={{ fontSize: '1.75rem', fontWeight: '800', color: '#111827' }}>{totalRooms}</h3>
+          </div>
+        </div>
+
+        {/* Bookings Today */}
+        <div style={{ background: '#ffffff', borderRadius: '16px', padding: '1.5rem', boxShadow: '0 4px 15px rgba(0,0,0,0.03)', display: 'flex', flexDirection: 'column', gap: '1rem', border: '1px solid #f3f4f6' }}>
+          <div style={{ width: '48px', height: '48px', background: '#f0fdf4', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <BookOpen size={24} color="#22c55e" />
+          </div>
+          <div>
+            <p style={{ color: '#6b7280', fontSize: '0.875rem', fontWeight: '600', marginBottom: '0.25rem' }}>Bookings Today</p>
+            <h3 style={{ fontSize: '1.75rem', fontWeight: '800', color: '#111827' }}>{bookingsToday}</h3>
+          </div>
+        </div>
+
+        {/* Revenue */}
+        <div style={{ background: '#ffffff', borderRadius: '16px', padding: '1.5rem', boxShadow: '0 4px 15px rgba(0,0,0,0.03)', display: 'flex', flexDirection: 'column', gap: '1rem', border: '1px solid #f3f4f6' }}>
+          <div style={{ width: '48px', height: '48px', background: '#faf5ff', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <IndianRupee size={24} color="#a855f7" />
+          </div>
+          <div>
+            <p style={{ color: '#6b7280', fontSize: '0.875rem', fontWeight: '600', marginBottom: '0.25rem' }}>Revenue</p>
+            <h3 style={{ fontSize: '1.75rem', fontWeight: '800', color: '#111827' }}>₹{revenue.toLocaleString('en-IN')}</h3>
+          </div>
+        </div>
+      </div>
+
+      <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '2rem 0' }} />
+      
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <div style={{ width: '50px', height: '50px', background: '#f3f4f6', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+           <Building2 size={24} color="#111" />
+        </div>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#111827' }}>NK Hotel Bookings</h2>
+      </div>
+      
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '2rem', marginTop: '2rem' }}>
+         <span style={{ fontSize: '0.8rem', fontWeight: '700', letterSpacing: '1px', color: '#111' }}>PRIVACY</span>
+         <span style={{ fontSize: '0.8rem', fontWeight: '700', letterSpacing: '1px', color: '#111' }}>TERMS</span>
+         <span style={{ fontSize: '0.8rem', fontWeight: '700', letterSpacing: '1px', color: '#111' }}>CONTACT</span>
+      </div>
+    </div>
   );
 
-  const renderHotels = () => (
-    <div className="table-container">
-      <div style={{ padding: '1.5rem', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <h3 className="luxury-font" style={{ fontSize: '1.25rem' }}>Hotels Manager</h3>
-          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Add new hotels and manage images</p>
-        </div>
-        <button onClick={() => setShowAddHotel(true)} className="btn-primary" style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+  const renderManageHotels = () => (
+    <div style={{ padding: '2rem 3rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <h2 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#111827' }}>Manage Hotels</h2>
+        <button 
+          onClick={() => setShowAddHotel(true)} 
+          style={{ background: '#ff5a36', color: 'white', padding: '0.6rem 1.2rem', borderRadius: '8px', fontWeight: '600', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+        >
           <Plus size={18} /> Add Hotel
         </button>
       </div>
-      <table className="data-table">
-        <thead>
-          <tr>
-            <th>Hotel Name</th>
-            <th>Location</th>
-            <th>Image</th>
-            <th>Amenities</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {hotels.map((h) => (
-            <tr key={h._id}>
-              <td style={{ fontWeight: '600' }}>{h.name}</td>
-              <td>{h.city}</td>
-              <td>
-                {h.images && h.images[0] ? (
-                  <img src={`http://localhost:5000${h.images[0]}`} alt={h.name} style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover' }} />
-                ) : <div style={{ width: '40px', height: '40px', background: '#f1f5f9', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><HotelIcon size={16} /></div>}
-              </td>
-              <td>{h.amenities?.slice(0, 2).join(', ')}...</td>
-              <td>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <button onClick={() => { setSelectedHotel(h); loadRooms(h._id); setActiveSection('rooms'); }} className="btn-primary" style={{ padding: '4px 8px', fontSize: '0.75rem' }}>Manage Rooms</button>
-                  <button onClick={() => api.deleteHotel(h._id).then(loadDashboardData)} style={{ background: 'none', border: 'none', color: 'var(--error)', cursor: 'pointer' }}><Trash2 size={16} /></button>
-                </div>
-              </td>
+
+      <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+          <thead>
+            <tr style={{ borderBottom: '1px solid #e5e7eb', background: '#f9fafb' }}>
+              <th style={{ padding: '1rem', fontSize: '0.875rem', fontWeight: '600', color: '#4b5563' }}>Hotel Name</th>
+              <th style={{ padding: '1rem', fontSize: '0.875rem', fontWeight: '600', color: '#4b5563' }}>Location</th>
+              <th style={{ padding: '1rem', fontSize: '0.875rem', fontWeight: '600', color: '#4b5563' }}>Image</th>
+              <th style={{ padding: '1rem', fontSize: '0.875rem', fontWeight: '600', color: '#4b5563' }}>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {hotels.map(h => (
+              <tr key={h._id} style={{ borderBottom: '1px solid #e5e7eb' }}>
+                <td style={{ padding: '1rem', fontWeight: '600', color: '#111827' }}>{h.name}</td>
+                <td style={{ padding: '1rem', color: '#4b5563' }}>{h.city}</td>
+                <td style={{ padding: '1rem' }}>
+                  {h.images?.length > 0 ? (
+                    <img src={`http://localhost:5000${h.images[0]}`} alt={h.name} style={{ width: '48px', height: '48px', borderRadius: '8px', objectFit: 'cover' }} />
+                  ) : <div style={{ width: '48px', height: '48px', background: '#f3f4f6', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Hotel size={20} color="#9ca3af" /></div>}
+                </td>
+                <td style={{ padding: '1rem' }}>
+                  <div style={{ display: 'flex', gap: '0.75rem' }}>
+                    <button 
+                      onClick={() => { setSelectedHotel(h); loadRooms(h._id); setActiveSection('manage_rooms'); }}
+                      style={{ background: '#f3f4f6', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '6px', fontWeight: '600', color: '#111827', cursor: 'pointer', fontSize: '0.8rem' }}
+                    >
+                      Manage Rooms
+                    </button>
+                    <button onClick={() => api.deleteHotel(h._id).then(loadDashboardData)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}>
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+            {loading && <tr><td colSpan="4" style={{ padding: '1rem', textAlign: 'center' }}>Loading...</td></tr>}
+            {!loading && hotels.length === 0 && <tr><td colSpan="4" style={{ padding: '1rem', textAlign: 'center', color: '#6b7280' }}>No hotels found.</td></tr>}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 
-  const handleUpdateRoom = async (id, data) => {
-    try {
-      await api.updateRoom(id, data);
-      loadRooms(selectedHotel?._id);
-    } catch (err) {
-      alert('Update failed');
-    }
-  };
-
-  const renderRoomCategories = () => (
-    <div className="table-container">
-      <div style={{ padding: '1.5rem', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+  const renderManageRooms = () => (
+    <div style={{ padding: '2rem 3rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
         <div>
-          <h3 className="luxury-font" style={{ fontSize: '1.25rem' }}>Room Management</h3>
-          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Create room categories for <strong>{selectedHotel?.name}</strong></p>
+          <h2 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#111827' }}>Manage Rooms</h2>
+          <p style={{ color: '#6b7280', fontSize: '0.9rem', marginTop: '0.25rem' }}>Hotel: <strong>{selectedHotel?.name || 'Please select a hotel first'}</strong></p>
         </div>
-        <button onClick={() => setShowAddRoom(true)} className="btn-primary" style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <Plus size={18} /> Create Room
-        </button>
+        {selectedHotel && (
+          <button 
+            onClick={() => setShowAddRoom(true)} 
+            style={{ background: '#ff5a36', color: 'white', padding: '0.6rem 1.2rem', borderRadius: '8px', fontWeight: '600', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+          >
+            <Plus size={18} /> Add Room
+          </button>
+        )}
       </div>
-      <table className="data-table">
-        <thead>
-          <tr>
-            <th>Room No</th>
-            <th>Category</th>
-            <th>Image</th>
-            <th>Capacity</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rooms.map((r) => (
-            <tr key={r._id}>
-              <td style={{ fontWeight: '700' }}>#{r.roomNumber}</td>
-              <td>{r.type}</td>
-              <td>
-                {r.images && r.images[0] ? (
-                  <img src={`http://localhost:5000${r.images[0]}`} alt={r.type} style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover' }} />
-                ) : <div style={{ width: '40px', height: '40px', background: '#f1f5f9', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={16} /></div>}
-              </td>
-              <td>{r.capacity} Persons</td>
-              <td>
-                <button onClick={() => api.deleteRoom(r._id).then(() => loadRooms(selectedHotel._id))} style={{ background: 'none', border: 'none', color: 'var(--error)', cursor: 'pointer' }}><Trash2 size={16} /></button>
-              </td>
+
+      <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+          <thead>
+            <tr style={{ borderBottom: '1px solid #e5e7eb', background: '#f9fafb' }}>
+              <th style={{ padding: '1rem', fontSize: '0.875rem', fontWeight: '600', color: '#4b5563' }}>Room No</th>
+              <th style={{ padding: '1rem', fontSize: '0.875rem', fontWeight: '600', color: '#4b5563' }}>Category</th>
+              <th style={{ padding: '1rem', fontSize: '0.875rem', fontWeight: '600', color: '#4b5563' }}>Price</th>
+              <th style={{ padding: '1rem', fontSize: '0.875rem', fontWeight: '600', color: '#4b5563' }}>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {rooms.map(r => (
+              <tr key={r._id} style={{ borderBottom: '1px solid #e5e7eb' }}>
+                <td style={{ padding: '1rem', fontWeight: '600', color: '#111827' }}>#{r.roomNumber}</td>
+                <td style={{ padding: '1rem', color: '#4b5563' }}>{r.type}</td>
+                <td style={{ padding: '1rem', color: '#111827', fontWeight: '600' }}>₹{r.price}</td>
+                <td style={{ padding: '1rem' }}>
+                  <button onClick={() => api.deleteRoom(r._id).then(() => loadRooms(selectedHotel._id))} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}>
+                    <Trash2 size={18} />
+                  </button>
+                </td>
+              </tr>
+            ))}
+            {!selectedHotel && <tr><td colSpan="4" style={{ padding: '1rem', textAlign: 'center', color: '#6b7280' }}>Select a hotel from Manage Hotels first.</td></tr>}
+            {selectedHotel && rooms.length === 0 && <tr><td colSpan="4" style={{ padding: '1rem', textAlign: 'center', color: '#6b7280' }}>No rooms found for this hotel.</td></tr>}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 
-  const renderPricingAvailability = () => (
-    <div className="table-container">
-      <div style={{ padding: '1.5rem', borderBottom: '1px solid #f1f5f9' }}>
-        <h3 className="luxury-font" style={{ fontSize: '1.25rem' }}>Price & Availability</h3>
-        <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Real-time inventory management for <strong>{selectedHotel?.name}</strong></p>
-      </div>
-      <table className="data-table">
-        <thead>
-          <tr>
-            <th>Room</th>
-            <th>Price per Night</th>
-            <th>Current Status</th>
-            <th>Quick Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rooms.map((r) => (
-            <tr key={r._id}>
-              <td style={{ fontWeight: '600' }}>{r.type} (#{r.roomNumber})</td>
-              <td>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span style={{ color: 'var(--text-muted)' }}>$</span>
-                  <input 
-                    type="number" 
-                    defaultValue={r.price} 
-                    onBlur={(e) => handleUpdateRoom(r._id, { price: Number(e.target.value) })}
-                    style={{ width: '90px', padding: '6px 10px', borderRadius: '8px', border: '1px solid #e2e8f0', fontWeight: '700', color: 'var(--primary)' }}
-                  />
-                </div>
-              </td>
-              <td>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: r.isAvailable ? '#10b981' : '#ef4444' }}></div>
-                  <span style={{ fontWeight: '500', color: r.isAvailable ? '#10b981' : '#ef4444' }}>
-                    {r.isAvailable ? 'Available' : 'Booked/Maintenance'}
+  const renderReservations = () => (
+    <div style={{ padding: '2rem 3rem' }}>
+      <h2 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#111827', marginBottom: '2rem' }}>Reservations</h2>
+      
+      <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+          <thead>
+            <tr style={{ borderBottom: '1px solid #e5e7eb', background: '#f9fafb' }}>
+              <th style={{ padding: '1rem', fontSize: '0.875rem', fontWeight: '600', color: '#4b5563' }}>Guest</th>
+              <th style={{ padding: '1rem', fontSize: '0.875rem', fontWeight: '600', color: '#4b5563' }}>Hotel</th>
+              <th style={{ padding: '1rem', fontSize: '0.875rem', fontWeight: '600', color: '#4b5563' }}>Dates</th>
+              <th style={{ padding: '1rem', fontSize: '0.875rem', fontWeight: '600', color: '#4b5563' }}>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {bookings.map(b => (
+              <tr key={b._id} style={{ borderBottom: '1px solid #e5e7eb' }}>
+                <td style={{ padding: '1rem' }}>
+                  <p style={{ fontWeight: '600', color: '#111827' }}>{b.user?.name}</p>
+                  <p style={{ fontSize: '0.75rem', color: '#6b7280' }}>{b.user?.email}</p>
+                </td>
+                <td style={{ padding: '1rem', color: '#4b5563' }}>{b.hotel?.name || 'N/A'}</td>
+                <td style={{ padding: '1rem', color: '#4b5563', fontSize: '0.875rem' }}>
+                  {new Date(b.checkInDate).toLocaleDateString()} - {new Date(b.checkOutDate).toLocaleDateString()}
+                </td>
+                <td style={{ padding: '1rem' }}>
+                  <span style={{ 
+                    padding: '0.25rem 0.75rem', 
+                    borderRadius: '999px', 
+                    fontSize: '0.75rem', 
+                    fontWeight: '600',
+                    background: b.status === 'confirmed' ? '#dcfce7' : '#f3f4f6', 
+                    color: b.status === 'confirmed' ? '#166534' : '#4b5563',
+                    textTransform: 'capitalize'
+                  }}>
+                    {b.status}
                   </span>
-                </div>
-              </td>
-              <td>
-                <button 
-                  onClick={() => handleUpdateRoom(r._id, { isAvailable: !r.isAvailable })}
-                  style={{ 
-                    padding: '6px 12px', 
-                    borderRadius: '8px', 
-                    border: '1px solid #e2e8f0', 
-                    background: 'white',
-                    cursor: 'pointer',
-                    fontSize: '0.8rem',
-                    fontWeight: '600'
-                  }}
-                >
-                  Mark as {r.isAvailable ? 'Unavailable' : 'Available'}
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-
-  const renderBookings = () => (
-    <div className="table-container">
-      <div style={{ padding: '1.5rem', borderBottom: '1px solid #f1f5f9' }}>
-        <h3 className="luxury-font" style={{ fontSize: '1.25rem' }}>Reservation Tracking</h3>
-        <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Manage guest check-ins and statuses</p>
+                </td>
+              </tr>
+            ))}
+            {bookings.length === 0 && <tr><td colSpan="4" style={{ padding: '1rem', textAlign: 'center', color: '#6b7280' }}>No reservations found.</td></tr>}
+          </tbody>
+        </table>
       </div>
-      <table className="data-table">
-        <thead>
-          <tr>
-            <th>Guest</th>
-            <th>Hotel/Room</th>
-            <th>Dates</th>
-            <th>Amount</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {bookings.map((b) => (
-            <tr key={b._id}>
-              <td>
-                <p style={{ fontWeight: '600' }}>{b.user?.name}</p>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{b.user?.email}</p>
-              </td>
-              <td>
-                <p style={{ fontWeight: '500' }}>{b.hotel?.name}</p>
-                <p style={{ fontSize: '0.75rem', color: 'var(--primary)' }}>Room #{b.room?.roomNumber}</p>
-              </td>
-              <td>
-                <p style={{ fontSize: '0.85rem' }}>{new Date(b.checkInDate).toLocaleDateString()}</p>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>to {new Date(b.checkOutDate).toLocaleDateString()}</p>
-              </td>
-              <td style={{ fontWeight: '600' }}>${b.totalPrice}</td>
-              <td>
-                <select 
-                  value={b.status} 
-                  onChange={(e) => handleUpdateBookingStatus(b._id, e.target.value)}
-                  style={{ padding: '4px 8px', borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '0.85rem' }}
-                >
-                  <option value="pending">Pending</option>
-                  <option value="confirmed">Confirmed</option>
-                  <option value="cancelled">Cancelled</option>
-                  <option value="completed">Completed</option>
-                </select>
-              </td>
-              <td>
-                <button className="btn-primary" style={{ padding: '4px 8px', fontSize: '0.7rem' }}>View Details</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
     </div>
   );
 
-  const renderSection = () => {
-    if (loading) return <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}>Loading dashboard...</div>;
-    
-    switch (activeSection) {
-      case 'hotels': return renderHotels();
-      case 'rooms': return renderRoomCategories();
-      case 'pricing': return renderPricingAvailability();
-      case 'bookings': return renderBookings();
-      default: return renderHotels();
-    }
-  };
+  const renderReviews = () => (
+    <div style={{ padding: '2rem 3rem' }}>
+      <h2 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#111827', marginBottom: '2rem' }}>Reviews</h2>
+      <div style={{ padding: '3rem', textAlign: 'center', background: '#f9fafb', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
+        <MessageSquare size={48} color="#9ca3af" style={{ margin: '0 auto 1rem' }} />
+        <p style={{ color: '#4b5563', fontWeight: '600' }}>No reviews available at the moment.</p>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="dashboard-container">
-      <Sidebar 
-        isOpen={isSidebarOpen} 
-        activeSection={activeSection} 
-        onSectionChange={(id) => {
-          setActiveSection(id);
-          setIsSidebarOpen(false);
-        }}
-      />
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#fafafa', fontFamily: '"Inter", sans-serif' }}>
       
-      <main className="dashboard-content">
-        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <button 
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer' }}
-              className="mobile-menu-btn"
+      {/* Mobile Toggle Button */}
+      <button 
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
+        style={{ position: 'fixed', top: '15px', left: '15px', zIndex: 1000, background: 'white', border: 'none', padding: '0.5rem', borderRadius: '8px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)', display: 'none' }}
+        className="mobile-only-btn"
+      >
+        <Menu size={20} />
+      </button>
+
+      {/* Sidebar */}
+      <aside className={`dashboard-sidebar ${isMobileMenuOpen ? 'open' : ''}`} style={{ 
+        width: '260px', 
+        background: '#ffffff', 
+        borderRight: '1px solid #e5e7eb', 
+        display: 'flex', 
+        flexDirection: 'column',
+        position: 'sticky',
+        top: 0,
+        height: '100vh',
+        zIndex: 50
+      }}>
+        <div style={{ padding: '2rem 1.5rem', flexShrink: 0 }}>
+          <h1 style={{ color: '#ff5a36', fontSize: '1.25rem', fontWeight: '800', margin: 0 }}>Manager Portal</h1>
+          <p style={{ color: '#9ca3af', fontSize: '0.8rem', marginTop: '0.3rem', fontWeight: '600' }}>Welcome back, Manager</p>
+        </div>
+
+        <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem', padding: '0 1rem' }}>
+          {[
+            { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+            { id: 'manage_hotels', label: 'Manage Hotels', icon: Building2 },
+            { id: 'manage_rooms', label: 'Manage Rooms', icon: BedDouble },
+            { id: 'reservations', label: 'Reservations', icon: BookOpen },
+            { id: 'reviews', label: 'Reviews', icon: MessageSquare }
+          ].map(item => (
+            <button
+              key={item.id}
+              onClick={() => { setActiveSection(item.id); setIsMobileMenuOpen(false); }}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.8rem 1rem', width: '100%',
+                background: activeSection === item.id ? '#ff5a36' : 'transparent',
+                color: activeSection === item.id ? 'white' : '#4b5563',
+                border: 'none', borderRadius: '8px', cursor: 'pointer',
+                textAlign: 'left', fontWeight: '600', fontSize: '0.9rem',
+                transition: '0.2s'
+              }}
             >
-              <Menu size={24} />
+              <item.icon size={18} />
+              {item.label}
             </button>
-            <h1 className="luxury-font" style={{ fontSize: '2rem', textTransform: 'capitalize' }}>
-              {activeSection} Portal
-            </h1>
-          </div>
-          
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <button className="btn-primary" onClick={() => setShowAddHotel(true)}>Add Hotel</button>
-            <div style={{ position: 'relative' }}>
-              <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
-              <input type="text" placeholder="Search..." style={{ padding: '10px 12px 10px 40px', borderRadius: '12px', border: '1px solid #e2e8f0', width: '250px' }} />
+          ))}
+        </nav>
+
+        <div style={{ padding: '1.5rem' }}>
+          <button 
+            onClick={handleLogout}
+            style={{ 
+              display: 'flex', alignItems: 'center', gap: '1rem', width: '100%', padding: '0.8rem 1rem',
+              background: 'transparent', color: '#ef4444', border: 'none', cursor: 'pointer',
+              fontWeight: '700', fontSize: '0.9rem'
+            }}
+          >
+            <LogOut size={18} /> Logout
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
+        
+        {/* Top Navbar */}
+        <header style={{ 
+          height: '70px', 
+          background: '#ffffff', 
+          borderBottom: '1px solid #e5e7eb',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '0 2rem'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div style={{ width: '32px', height: '32px', background: '#f3f4f6', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+               <Building2 size={18} color="#111" />
             </div>
+            <span style={{ fontSize: '1.25rem', fontWeight: '800', color: '#111827' }}>NK Manager</span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+            <span style={{ color: '#4b5563', fontSize: '0.9rem', fontWeight: '500' }}>Manager</span>
+            <div style={{ width: '36px', height: '36px', background: '#f8fafc', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <Bell size={18} color="#4b5563" />
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+               <div style={{ width: '28px', height: '28px', border: '1px solid #e5e7eb', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+               </div>
+               <span style={{ fontWeight: '700', fontSize: '0.9rem', color: '#111827' }}>Manager</span>
+               <span style={{ background: '#ffedd5', color: '#ea580c', fontSize: '0.6rem', padding: '0.2rem 0.5rem', borderRadius: '4px', fontWeight: '800' }}>MANAGER</span>
+            </div>
+            <button onClick={handleLogout} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.85rem', fontWeight: '600' }}>
+               <LogOut size={16} /> Logout
+            </button>
           </div>
         </header>
 
-        {renderSection()}
+        {/* Dynamic Content */}
+        {activeSection === 'dashboard' && renderDashboard()}
+        {activeSection === 'manage_hotels' && renderManageHotels()}
+        {activeSection === 'manage_rooms' && renderManageRooms()}
+        {activeSection === 'reservations' && renderReservations()}
+        {activeSection === 'reviews' && renderReviews()}
 
-        {/* Add Hotel Modal */}
-        {showAddHotel && (
-          <div className="modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000 }}>
-            <div className="stat-card" style={{ 
-              position: 'fixed',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: '95%', 
-              maxWidth: '600px', 
-              maxHeight: '90vh',
-              background: 'white', 
-              borderRadius: '16px', 
-              display: 'flex', 
-              flexDirection: 'column', 
-              padding: 0, 
-              overflow: 'hidden' 
-            }}>
-              
-              <div style={{ padding: '1.5rem 2rem', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
-                <h3 className="luxury-font" style={{ margin: 0 }}>Add New Hotel</h3>
-                <button onClick={() => { setShowAddHotel(false); setSelectedAmenities([]); setHotelImageUrls([]); }} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex' }}><X size={20} color="#64748b" /></button>
-              </div>
+      </main>
 
-              <div style={{ padding: '2rem', overflowY: 'auto', flex: 1 }}>
-                <form id="dashboardHotelForm" onSubmit={async (e) => {
+      {/* Add Hotel Modal Overlay */}
+      {showAddHotel && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+          <div style={{ background: 'white', borderRadius: '16px', width: '100%', maxWidth: '600px', maxHeight: '90vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '700' }}>Add New Hotel</h3>
+              <button onClick={() => { setShowAddHotel(false); setSelectedAmenities([]); setHotelImageUrls([]); }} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} color="#64748b" /></button>
+            </div>
+            
+            <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
+              <form id="addHotelForm" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }} onSubmit={async (e) => {
                   e.preventDefault();
                   const formData = new FormData(e.target);
                   const data = {
@@ -449,110 +493,74 @@ const ManagerDashboard = () => {
                   setSelectedAmenities([]);
                   setHotelImageUrls([]);
                   loadDashboardData();
-                }} className="better-form">
-                  <div className="form-group-col">
-                    <label className="input-label">Hotel Name</label>
-                    <input name="name" placeholder="Enter hotel name" required className="styled-input" />
-                  </div>
-                  
-                  <div className="form-row-2">
-                    <div className="form-group-col">
-                      <label className="input-label">City</label>
-                      <input name="city" placeholder="City" required className="styled-input" />
-                    </div>
-                    <div className="form-group-col">
-                      <label className="input-label">Address</label>
-                      <input name="address" placeholder="Full address" required className="styled-input" />
-                    </div>
-                  </div>
-                  
-                  <div className="form-group-col">
-                    <label className="input-label">Description</label>
-                    <textarea name="description" placeholder="Describe the hotel..." required className="styled-input" style={{ height: '100px', resize: 'vertical' }} />
-                  </div>
-                    
-                  <div>
-                    <p style={{ fontWeight: '600', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Select Amenities</p>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', maxHeight: '200px', overflowY: 'auto', padding: '10px', border: '1px solid #f1f5f9', borderRadius: '8px' }}>
-                      {AMENITIES_LIST.map((item) => (
-                        <label key={item.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.85rem' }}>
-                          <input 
-                            type="checkbox" 
-                            checked={selectedAmenities.includes(`${item.label} ${item.icon}`)}
-                            onChange={() => toggleAmenity(`${item.label} ${item.icon}`)}
-                          />
-                          <span>{item.icon} {item.label}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
+                }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <label style={{ fontSize: '0.85rem', fontWeight: '600', color: '#374151' }}>Hotel Name</label>
+                  <input name="name" required style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid #d1d5db', outline: 'none' }} />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <p style={{ fontWeight: '600', fontSize: '0.9rem' }}>Hotel Images</p>
-                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                      <input 
-                        type="file" 
-                        accept="image/*" 
-                        multiple
-                        onChange={(e) => uploadFileHandler(e, setHotelImageUrls)}
-                        style={{ fontSize: '0.85rem' }}
-                      />
-                      {uploading && <span style={{ fontSize: '0.75rem', color: 'var(--primary)' }}>Uploading...</span>}
-                    </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
-                      {hotelImageUrls.map((url, idx) => (
-                        <div key={idx} style={{ position: 'relative', width: 'fit-content' }}>
-                          <img src={`http://localhost:5000${url}`} alt="Preview" style={{ width: '80px', height: '60px', borderRadius: '8px', objectFit: 'cover' }} />
-                          <button 
-                            type="button"
-                            onClick={() => removeImage(url, setHotelImageUrls)} 
-                            style={{ position: 'absolute', top: '-5px', right: '-5px', background: 'var(--error)', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                          >
-                            <X size={12} />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
+                    <label style={{ fontSize: '0.85rem', fontWeight: '600', color: '#374151' }}>City</label>
+                    <input name="city" required style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid #d1d5db', outline: 'none' }} />
                   </div>
-                </form>
-              </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <label style={{ fontSize: '0.85rem', fontWeight: '600', color: '#374151' }}>Address</label>
+                    <input name="address" required style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid #d1d5db', outline: 'none' }} />
+                  </div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <label style={{ fontSize: '0.85rem', fontWeight: '600', color: '#374151' }}>Description</label>
+                  <textarea name="description" required style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid #d1d5db', outline: 'none', minHeight: '100px' }} />
+                </div>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <label style={{ fontSize: '0.85rem', fontWeight: '600', color: '#374151' }}>Amenities</label>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', maxHeight: '150px', overflowY: 'auto', padding: '0.5rem', border: '1px solid #e5e7eb', borderRadius: '8px' }}>
+                    {AMENITIES_LIST.map((item) => (
+                      <label key={item.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', cursor: 'pointer' }}>
+                        <input type="checkbox" checked={selectedAmenities.includes(`${item.label} ${item.icon}`)} onChange={() => toggleAmenity(`${item.label} ${item.icon}`)} />
+                        {item.icon} {item.label}
+                      </label>
+                    ))}
+                  </div>
+                </div>
 
-              <div style={{ padding: '1.25rem 2rem', borderTop: '1px solid #f1f5f9', display: 'flex', gap: '1rem', background: '#f8fafc', flexShrink: 0 }}>
-                <button type="button" className="btn-secondary" style={{ flex: 1, padding: '0.7rem', borderRadius: '8px', fontWeight: '600' }} onClick={() => setShowAddHotel(false)}>Cancel</button>
-                <button type="submit" form="dashboardHotelForm" className="btn-primary" disabled={uploading} style={{ flex: 1, padding: '0.7rem', borderRadius: '8px', fontWeight: '600', display: 'flex', alignItems: 'center', justifyItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
-                  {uploading ? 'Processing...' : <><Save size={18} /> Save Hotel</>}
-                </button>
-              </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <label style={{ fontSize: '0.85rem', fontWeight: '600', color: '#374151' }}>Images</label>
+                  <input type="file" multiple accept="image/*" onChange={(e) => uploadFileHandler(e, setHotelImageUrls)} style={{ fontSize: '0.85rem' }} />
+                  {uploading && <span style={{ fontSize: '0.75rem', color: '#ff5a36' }}>Uploading...</span>}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
+                    {hotelImageUrls.map((url, idx) => (
+                      <div key={idx} style={{ position: 'relative' }}>
+                        <img src={`http://localhost:5000${url}`} style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '6px' }} />
+                        <button type="button" onClick={() => removeImage(url, setHotelImageUrls)} style={{ position: 'absolute', top: '-5px', right: '-5px', background: 'red', color: 'white', border: 'none', borderRadius: '50%', width: '18px', height: '18px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={10} /></button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div style={{ padding: '1.25rem 1.5rem', background: '#f9fafb', borderTop: '1px solid #e5e7eb', display: 'flex', gap: '1rem' }}>
+              <button onClick={() => setShowAddHotel(false)} style={{ flex: 1, padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '8px', background: 'white', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
+              <button form="addHotelForm" type="submit" disabled={uploading} style={{ flex: 1, padding: '0.75rem', border: 'none', borderRadius: '8px', background: '#ff5a36', color: 'white', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                <Save size={18} /> Save Hotel
+              </button>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Add Room Modal */}
-        {showAddRoom && (
-          <div className="modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000 }}>
-            <div className="stat-card" style={{ 
-              position: 'fixed',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: '95%', 
-              maxWidth: '500px', 
-              maxHeight: '90vh',
-              background: 'white', 
-              borderRadius: '16px', 
-              display: 'flex', 
-              flexDirection: 'column', 
-              padding: 0, 
-              overflow: 'hidden' 
-            }}>
-              
-              <div style={{ padding: '1.5rem 2rem', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
-                <h3 className="luxury-font" style={{ margin: 0 }}>Add New Room</h3>
-                <button onClick={() => { setShowAddRoom(false); setRoomImageUrls([]); }} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex' }}><X size={20} color="#64748b" /></button>
-              </div>
-
-              <div style={{ padding: '2rem', overflowY: 'auto', flex: 1 }}>
-                <form id="dashboardRoomForm" onSubmit={async (e) => {
+      {/* Add Room Modal Overlay */}
+      {showAddRoom && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+          <div style={{ background: 'white', borderRadius: '16px', width: '100%', maxWidth: '500px', maxHeight: '90vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '700' }}>Add New Room</h3>
+              <button onClick={() => { setShowAddRoom(false); setRoomImageUrls([]); }} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} color="#64748b" /></button>
+            </div>
+            
+            <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
+              <form id="addRoomForm" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }} onSubmit={async (e) => {
                   e.preventDefault();
                   const formData = new FormData(e.target);
                   const data = {
@@ -567,160 +575,74 @@ const ManagerDashboard = () => {
                   setShowAddRoom(false);
                   setRoomImageUrls([]);
                   loadRooms(selectedHotel?._id);
-                }} className="better-form">
-                  <div className="form-row-2">
-                    <div className="form-group-col">
-                      <label className="input-label">Room Number</label>
-                      <input name="roomNumber" placeholder="Ex: 101" required className="styled-input" />
-                    </div>
-                    <div className="form-group-col">
-                      <label className="input-label">Category</label>
-                      <select name="type" required className="styled-input">
-                        <option value="Standard">Standard</option>
-                        <option value="Deluxe">Deluxe</option>
-                        <option value="Suite">Suite</option>
-                        <option value="Presidential">Presidential</option>
-                      </select>
-                    </div>
-                  </div>
-                  
-                  <div className="form-row-2">
-                    <div className="form-group-col">
-                      <label className="input-label">Price/Night</label>
-                      <input name="price" type="number" placeholder="Ex: 150" required className="styled-input" />
-                    </div>
-                    <div className="form-group-col">
-                      <label className="input-label">Capacity (Persons)</label>
-                      <input name="capacity" type="number" placeholder="Ex: 2" required className="styled-input" />
-                    </div>
-                  </div>
-                    
+                }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <p style={{ fontWeight: '600', fontSize: '0.9rem' }}>Room Images</p>
-                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                      <input 
-                        type="file" 
-                        accept="image/*" 
-                        multiple
-                        onChange={(e) => uploadFileHandler(e, setRoomImageUrls)}
-                        style={{ fontSize: '0.85rem' }}
-                      />
-                      {uploading && <span style={{ fontSize: '0.75rem', color: 'var(--primary)' }}>Uploading...</span>}
-                    </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
-                      {roomImageUrls.map((url, idx) => (
-                        <div key={idx} style={{ position: 'relative', width: 'fit-content' }}>
-                          <img src={`http://localhost:5000${url}`} alt="Preview" style={{ width: '80px', height: '60px', borderRadius: '8px', objectFit: 'cover' }} />
-                          <button 
-                            type="button"
-                            onClick={() => removeImage(url, setRoomImageUrls)} 
-                            style={{ position: 'absolute', top: '-5px', right: '-5px', background: 'var(--error)', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                          >
-                            <X size={12} />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
+                    <label style={{ fontSize: '0.85rem', fontWeight: '600', color: '#374151' }}>Room Number</label>
+                    <input name="roomNumber" required style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid #d1d5db', outline: 'none' }} />
                   </div>
-                </form>
-              </div>
-
-              <div style={{ padding: '1.25rem 2rem', borderTop: '1px solid #f1f5f9', display: 'flex', gap: '1rem', background: '#f8fafc', flexShrink: 0 }}>
-                <button type="button" className="btn-secondary" style={{ flex: 1, padding: '0.7rem', borderRadius: '8px', fontWeight: '600' }} onClick={() => setShowAddRoom(false)}>Cancel</button>
-                <button type="submit" form="dashboardRoomForm" className="btn-primary" disabled={uploading} style={{ flex: 1, padding: '0.7rem', borderRadius: '8px', fontWeight: '600', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                  {uploading ? 'Processing...' : <><Save size={18} /> Add Room</>}
-                </button>
-              </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <label style={{ fontSize: '0.85rem', fontWeight: '600', color: '#374151' }}>Category</label>
+                    <select name="type" required style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid #d1d5db', outline: 'none' }}>
+                      <option value="Standard">Standard</option>
+                      <option value="Deluxe">Deluxe</option>
+                      <option value="Suite">Suite</option>
+                    </select>
+                  </div>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <label style={{ fontSize: '0.85rem', fontWeight: '600', color: '#374151' }}>Price/Night (₹)</label>
+                    <input name="price" type="number" required style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid #d1d5db', outline: 'none' }} />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <label style={{ fontSize: '0.85rem', fontWeight: '600', color: '#374151' }}>Capacity</label>
+                    <input name="capacity" type="number" required style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid #d1d5db', outline: 'none' }} />
+                  </div>
+                </div>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <label style={{ fontSize: '0.85rem', fontWeight: '600', color: '#374151' }}>Images</label>
+                  <input type="file" multiple accept="image/*" onChange={(e) => uploadFileHandler(e, setRoomImageUrls)} style={{ fontSize: '0.85rem' }} />
+                  {uploading && <span style={{ fontSize: '0.75rem', color: '#ff5a36' }}>Uploading...</span>}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
+                    {roomImageUrls.map((url, idx) => (
+                      <div key={idx} style={{ position: 'relative' }}>
+                        <img src={`http://localhost:5000${url}`} style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '6px' }} />
+                        <button type="button" onClick={() => removeImage(url, setRoomImageUrls)} style={{ position: 'absolute', top: '-5px', right: '-5px', background: 'red', color: 'white', border: 'none', borderRadius: '50%', width: '18px', height: '18px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={10} /></button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div style={{ padding: '1.25rem 1.5rem', background: '#f9fafb', borderTop: '1px solid #e5e7eb', display: 'flex', gap: '1rem' }}>
+              <button onClick={() => setShowAddRoom(false)} style={{ flex: 1, padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '8px', background: 'white', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
+              <button form="addRoomForm" type="submit" disabled={uploading} style={{ flex: 1, padding: '0.75rem', border: 'none', borderRadius: '8px', background: '#ff5a36', color: 'white', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                <Save size={18} /> Add Room
+              </button>
             </div>
           </div>
-        )}
-      </main>
+        </div>
+      )}
 
       <style>{`
-        .modal-overlay { 
-          animation: fadeIn 0.2s ease-out; 
-          backdrop-filter: blur(4px);
-        }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        
-        .stat-card {
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .stat-card:hover {
-          transform: translateY(-5px);
-          box-shadow: var(--shadow-lg);
-        }
-
-        .better-form {
-          display: flex;
-          flex-direction: column;
-          gap: 1.25rem;
-        }
-
-        .form-row-2 {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 1rem;
-        }
-
-        .form-group-col {
-          display: flex;
-          flex-direction: column;
-          gap: 0.4rem;
-        }
-
-        .input-label {
-          font-weight: 600;
-          font-size: 0.9rem;
-          color: #1e293b;
-        }
-
-        .styled-input {
-          padding: 10px 14px;
-          border-radius: 8px;
-          border: 1px solid #cbd5e1;
-          outline: none;
-          font-family: inherit;
-          transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        .styled-input:focus {
-          border-color: var(--primary);
-          box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.1);
-        }
-
-        .modal-actions {
-          display: flex;
-          gap: 1rem;
-          margin-top: 1rem;
-        }
-
-        .modal-actions button {
-          flex: 1;
-          padding: 0.8rem;
-          border-radius: 8px;
-          font-weight: 600;
-        }
-
-        .btn-secondary {
-          background: #f1f5f9;
-          border: none;
-          color: #475569;
-          cursor: pointer;
-          transition: 0.2s;
-        }
-        .btn-secondary:hover {
-          background: #e2e8f0;
-        }
-
-        @media (max-width: 1024px) {
-          .mobile-menu-btn { display: block !important; }
-          .dashboard-content { padding: 1.5rem !important; }
-          header { flex-direction: column; align-items: flex-start !important; gap: 1.5rem; }
-          div[style*="gridTemplateColumns: 1.5fr 1fr"] {
-            grid-template-columns: 1fr !important;
+        body { margin: 0; padding: 0; }
+        * { box-sizing: border-box; }
+        @media (max-width: 768px) {
+          .mobile-only-btn { display: block !important; }
+          .dashboard-sidebar {
+            position: fixed !important;
+            transform: translateX(-100%);
+            transition: 0.3s;
           }
-          .data-table { display: block; overflow-x: auto; }
+          .dashboard-sidebar.open {
+            transform: translateX(0);
+          }
+          header { flex-wrap: wrap; height: auto !important; padding: 1rem !important; gap: 1rem; }
+          header > div:last-child {
+            display: none !important; /* Hide right menu on mobile for simplicity */
+          }
         }
       `}</style>
     </div>
