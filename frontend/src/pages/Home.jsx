@@ -46,34 +46,44 @@ const Home = () => {
   return (
     <div className="bg-white min-h-screen">
       
-      {/* 1. BLUE HERO SECTION ────────────────────────────────────────── */}
-      <section className="bg-booking-blue pt-32 pb-24 md:pt-40 md:pb-32 px-4 md:px-0">
-         <div className="container-booking space-y-8 animate-fade-in relative z-10">
-            <div className="space-y-4 max-w-4xl">
-               <h1 className="h1-booking">
-                  Find your next stay
+      {/* 1. HERO SECTION ────────────────────────────────────────── */}
+      <section className="relative pt-32 pb-24 md:pt-48 md:pb-40 px-4 md:px-0 flex items-center min-h-[80vh]">
+         {/* Background Image with Overlay */}
+         <div className="absolute inset-0 z-0">
+            <img 
+               src="https://images.unsplash.com/photo-1542314831-c6a4d14d8379?auto=format&fit=crop&q=80&w=2000" 
+               alt="Luxury Resort" 
+               className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-slate-900/80 via-slate-900/50 to-slate-900/90" />
+         </div>
+
+         <div className="container-booking space-y-8 animate-slide-up relative z-10 text-center flex flex-col items-center justify-center">
+            <div className="space-y-6 max-w-4xl mx-auto">
+               <h1 className="h1-hero text-white">
+                  Book Your Dream Stay at the Best Prices
                </h1>
-               <p className="text-xl md:text-2xl text-white opacity-90 font-medium">
-                  Search low prices on hotels, holiday homes and much more...
+               <p className="text-lg md:text-xl text-slate-200 font-medium max-w-2xl mx-auto">
+                  Experience modern luxury and comfort in handpicked destinations around the globe.
                </p>
             </div>
             
-            <div className="flex flex-wrap items-center gap-6 pt-4">
-               <div className="flex items-center gap-2 px-4 py-2 bg-white/10 rounded-lg text-white font-bold text-xs border border-white/5 shadow-sm">
-                  <CheckCircle2 size={16} className="text-sky-400" /> 
-                  Free Cancellation on most rooms
+            <div className="flex flex-wrap items-center justify-center gap-6 pt-4">
+               <div className="flex items-center gap-2 px-5 py-2.5 glass-card rounded-full text-white font-semibold text-sm">
+                  <CheckCircle2 size={18} className="text-emerald-400" /> 
+                  Best Price Guarantee
                </div>
-               <div className="flex items-center gap-2 px-4 py-2 bg-white/10 rounded-lg text-white font-bold text-xs border border-white/5 shadow-sm">
-                  <Sparkles size={16} className="text-orange-400" /> 
-                  15% off Early 2026 Deals
+               <div className="flex items-center gap-2 px-5 py-2.5 glass-card rounded-full text-white font-semibold text-sm">
+                  <Sparkles size={18} className="text-cyan-400" /> 
+                  Premium Properties
                </div>
             </div>
          </div>
       </section>
 
       {/* 2. OVERLAPPING SEARCH HUB ───────────────────────────────────── */}
-      <section className="container-booking relative z-50 -mt-10 mb-20">
-         <div className="bg-white rounded-lg border-4 border-booking-yellow shadow-2xl overflow-hidden">
+      <section className="container-booking relative z-50 -mt-20 mb-24">
+         <div className="glass-card rounded-[24px] p-2 border border-white/40 shadow-glass backdrop-blur-xl bg-white/60">
             <SearchBar onSearch={handleSearch} />
          </div>
       </section>

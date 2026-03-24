@@ -7,7 +7,7 @@ const HotelCard = ({ hotel }) => {
   return (
     <Link 
       to={`/hotel/${hotel._id || hotel.id}`} 
-      className="group block relative bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 h-full flex flex-col"
+      className="group block relative card-premium h-full flex flex-col"
     >
       {/* Property Visual */}
       <div className="relative h-56 overflow-hidden">
@@ -24,8 +24,8 @@ const HotelCard = ({ hotel }) => {
 
         {/* Status Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-           <div className="px-2 py-1 bg-white/90 backdrop-blur-md rounded text-[9px] font-black text-secondary-dark uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
-              <ShieldCheck size={10} className="text-blue-600" /> TOP RATED
+           <div className="px-3 py-1 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-bold text-slate-900 uppercase tracking-widest flex items-center gap-1.5 shadow-sm">
+              <ShieldCheck size={12} className="text-cyan-600" /> TOP RATED
            </div>
         </div>
       </div>
@@ -34,48 +34,48 @@ const HotelCard = ({ hotel }) => {
       <div className="p-4 flex-1 flex flex-col">
           <div className="flex justify-between items-start gap-2 mb-2">
              <div className="flex-1 min-w-0">
-                <h3 className="text-lg font-bold text-[#003b95] leading-tight group-hover:underline truncate">
+                <h3 className="text-lg font-bold text-slate-900 leading-tight group-hover:text-cyan-600 transition-colors truncate">
                    {hotel.name}
                 </h3>
-                <div className="flex items-center gap-1.5 text-gray-500 font-medium text-[11px] mt-1">
-                   <MapPin size={12} className="text-blue-600" /> 
-                   <span className="truncate underline cursor-pointer hover:text-blue-700">{hotel.location || hotel.city}</span>
+                <div className="flex items-center gap-1.5 text-slate-500 font-medium text-[12px] mt-1.5">
+                   <MapPin size={14} className="text-cyan-600" /> 
+                   <span className="truncate hover:text-cyan-700 transition-colors cursor-pointer">{hotel.location || hotel.city}</span>
                 </div>
              </div>
              
-             {/* Score Badge (Booking.com style) */}
+             {/* Score Badge */}
              <div className="flex flex-col items-end">
                 <div className="flex items-center gap-2">
                    <div className="text-right">
-                      <p className="text-[11px] font-bold text-gray-900 leading-none">Excellent</p>
-                      <p className="text-[10px] text-gray-500 mt-0.5">2,500 reviews</p>
+                      <p className="text-[12px] font-bold text-slate-900 leading-none">Excellent</p>
+                      <p className="text-[10px] text-slate-500 mt-1">2,500 reviews</p>
                    </div>
-                   <div className="w-8 h-8 bg-[#003580] text-white rounded-t-lg rounded-br-lg flex items-center justify-center text-xs font-bold shadow-sm">
+                   <div className="w-9 h-9 bg-slate-900 text-white rounded-xl flex items-center justify-center text-sm font-bold shadow-sm">
                       {hotel.averageRating ? hotel.averageRating.toFixed(1) : '8.8'}
                    </div>
                 </div>
              </div>
           </div>
 
-          <p className="text-[12px] text-gray-600 leading-relaxed line-clamp-2 mt-auto pb-4">
+          <p className="text-[13px] text-slate-600 leading-relaxed line-clamp-2 mt-auto pb-5">
              {hotel.description || 'Verified property with elite amenities and exceptional service in high-demand coordinates.'}
           </p>
 
-          <div className="pt-3 border-t border-gray-100 flex items-end justify-between">
+          <div className="pt-4 border-t border-slate-100 flex items-end justify-between">
              <div className="space-y-1">
-                <div className="flex items-center gap-1.5 text-emerald-600 font-bold text-[11px]">
+                <div className="flex items-center gap-1.5 text-emerald-600 font-bold text-[11px] bg-emerald-50 px-2 py-1 rounded-md">
                    <Zap size={10} /> Limited-time Deal
                 </div>
-                <p className="text-[10px] text-gray-400 font-medium">1 night, 2 adults</p>
+                <p className="text-[11px] text-slate-400 font-medium">1 night, 2 adults</p>
              </div>
              <div className="text-right">
-                <p className="text-[10px] text-gray-400 line-through opacity-60">
+                <p className="text-[11px] text-slate-400 line-through opacity-60">
                    {formatCurrency((hotel.minPrice || hotel.pricePerNight || 0) * 1.25)}
                 </p>
-                <p className="text-xl font-black text-gray-900 leading-none">
+                <p className="text-2xl font-bold text-slate-900 leading-none mt-1">
                    {formatCurrency(hotel.minPrice || hotel.pricePerNight || 0)}
                 </p>
-                <p className="text-[10px] text-gray-400 mt-1.5">+ taxes & charges</p>
+                <p className="text-[10px] text-slate-400 mt-1.5 uppercase tracking-wide">Includes Taxes</p>
              </div>
           </div>
       </div>

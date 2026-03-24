@@ -56,11 +56,11 @@ const SearchBar = ({ onSearch }) => {
 
   return (
     <div className="w-full">
-      <div className="bg-white shadow-booking flex flex-col lg:flex-row items-stretch lg:h-16 overflow-hidden">
+      <div className="bg-white rounded-[20px] shadow-sm flex flex-col lg:flex-row items-stretch lg:h-20 overflow-visible border border-slate-200">
         
         {/* 1. Destination Segment */}
-        <div className="flex-1 flex items-center border-b lg:border-b-0 lg:border-r border-gray-100 px-4 gap-3 relative" ref={suggestionsRef}>
-           <Bed className="text-gray-400" size={24} />
+        <div className="flex-1 flex items-center border-b lg:border-b-0 lg:border-r border-slate-200 px-6 gap-4 relative" ref={suggestionsRef}>
+           <MapPin className="text-slate-400" size={24} />
            <input 
              type="text" 
              placeholder="Where are you going?" 
@@ -70,14 +70,14 @@ const SearchBar = ({ onSearch }) => {
              className="w-full bg-transparent border-none outline-none text-sm font-bold text-secondary placeholder:text-gray-500 tracking-tight"
            />
            {showSuggestions && suggestions.length > 0 && (
-             <div className="absolute top-[110%] left-0 w-full lg:w-[400px] bg-white rounded-lg shadow-2xl border border-gray-100 py-3 z-[1000] animate-fade-in">
+             <div className="absolute top-[110%] left-0 w-full lg:w-[400px] bg-white rounded-xl shadow-hover border border-slate-100 py-3 z-[1000] animate-fade-in">
                 {suggestions.map((text, idx) => (
                   <button 
                     key={idx} 
                     onClick={() => { setLocation(text); setShowSuggestions(false); }}
-                    className="w-full px-6 py-4 text-left flex items-center gap-4 hover:bg-gray-50 font-bold text-gray-700 transition-colors"
+                    className="w-full px-6 py-4 text-left flex items-center gap-4 hover:bg-slate-50 font-bold text-slate-700 transition-colors"
                   >
-                    <MapPin size={18} className="text-[#006ce4]" /> {text}
+                    <MapPin size={18} className="text-cyan-600" /> {text}
                   </button>
                 ))}
              </div>
@@ -85,9 +85,9 @@ const SearchBar = ({ onSearch }) => {
         </div>
 
         {/* 2. Dates Segment */}
-        <div className="flex-1 border-b lg:border-b-0 lg:border-r border-gray-100 flex items-center px-4 gap-3">
-           <Calendar className="text-gray-400" size={24} />
-           <div className="flex items-center gap-2 flex-1 font-bold text-sm text-secondary">
+        <div className="flex-[1.5] border-b lg:border-b-0 lg:border-r border-slate-200 flex items-center px-6 gap-4 py-3 lg:py-0">
+           <Calendar className="text-slate-400" size={24} />
+           <div className="flex items-center gap-2 flex-1 font-bold text-sm text-slate-800">
               <DatePicker
                 selected={startDate}
                 onChange={(date) => setStartDate(date)}
@@ -114,15 +114,15 @@ const SearchBar = ({ onSearch }) => {
         </div>
 
         {/* 3. Guests Segment */}
-        <div className="relative flex-1 flex items-center px-4 gap-3 cursor-pointer" ref={guestsRef} onClick={() => setShowGuests(!showGuests)}>
-           <Users className="text-gray-400" size={24} />
-           <p className="text-sm font-bold text-secondary flex-1">
+        <div className="relative flex-1 flex items-center px-6 gap-4 cursor-pointer py-4 lg:py-0 hover:bg-slate-50 transition-colors rounded-tr-[20px] rounded-br-[20px]" ref={guestsRef} onClick={() => setShowGuests(!showGuests)}>
+           <Users className="text-slate-400" size={24} />
+           <p className="text-sm font-bold text-slate-800 flex-1">
               <span className="hidden xl:inline">{guests} adults · {rooms} room</span>
               <span className="xl:hidden">{guests} A · {rooms} R</span>
            </p>
-           <ChevronDown size={18} className={`text-gray-400 transition-transform duration-300 ${showGuests ? 'rotate-180' : ''}`} />
+           <ChevronDown size={18} className={`text-slate-400 transition-transform duration-300 ${showGuests ? 'rotate-180' : ''}`} />
            {showGuests && (
-             <div className="absolute top-[110%] right-0 w-full lg:w-[320px] bg-white rounded-xl shadow-2xl border border-gray-100 p-6 z-[1001] animate-fade-in" onClick={e => e.stopPropagation()}>
+             <div className="absolute top-[110%] right-0 w-full lg:w-[320px] bg-white rounded-2xl shadow-hover border border-slate-100 p-6 z-[1001] animate-fade-in" onClick={e => e.stopPropagation()}>
                 <div className="space-y-6">
                    <div className="flex items-center justify-between">
                       <div className="space-y-1">
@@ -146,19 +146,21 @@ const SearchBar = ({ onSearch }) => {
                          <button onClick={() => setRooms(rooms + 1)} className="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"><Plus size={14} /></button>
                       </div>
                    </div>
-                   <button onClick={() => setShowGuests(false)} className="w-full h-12 bg-blue-50 text-[#006ce4] font-black rounded-lg text-xs tracking-widest uppercase hover:bg-blue-100 transition-colors">Apply Selection</button>
+                   <button onClick={() => setShowGuests(false)} className="w-full h-12 bg-cyan-50 text-cyan-600 font-bold rounded-xl text-sm hover:bg-cyan-100 transition-colors">Apply Selection</button>
                 </div>
              </div>
            )}
         </div>
 
         {/* 4. Search Trigger */}
-        <button 
-          onClick={handleSearch}
-          className="h-16 lg:h-auto px-10 bg-[#006ce4] text-white font-black text-sm tracking-widest uppercase hover:bg-[#0052ad] transition-all active:scale-95 shadow-lg lg:shadow-none"
-        >
-           Search
-        </button>
+        <div className="p-2 flex">
+           <button 
+             onClick={handleSearch}
+             className="w-full lg:w-auto px-10 bg-cyan-600 text-white font-bold text-base rounded-[14px] hover:bg-cyan-700 transition-all active:scale-[0.98] shadow-md hover:shadow-cyan-600/20"
+           >
+              Search
+           </button>
+        </div>
       </div>
 
       {/* 5. Mobile Meta Helper */}

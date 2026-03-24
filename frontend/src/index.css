@@ -4,84 +4,101 @@
 
 @layer base {
   :root {
-    --primary: 0 59 149; /* #003b95 - Booking Blue */
-    --accent: 255 183 0; /* #ffb700 - Booking Yellow */
-    --secondary: 2 6 23; /* #020617 - Deep Navy */
-    --background: 255 255 255; 
+    --primary: 8 145 178; /* #0891b2 - Cyan 600 */
+    --primary-hover: 14 116 144; /* #0e7490 - Cyan 700 */
+    --background: 248 250 252; /* #f8fafc - Slate 50 */
+    --text-primary: 15 23 42; /* #0f172a - Slate 900 */
+    --text-secondary: 71 85 105; /* #475569 - Slate 600 */
+    --border: 226 232 240; /* #e2e8f0 - Slate 200 */
+    --success: 16 185 129; /* #10b981 - Emerald 500 */
+    --warning: 245 158 11; /* #f59e0b - Amber 500 */
+    --danger: 239 68 68; /* #ef4444 - Red 500 */
   }
 
   body {
-    @apply font-sans antialiased text-secondary bg-background m-0 p-0;
-    overflow-x: hidden;
-  }
-
-  button, a {
-    @apply transition-all duration-200;
+    @apply bg-slate-50 text-slate-900 font-sans antialiased m-0 p-0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: rgb(var(--text-primary));
+    background-color: rgb(var(--background));
   }
 
   ::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
   }
   ::-webkit-scrollbar-track {
-    @apply bg-gray-100;
+    @apply bg-slate-100;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-primary/30 rounded-full hover:bg-primary/50;
+    @apply bg-cyan-600/30 rounded-full hover:bg-cyan-600/50 transition-colors;
   }
 }
 
 @layer components {
   .container-booking {
-    @apply max-w-[1140px] mx-auto px-4 sm:px-6 lg:px-8;
+    @apply max-w-[1280px] mx-auto px-6 md:px-8 lg:px-12;
   }
 
   .btn-primary-booking {
-    @apply flex items-center justify-center gap-2 px-6 py-3.5 bg-[#006ce4] text-white font-bold rounded-lg 
-           hover:bg-[#0052ad] active:scale-95 transition-all text-sm;
+    @apply inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-cyan-600 text-white font-semibold rounded-xl 
+           hover:bg-cyan-700 active:scale-[0.98] transition-all shadow-md hover:shadow-cyan-600/20 duration-300;
   }
 
   .btn-secondary-booking {
-    @apply flex items-center justify-center gap-2 px-6 py-2.5 bg-white text-[#006ce4] font-bold rounded-lg 
-           border border-[#006ce4] hover:bg-blue-50 active:scale-95 transition-all text-sm;
+    @apply inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-white text-slate-900 font-semibold rounded-xl 
+           border border-slate-200 hover:bg-slate-50 active:scale-[0.98] transition-all shadow-sm duration-300;
   }
 
-  /* Booking Search Bar Segmented Architecture */
-  .search-segment {
-    @apply flex items-center gap-3 px-4 py-3 min-w-[200px] border-r border-gray-100 last:border-none;
+  .glass-card {
+    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-xl;
   }
 
-  .booking-card {
-    @apply bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden;
+  .glass-nav {
+    @apply bg-white/80 backdrop-blur-lg border-b border-white/20;
   }
 
-  .h1-booking {
-    @apply text-4xl md:text-5xl lg:text-6xl text-white font-black tracking-tight leading-[1.1];
+  .card-premium {
+    @apply bg-white rounded-[12px] border border-slate-200 shadow-soft hover:shadow-hover transition-all duration-500 overflow-hidden;
   }
 
-  .h2-booking {
-    @apply text-2xl md:text-2xl lg:text-2xl text-secondary font-black tracking-tight leading-tight;
+  .h1-hero {
+    @apply text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.05];
+    letter-spacing: -0.02em;
+  }
+
+  .h2-section {
+    @apply text-3xl md:text-4xl font-bold text-slate-900 tracking-tight;
   }
 }
 
 @layer utilities {
-  .bg-booking-blue {
-    background-color: #003b95;
-  }
-  
-  .border-booking-yellow {
-    border-color: #ffb700;
+  .shadow-soft {
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.04), 0 4px 6px -4px rgb(0 0 0 / 0.04);
   }
 
-  .shadow-booking {
-    box-shadow: 0 4px 16px rgba(0,0,0,.15);
+  .shadow-hover {
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  }
+
+  .shadow-glass {
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
   }
 
   .animate-fade-in {
-    @apply animate-[fadeIn_0.5s_ease-out_forwards];
+    animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
   to { opacity: 1; transform: translateY(0); }
 }
+

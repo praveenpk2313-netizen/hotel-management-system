@@ -43,7 +43,7 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-[1000] bg-booking-blue text-white shadow-lg">
+    <nav className={`fixed top-0 left-0 w-full z-[1000] transition-all duration-300 ${scrolled ? 'glass-nav text-slate-900 py-2 shadow-soft' : 'bg-transparent text-white py-4'}`}>
       <div className="container-booking">
         
         {/* Upper Nav - Brand & Profile */}
@@ -51,8 +51,8 @@ const Navbar = () => {
           
           {/* Brand Identity */}
           <Link to="/" className="flex items-center gap-2 group">
-             <div className="text-2xl md:text-2xl font-black tracking-tighter text-white">
-                PK <span className="text-sky-400">UrbanStay</span>
+             <div className="text-2xl md:text-3xl font-black tracking-tighter">
+                PK <span className="text-cyan-500">UrbanStay</span>
              </div>
           </Link>
 
@@ -90,13 +90,13 @@ const Navbar = () => {
                <div className="flex items-center gap-3">
                   <Link 
                     to="/register" 
-                    className="nav-btn-white"
+                    className="flex items-center justify-center font-bold px-4 py-2 hover:bg-slate-900/5 rounded-lg transition-colors"
                   >
                     Register
                   </Link>
                   <Link 
                     to="/login" 
-                    className="nav-btn-white"
+                    className="flex items-center justify-center font-bold px-5 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors shadow-md"
                   >
                     Sign in
                   </Link>
