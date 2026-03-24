@@ -6,7 +6,7 @@ export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:50
 
 const api = axios.create({
   baseURL: `${API_BASE_URL}/api`,
-  timeout: 10000, // 10 second timeout
+  timeout: 30000, // 30 seconds — Render free-tier cold starts can take 15-20s
 });
 
 // Response interceptor — handles timeouts and unauthorised responses globally

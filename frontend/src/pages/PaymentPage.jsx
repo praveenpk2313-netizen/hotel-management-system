@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { 
   ArrowLeft, 
@@ -41,6 +41,12 @@ const PaymentPage = () => {
   const [error, setError] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('stripe'); // Default to stripe
 
+  // Stable transaction IDs — generated once per page load.
+  // Re-using the same ID on retries triggers the backend idempotency check
+  // so the room is never double-booked and no 400 errors occur.
+  const razorpayTxnRef = useRef('MOCK_TRX_'  + Math.random().toString(36).substr(2, 9).toUpperCase());
+  const stripeTxnRef   = useRef('MOCK_STRIPE_' + Math.random().toString(36).substr(2, 9).toUpperCase());
+
   const { bookingData, hotel, selectedRoom } = location.state || {};
 
   useEffect(() => {
@@ -67,22 +73,17 @@ const PaymentPage = () => {
 
     try {
       if (MOCK_PAYMENT) {
-        // --- 1. HANDLE MOCK PAYMENT ---
-        const mockTransactionId = 'MOCK_TRX_' + Math.random().toString(36).substr(2, 9).toUpperCase();
-        
+        // --- MOCK PAYMENT: reuse the stable transactionId from the ref ---
         const bookingPayload = {
           ...bookingData,
-          paymentMethod: 'Mock/Razorpay',
-          transactionId: mockTransactionId
+          paymentMethod:  'Mock/Razorpay',
+          transactionId:  razorpayTxnRef.current   // same ID on every retry
         };
         
         const { data: finalBooking } = await confirmBookingAfterPayment(bookingPayload);
         
-        // --- 2. SIMULATE SUCCESS ---
-        setTimeout(() => {
-          setLoading(false);
-          navigate('/booking-success', { state: { booking: finalBooking } });
-        }, 1500);
+        setLoading(false);
+        navigate('/booking-success', { state: { booking: finalBooking } });
         return;
       }
 
@@ -232,9 +233,11 @@ const PaymentPage = () => {
 
               {paymentMethod === 'stripe' ? (
                 <div style={{ marginTop: '2.5rem' }}>
-                  <Elements stripe={stripePromise}>
+                                <Elements stripe={stripePromise}>
                     <StripeCheckoutForm 
                       bookingData={bookingData} 
+                      stripeTxnId={stripeTxnRef.current}
+                      navigate={navigate}
                       onSuccess={() => setSuccess(true)} 
                       onError={setError}
                       setLoading={setLoading}
@@ -345,8 +348,8 @@ const PaymentPage = () => {
 
 // ─── Stripe Checkout Form Component ──────────────────────────────────────────
 
-const StripeCheckoutForm = ({ bookingData, onSuccess, onError, setLoading, loading }) => {
-  const stripe = useStripe();
+const StripeCheckoutForm = ({ bookingData, stripeTxnId, navigate, onSuccess, onError, setLoading, loading }) => {
+  const stripe   = useStripe();
   const elements = useElements();
 
   const handleSubmit = async (e) => {
@@ -356,29 +359,27 @@ const StripeCheckoutForm = ({ bookingData, onSuccess, onError, setLoading, loadi
 
     try {
       if (MOCK_PAYMENT) {
-          const mockTransactionId = 'MOCK_STRIPE_' + Math.random().toString(36).substr(2, 9).toUpperCase();
-          const { data: finalBooking } = await confirmBookingAfterPayment({
-              ...bookingData,
-              paymentMethod: 'Mock/Stripe',
-              transactionId: mockTransactionId
-          });
-          
-          setTimeout(() => {
-              setLoading(false);
-              navigate('/booking-success', { state: { booking: finalBooking } });
-          }, 1500);
-          return;
+        // Use the stable stripeTxnId passed from the parent (same on every retry)
+        const { data: finalBooking } = await confirmBookingAfterPayment({
+          ...bookingData,
+          paymentMethod: 'Mock/Stripe',
+          transactionId: stripeTxnId
+        });
+
+        setLoading(false);
+        navigate('/booking-success', { state: { booking: finalBooking } });
+        return;
       }
 
       if (!stripe || !elements) return;
 
-      // 1. Create Intent without a booking reference (using just amount)
+      // 1. Create Payment Intent
       const { data: intentData } = await createStripeIntent({ amount: bookingData.totalPrice });
 
       const result = await stripe.confirmCardPayment(intentData.clientSecret, {
         payment_method: {
           card: elements.getElement(CardElement),
-          billing_details: { name: user?.name || 'Valued Guest' },
+          billing_details: { name: bookingData?.userName || 'Valued Guest' },
         }
       });
 
@@ -386,17 +387,18 @@ const StripeCheckoutForm = ({ bookingData, onSuccess, onError, setLoading, loadi
         onError(result.error.message);
         setLoading(false);
       } else if (result.paymentIntent.status === 'succeeded') {
-        // 2. Verified Creation
+        // Real Stripe payment ID is stable — use it directly as transactionId
         const { data: finalBooking } = await confirmBookingAfterPayment({
-            ...bookingData,
-            paymentMethod: 'Stripe',
-            transactionId: result.paymentIntent.id
+          ...bookingData,
+          paymentMethod: 'Stripe',
+          transactionId: result.paymentIntent.id
         });
         navigate('/booking-success', { state: { booking: finalBooking } });
       }
     } catch (err) {
-      onError(err.response?.data?.message || 'Transaction failed.');
+      onError(err.response?.data?.message || 'Transaction failed. Please try again.');
       setLoading(false);
+
     }
   };
 
