@@ -21,9 +21,27 @@
   }
 
   body {
-    @apply bg-white text-slate-900 antialiased m-0 p-0;
+    @apply bg-[#1a1a1a] text-slate-900 antialiased m-0 p-0;
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     letter-spacing: -0.011em;
+  }
+
+  .bg-diagonal-pattern {
+    background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 10px);
+  }
+
+  .text-luxury-gold {
+    background: linear-gradient(to right, #c5a059, #f9e3b4, #c5a059);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .bg-luxury-gold {
+    background: linear-gradient(135deg, #c5a059 0%, #ecd08d 50%, #c5a059 100%);
+  }
+  
+  .bg-luxury-gold-hover {
+    background: linear-gradient(135deg, #ecd08d 0%, #f9e3b4 50%, #ecd08d 100%);
   }
 
   h1, h2, h3, h4, .font-serif {
