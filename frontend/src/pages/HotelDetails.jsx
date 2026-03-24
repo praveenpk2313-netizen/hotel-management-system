@@ -25,6 +25,8 @@ import { fetchHotelById, fetchRooms, createBooking } from '../services/api';
 import { formatCurrency, formatDate } from '../utils/helpers';
 import { useAuth } from '../context/AuthContext';
 import RoomCard from '../components/RoomCard';
+import DatePicker from 'react-datepicker';
+import "react-datepicker/dist/react-datepicker.css";
 
 const HotelDetails = () => {
   const { id } = useParams();
@@ -35,6 +37,11 @@ const HotelDetails = () => {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  const [checkIn, setCheckIn] = useState(null);
+  const [checkOut, setCheckOut] = useState(null);
+  const [guests, setGuests] = useState(2);
+  const [dateError, setDateError] = useState('');
 
   useEffect(() => {
     const loadHotelData = async () => {
@@ -173,7 +180,46 @@ const HotelDetails = () => {
                {/* Availability Table Header */}
                <section id="availability" className="space-y-8 pt-8 border-t border-slate-200">
                   <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Availability</h2>
-                  <div className="bg-cyan-50/50 p-6 rounded-2xl border border-cyan-100 flex items-center gap-4">
+                  
+                  {/* Select Dates Form */}
+                  <div className="bg-white p-6 rounded-[24px] border border-slate-200 shadow-sm space-y-4">
+                     <h3 className="text-lg font-bold text-slate-900">Select your dates</h3>
+                     {dateError && <div className="p-3 bg-rose-50 border border-rose-100 rounded-lg text-sm text-rose-600 font-bold">{dateError}</div>}
+                     <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <div className="space-y-2">
+                           <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Check-in Date</label>
+                           <DatePicker 
+                             selected={checkIn}
+                             onChange={date => { setCheckIn(date); setDateError(''); }}
+                             minDate={new Date()}
+                             className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-cyan-500 focus:bg-white transition-all font-bold text-slate-900"
+                             placeholderText="Select check-in"
+                           />
+                        </div>
+                        <div className="space-y-2">
+                           <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Check-out Date</label>
+                           <DatePicker 
+                             selected={checkOut}
+                             onChange={date => { setCheckOut(date); setDateError(''); }}
+                             minDate={checkIn || new Date()}
+                             className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-cyan-500 focus:bg-white transition-all font-bold text-slate-900"
+                             placeholderText="Select check-out"
+                           />
+                        </div>
+                        <div className="space-y-2">
+                           <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Guests</label>
+                           <select 
+                             value={guests} 
+                             onChange={(e) => setGuests(parseInt(e.target.value))}
+                             className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-cyan-500 focus:bg-white transition-all font-bold text-slate-900 appearance-none cursor-pointer"
+                           >
+                             {[1,2,3,4,5,6].map(n => <option key={n} value={n}>{n} Adult{n>1?'s':''}</option>)}
+                           </select>
+                        </div>
+                     </div>
+                  </div>
+
+                  <div className="bg-cyan-50/50 p-6 rounded-[24px] border border-cyan-100 flex items-center gap-4">
                      <Info size={28} className="text-cyan-600 flex-shrink-0" />
                      <p className="text-sm font-bold text-slate-800">These prices are exclusive to our members. Sign in to save even more on your stay.</p>
                   </div>
@@ -192,6 +238,10 @@ const HotelDetails = () => {
                              hotelId={id} 
                              hotelName={hotel.name}
                              hotel={hotel}
+                             checkIn={checkIn}
+                             checkOut={checkOut}
+                             guests={guests}
+                             onBookError={(msg) => setDateError(msg)}
                            />
                          ))}
                        </div>

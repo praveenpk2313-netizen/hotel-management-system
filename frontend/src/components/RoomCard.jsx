@@ -14,12 +14,19 @@ import {
 } from 'lucide-react';
 import { formatCurrency } from '../utils/helpers';
 
-const RoomCard = ({ room, hotelId, hotelName, hotel }) => {
+const RoomCard = ({ room, hotelId, hotelName, hotel, checkIn, checkOut, guests, onBookError }) => {
   const navigate = useNavigate();
 
   const handleBookNow = () => {
-    const checkInDate = new Date().toISOString();
-    const checkOutDate = new Date(Date.now() + 86400000).toISOString(); // +1 day
+    if (!checkIn || !checkOut) {
+       if (onBookError) onBookError('Please select your preferred check-in and check-out dates to continue.');
+       document.getElementById('availability')?.scrollIntoView({ behavior: 'smooth' });
+       return;
+    }
+
+    const checkInDate = checkIn.toISOString();
+    const checkOutDate = checkOut.toISOString();
+    const nights = Math.ceil(Math.abs(checkOut - checkIn) / (1000 * 60 * 60 * 24)) || 1;
 
     navigate('/payment', { 
       state: { 
@@ -30,8 +37,8 @@ const RoomCard = ({ room, hotelId, hotelName, hotel }) => {
           room: room._id,
           checkInDate,
           checkOutDate,
-          numGuests: 2, // Default
-          totalPrice: room.price,
+          numGuests: guests || 2,
+          totalPrice: room.price * nights,
           userName: 'Guest'
         }
       } 

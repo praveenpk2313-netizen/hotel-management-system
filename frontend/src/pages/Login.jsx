@@ -46,7 +46,7 @@ const Login = () => {
       const from = location.state?.from || (
         data.role === 'admin'   ? '/admin/dashboard'   :
         data.role === 'manager' ? '/manager/dashboard' :
-        '/customer/dashboard'
+        '/booking-history'
       );
       navigate(from, { state: location.state, replace: true });
     } catch (err) {
