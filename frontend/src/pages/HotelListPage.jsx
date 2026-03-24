@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import HotelCard from '../components/HotelCard';
 import { fetchHotels } from '../services/api';
 import { 
@@ -12,11 +12,10 @@ import {
   X, 
   Star,
   ChevronRight,
-  Loader2,
-  Filter,
-  ArrowUpDown,
-  CheckCircle2
+  Loader2
 } from 'lucide-react';
+import DatePicker from 'react-datepicker';
+import "react-datepicker/dist/react-datepicker.css";
 import { formatCurrency } from '../utils/helpers';
 
 const AMENITIES_OPTIONS = [
@@ -33,12 +32,15 @@ const HotelListPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   
+  // Filters State
   const [filters, setFilters] = useState({
     location: searchParams.get('location') || '',
     minPrice: 0,
-    maxPrice: 5000,
+    maxPrice: 2000,
     amenities: [],
-    rating: 0
+    rating: 0,
+    startDate: searchParams.get('checkin') ? new Date(searchParams.get('checkin')) : null,
+    endDate: searchParams.get('checkout') ? new Date(searchParams.get('checkout')) : null
   });
 
   const [showMobileFilters, setShowMobileFilters] = useState(false);
@@ -53,20 +55,23 @@ const HotelListPage = () => {
         rating: filters.rating > 0 ? filters.rating : undefined,
         amenities: filters.amenities.length > 0 ? filters.amenities.join(',') : undefined
       };
+
       const { data } = await fetchHotels(params);
       setHotels(data);
       setError('');
     } catch (err) {
-      setError('Failed to fetch property archive.');
+      console.error('Failed to fetch hotels:', err);
+      setError('Could not load hotels. Please try again later.');
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [filters.location, filters.minPrice, filters.maxPrice, filters.rating, filters.amenities]);
 
+  // Debounce API calls for location and price
   useEffect(() => {
     const timer = setTimeout(() => {
       loadHotels();
-    }, 300);
+    }, 500);
     return () => clearTimeout(timer);
   }, [loadHotels]);
 
@@ -79,173 +84,318 @@ const HotelListPage = () => {
     }));
   };
 
+  const clearFilters = () => {
+    setFilters({
+      location: '',
+      minPrice: 0,
+      maxPrice: 2000,
+      amenities: [],
+      rating: 0,
+      startDate: null,
+      endDate: null
+    });
+  };
+
   return (
-    <div className="bg-slate-50 min-h-screen pb-24 pt-32 lg:pt-40">
-      <div className="container-booking space-y-10 animate-fade-in">
+    <div style={{ background: '#f8fafc', minHeight: '100vh', padding: '2rem 1rem' }}>
+      <div className="container" style={{ maxWidth: '1400px' }}>
         
-        {/* Search Results Summary Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-6 border-b border-slate-200">
-           <div>
-               <nav className="text-[11px] font-bold text-slate-500 flex items-center gap-2 mb-2 uppercase tracking-wide">
-                  <Link to="/" className="text-cyan-600 hover:text-cyan-700 transition-colors">Home</Link>
-                  <ChevronRight size={10} />
-                  <span>All properties</span>
-                  {filters.location && (
-                    <>
-                       <ChevronRight size={10} />
-                       <span className="text-slate-900">{filters.location}</span>
-                    </>
-                  )}
-               </nav>
-               <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
-                 {filters.location ? `${filters.location}: ` : ""}
-                 {hotels.length} properties found
-              </h1>
-           </div>
-           
-           <div className="flex items-center gap-4">
-               <button 
-                 onClick={() => setShowMobileFilters(true)}
-                 className="lg:hidden h-11 px-6 bg-white border border-slate-200 text-slate-700 rounded-full flex items-center gap-2 text-xs font-bold shadow-sm"
-               >
-                   <Filter size={16} /> Filters
-               </button>
-               <div className="relative h-11 px-6 bg-white border border-slate-200 rounded-full flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer hover:border-cyan-500 transition-all shadow-sm">
-                  <ArrowUpDown size={14} className="text-cyan-600" />
-                  <select className="bg-transparent border-none appearance-none outline-none pr-4 cursor-pointer text-slate-700">
-                    <option>Our top picks</option>
-                    <option>Price (lowest first)</option>
-                    <option>Star rating (highest first)</option>
-                    <option>Best reviewed</option>
-                 </select>
-              </div>
-           </div>
+        {/* Header Section */}
+        <div style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1.5rem' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--primary)', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px' }}>
+              <ChevronRight size={16} /> Explore
+            </div>
+            <h1 className="luxury-font" style={{ fontSize: '2.5rem', color: '#0f172a', margin: 0 }}>Discover Luxury Stays</h1>
+            <p style={{ color: '#64748b', marginTop: '0.5rem' }}>Indulge in unparalleled comfort across the world's most premium destinations.</p>
+          </div>
+          
+          <button 
+            onClick={() => setShowMobileFilters(true)}
+            style={{ 
+              display: 'none', 
+              background: 'white', 
+              padding: '0.6rem 1.2rem', 
+              borderRadius: '10px', 
+              border: '1px solid #e2e8f0',
+              fontWeight: '600',
+              gap: '0.5rem',
+              alignItems: 'center'
+            }}
+            className="mobile-filter-btn"
+          >
+            <SlidersHorizontal size={18} /> Filters
+          </button>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8 relative items-start">
+        <div style={{ display: 'flex', gap: '2rem', position: 'relative' }}>
           
-          {/* Sidebar Filters - Desktop */}
-          <aside className="hidden lg:block w-72 space-y-6 sticky top-24">
-             <div className="card-premium border-slate-200 rounded-xl overflow-hidden shadow-soft">
-                <div className="bg-slate-50 p-5 border-b border-slate-200">
-                   <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Filter by:</h3>
-                </div>
-                
-                <div className="p-6 space-y-10 bg-white">
-                   {/* Location Filter */}
-                   <div className="space-y-3">
-                      <label className="text-xs font-black text-slate-900 uppercase tracking-wide">Your destination</label>
-                       <div className="relative">
-                          <MapPin size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-600" />
-                          <input 
-                            type="text" 
-                            placeholder="Where next?"
-                            value={filters.location}
-                            onChange={(e) => setFilters({...filters, location: e.target.value})}
-                            className="w-full h-12 pl-12 pr-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 outline-none transition-all shadow-inner"
-                          />
-                       </div>
-                   </div>
+          {/* Sidebar Filters */}
+          <aside className={`filter-sidebar ${showMobileFilters ? 'mobile-open' : ''}`} style={{
+            width: '320px',
+            flexShrink: 0,
+            background: 'white',
+            borderRadius: '24px',
+            padding: '2rem',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.03)',
+            height: 'fit-content',
+            position: 'sticky',
+            top: '100px',
+            zIndex: 10
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: '700', margin: 0 }}>Filters</h3>
+              <button onClick={clearFilters} style={{ background: 'none', color: 'var(--primary)', fontWeight: '600', fontSize: '0.85rem' }}>Reset All</button>
+              <button onClick={() => setShowMobileFilters(false)} className="mobile-close-btn" style={{ display: 'none' }}><X /></button>
+            </div>
 
-                   {/* Price Filter */}
-                   <div className="space-y-6">
-                       <div className="flex justify-between items-center">
-                          <label className="text-xs font-black text-slate-900 uppercase tracking-wide">Budget per night</label>
-                          <span className="text-xs font-bold text-cyan-600 bg-cyan-50 px-2 py-1 rounded-md">{formatCurrency(filters.maxPrice)}</span>
-                       </div>
-                       <input 
-                         type="range" min="0" max="5000" step="100"
-                         value={filters.maxPrice}
-                         onChange={(e) => setFilters({...filters, maxPrice: e.target.value})}
-                         className="w-full accent-cyan-600 h-1.5 bg-slate-200 rounded-full appearance-none cursor-pointer"
-                       />
-                   </div>
+            {/* Location Search */}
+            <div style={{ marginBottom: '2rem' }}>
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', color: '#64748b', marginBottom: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Location</label>
+              <div style={{ position: 'relative' }}>
+                <MapPin size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                <input 
+                  type="text" 
+                  placeholder="Where are you going?"
+                  value={filters.location}
+                  onChange={(e) => setFilters({...filters, location: e.target.value})}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem 0.75rem 2.5rem',
+                    borderRadius: '12px',
+                    border: '1.5px solid #e2e8f0',
+                    outline: 'none',
+                    fontSize: '0.95rem'
+                  }}
+                />
+              </div>
+            </div>
 
-                   {/* Amenities Filter */}
-                   <div className="space-y-4">
-                      <label className="text-xs font-black text-slate-900 uppercase tracking-wide">Popular filters</label>
-                      <div className="space-y-3">
-                         {AMENITIES_OPTIONS.map(amenity => (
-                           <label key={amenity.id} className="flex items-center gap-3 cursor-pointer group">
-                               <input 
-                                 type="checkbox"
-                                 checked={filters.amenities.includes(amenity.id)}
-                                 onChange={() => handleAmenityToggle(amenity.id)}
-                                 className="w-5 h-5 rounded border-slate-300 text-cyan-600 focus:ring-cyan-600"
-                               />
-                               <span className="text-sm font-medium text-slate-700 group-hover:text-cyan-600 transition-colors">{amenity.name}</span>
-                           </label>
-                         ))}
-                      </div>
-                   </div>
+            {/* Price Range */}
+            <div style={{ marginBottom: '2rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <label style={{ fontSize: '0.85rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Price Range</label>
+                <span style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--primary)' }}>
+                  Max: {formatCurrency(filters.maxPrice)}
+                </span>
+              </div>
+              <input 
+                type="range" 
+                min="0" 
+                max="5000" 
+                step="50"
+                value={filters.maxPrice}
+                onChange={(e) => setFilters({...filters, maxPrice: e.target.value})}
+                style={{ width: '100%', accentColor: 'var(--primary)' }}
+              />
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', color: '#94a3b8', fontSize: '0.75rem' }}>
+                <span>$0</span>
+                <span>$5,000+</span>
+              </div>
+            </div>
 
-                   {/* Rating Filter */}
-                   <div className="space-y-4 pt-6 border-t border-slate-100">
-                      <label className="text-xs font-black text-slate-900 uppercase tracking-wide">Review score</label>
-                      <div className="flex flex-col gap-3">
-                         {[4, 3, 2].map(score => (
-                             <button
-                               key={score}
-                               onClick={() => setFilters({...filters, rating: score})}
-                               className={`flex items-center gap-3 text-sm transition-all ${filters.rating === score ? 'text-cyan-600 font-bold' : 'text-slate-600 font-medium hover:text-cyan-600'}`}
-                             >
-                                <div className={`w-5 h-5 rounded flex items-center justify-center transition-all ${filters.rating === score ? 'bg-cyan-600 text-white shadow-sm' : 'border border-slate-300 bg-slate-50'}`}>
-                                   {filters.rating === score && <CheckCircle2 size={14} className="text-white" />}
-                                </div>
-                               <span>{score}+ Superb</span>
-                           </button>
-                         ))}
-                      </div>
-                   </div>
-                </div>
-             </div>
+            {/* Date Range */}
+            <div style={{ marginBottom: '2rem' }}>
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', color: '#64748b', marginBottom: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Dates</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <DatePicker
+                  selected={filters.startDate}
+                  onChange={(date) => setFilters({...filters, startDate: date})}
+                  placeholderText="Check-in Date"
+                  className="datepicker-input"
+                  minDate={new Date()}
+                />
+                <DatePicker
+                  selected={filters.endDate}
+                  onChange={(date) => setFilters({...filters, endDate: date})}
+                  placeholderText="Check-out Date"
+                  className="datepicker-input"
+                  minDate={filters.startDate || new Date()}
+                />
+              </div>
+            </div>
+
+            {/* Amenities */}
+            <div style={{ marginBottom: '2rem' }}>
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', color: '#64748b', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Amenities</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {AMENITIES_OPTIONS.map(amenity => (
+                  <label key={amenity.id} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', transition: '0.2s' }}>
+                    <div 
+                      onClick={() => handleAmenityToggle(amenity.id)}
+                      style={{
+                        width: '20px',
+                        height: '20px',
+                        borderRadius: '6px',
+                        border: '2px solid',
+                        borderColor: filters.amenities.includes(amenity.id) ? 'var(--primary)' : '#cbd5e1',
+                        background: filters.amenities.includes(amenity.id) ? 'var(--primary)' : 'transparent',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: '0.2s'
+                      }}
+                    >
+                      {filters.amenities.includes(amenity.id) && <X size={14} color="white" />}
+                    </div>
+                    <span style={{ fontSize: '0.95rem', color: filters.amenities.includes(amenity.id) ? '#0f172a' : '#64748b', fontWeight: filters.amenities.includes(amenity.id) ? '600' : '400' }}>
+                      {amenity.name}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Rating Filter */}
+            <div>
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', color: '#64748b', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Minimum Rating</label>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                {[3, 4, 5].map(star => (
+                  <button
+                    key={star}
+                    onClick={() => setFilters({...filters, rating: filters.rating === star ? 0 : star})}
+                    style={{
+                      flex: 1,
+                      padding: '0.6rem',
+                      borderRadius: '10px',
+                      border: '1.5px solid',
+                      borderColor: filters.rating === star ? 'var(--primary)' : '#e2e8f0',
+                      background: filters.rating === star ? 'rgba(197, 160, 89, 0.1)' : 'white',
+                      color: filters.rating === star ? 'var(--primary)' : '#64748b',
+                      fontWeight: '700',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.3rem'
+                    }}
+                  >
+                    {star}+ <Star size={14} fill={filters.rating === star ? 'var(--primary)' : 'none'} />
+                  </button>
+                ))}
+              </div>
+            </div>
           </aside>
 
           {/* Hotel Grid */}
-          <main className="flex-1 space-y-6">
+          <main style={{ flexGrow: 1 }}>
+            
+            {/* Search Summary */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', background: 'white', padding: '1rem 1.5rem', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
+              <div style={{ fontWeight: '600', color: '#0f172a' }}>
+                {loading ? 'Searching...' : `${hotels.length} hotels found`}
+                {filters.location && <span style={{ color: '#94a3b8', fontWeight: '400' }}> in {filters.location}</span>}
+              </div>
+              
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Sort by:</span>
+                <select style={{ border: 'none', background: 'none', fontWeight: '600', color: 'var(--primary)', outline: 'none', cursor: 'pointer' }}>
+                  <option>Recommended</option>
+                  <option>Price: Low to High</option>
+                  <option>Price: High to Low</option>
+                  <option>Top Rated</option>
+                </select>
+              </div>
+            </div>
+
             {loading && hotels.length === 0 ? (
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {[...Array(4)].map((_, i) => (
-                    <div key={i} className="bg-white h-[380px] rounded-2xl animate-pulse border border-slate-100 shadow-sm" />
-                  ))}
-               </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}>
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="skeleton" style={{ height: '420px', borderRadius: '16px', background: 'white' }}></div>
+                ))}
+              </div>
             ) : error ? (
-               <div className="py-20 text-center space-y-4 bg-white rounded-2xl border border-slate-100 shadow-sm">
-                  <p className="text-rose-500 font-bold">{error}</p>
-                  <button onClick={loadHotels} className="btn-primary-booking mx-auto">Retry</button>
-               </div>
+              <div style={{ textAlign: 'center', padding: '5rem 0', background: 'white', borderRadius: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+                <X size={48} color="var(--error)" style={{ marginBottom: '1rem' }} />
+                <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{error}</h3>
+                <button onClick={loadHotels} className="btn-primary" style={{ marginTop: '1rem' }}>Try Again</button>
+              </div>
             ) : hotels.length === 0 ? (
-               <div className="py-32 text-center space-y-6 bg-white rounded-2xl border border-slate-100 shadow-sm">
-                  <div className="w-16 h-16 bg-slate-50 border border-slate-200 rounded-full flex items-center justify-center mx-auto text-slate-400">
-                     <Search size={32} />
-                  </div>
-                  <div className="space-y-2">
-                     <h3 className="text-xl font-bold text-slate-900">No properties match your filters</h3>
-                     <p className="text-sm text-slate-500">Try removing some criteria to see more results</p>
-                  </div>
-                   <button 
-                     onClick={() => setFilters({location: '', minPrice: 0, maxPrice: 5000, amenities: [], rating: 0})}
-                     className="text-cyan-600 font-bold hover:text-cyan-700 transition-colors text-sm px-6 py-2 bg-cyan-50 rounded-lg mt-4 inline-block"
-                   >
-                      Clear all filters
-                   </button>
-               </div>
+              <div style={{ textAlign: 'center', padding: '5rem 2rem', background: 'white', borderRadius: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+                <div style={{ 
+                  width: '80px', height: '80px', background: '#f1f5f9', borderRadius: '50%', 
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' 
+                }}>
+                  <Search size={32} color="#94a3b8" />
+                </div>
+                <h3 className="luxury-font" style={{ fontSize: '1.8rem', marginBottom: '1rem' }}>No Hotels Found</h3>
+                <p style={{ color: '#64748b', maxWidth: '400px', margin: '0 auto 2rem' }}>
+                  We couldn't find any properties matching your current filters. Try adjusting your search or resetting filters.
+                </p>
+                <button onClick={clearFilters} className="btn-primary">View All Hotels</button>
+              </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 animate-slide-up relative z-10">
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', 
+                gap: '2rem' 
+              }}>
                 {hotels.map(hotel => (
-                  <HotelCard key={hotel._id || hotel.id} hotel={hotel} />
+                  <HotelCard key={hotel._id} hotel={hotel} />
                 ))}
               </div>
             )}
             
             {loading && hotels.length > 0 && (
-             <div className="flex items-center justify-center py-10">
-                <Loader2 size={32} className="animate-spin text-cyan-600" />
-             </div>
+              <div style={{ 
+                position: 'fixed', bottom: '3rem', left: '50%', transform: 'translateX(-50%)',
+                background: 'white', padding: '0.75rem 1.5rem', borderRadius: '30px',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: '0.75rem',
+                zIndex: 100
+              }}>
+                <Loader2 size={18} className="animate-spin" style={{ color: 'var(--primary)' }} />
+                <span style={{ fontWeight: '600', fontSize: '0.9rem' }}>Updating results...</span>
+              </div>
             )}
           </main>
         </div>
       </div>
+
+      <style>{`
+        .datepicker-input {
+          width: 100%;
+          padding: 0.75rem 1rem;
+          border-radius: 12px;
+          border: 1.5px solid #e2e8f0;
+          outline: none;
+          font-size: 0.95rem;
+          cursor: pointer;
+        }
+        .datepicker-input:focus {
+          border-color: var(--primary);
+        }
+        .animate-spin {
+          animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        .skeleton {
+          background: linear-gradient(90deg, #f0f0f0 25%, #f8f8f8 50%, #f0f0f0 75%);
+          background-size: 200% 100%;
+          animation: loading 1.5s infinite;
+        }
+        @keyframes loading {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+        @media (max-width: 1024px) {
+          .filter-sidebar {
+            display: none;
+          }
+          .filter-sidebar.mobile-open {
+            display: block;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%; height: 100%;
+            border-radius: 0;
+            overflow-y: auto;
+            margin: 0;
+          }
+          .mobile-filter-btn { display: flex !important; }
+          .mobile-close-btn { display: block !important; }
+        }
+      `}</style>
     </div>
   );
 };
