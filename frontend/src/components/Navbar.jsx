@@ -41,36 +41,71 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-[1000] py-4 bg-transparent">
-      <div className="max-w-[1440px] mx-auto px-10 flex justify-between items-center text-white">
+    <nav className={`fixed top-0 left-0 w-full z-[1000] py-6 transition-all duration-500 ${
+      scrolled ? 'bg-white/80 backdrop-blur-xl shadow-sm py-4' : 'bg-transparent'
+    }`}>
+      <div className="max-w-7xl mx-auto px-6 md:px-10 flex justify-between items-center">
+        
+        {/* Brand Logo */}
+        <Link 
+          to="/" 
+          onClick={scrollToTop}
+          className={`text-2xl font-serif font-black tracking-tighter transition-colors ${
+            scrolled ? 'text-slate-900' : 'text-white'
+          }`}
+        >
+          URBAN<span className="text-luxury-gold italic">STAY</span>
+        </Link>
         
         {/* Navigation Links */}
-        <div className="flex items-center gap-12 font-semibold text-sm">
-          <button onClick={scrollToTop} className="hover:text-[#c5a059] transition-colors">Home</button>
-          <button onClick={() => scrollToSection('about')} className="hover:text-[#c5a059] transition-colors">About us</button>
-          <button className="hover:text-[#c5a059] transition-colors">Gallery</button>
-          <button onClick={() => scrollToSection('contact')} className="hover:text-[#c5a059] transition-colors">Contact us</button>
+        <div className={`hidden lg:flex items-center gap-12 font-bold text-[10px] uppercase tracking-[0.2em] ${
+          scrolled ? 'text-slate-600' : 'text-white/80'
+        }`}>
+          <button onClick={scrollToTop} className="hover:text-luxury-gold transition-colors">Home</button>
+          <button onClick={() => scrollToSection('about')} className="hover:text-luxury-gold transition-colors">About</button>
+          <button onClick={() => scrollToSection('hotels')} className="hover:text-luxury-gold transition-colors">Properties</button>
+          <button className="hover:text-luxury-gold transition-colors">Contact</button>
         </div>
 
-        {/* Search and Auth */}
-        <div className="flex items-center gap-8">
-          <div className="relative group">
-            <input 
-              type="text" 
-              placeholder="Search Room..." 
-              className="bg-white rounded-full px-6 py-2.5 w-[300px] text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#c5a059]/50 transition-all pl-12"
-            />
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#c5a059]" size={18} />
-          </div>
-
-          <div className="flex items-center gap-6">
-            <Link to="/login" className="flex items-center gap-2 hover:text-[#c5a059] transition-colors font-semibold text-sm">
-              <div className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center">
-                <User size={16} className="text-[#c5a059]" />
-              </div>
-              <span>Sign In | Log In</span>
+        {/* Auth & Actions */}
+        <div className="flex items-center gap-6">
+          {user ? (
+             <div className="flex items-center gap-6">
+                <NotificationBell scrolled={scrolled} />
+                <button 
+                  onClick={() => navigate(user.role === 'admin' ? '/admin/dashboard' : user.role === 'manager' ? '/manager/dashboard' : '/customer/dashboard')}
+                  className={`flex items-center gap-3 px-6 py-2.5 rounded-full border transition-all text-[10px] font-black uppercase tracking-widest ${
+                    scrolled 
+                    ? 'border-slate-200 text-slate-900 hover:bg-slate-900 hover:text-white' 
+                    : 'border-white/20 text-white hover:bg-white hover:text-slate-900'
+                  }`}
+                >
+                  Dashboard
+                </button>
+                <button 
+                  onClick={handleLogout}
+                  className="p-2.5 rounded-full bg-rose-50 text-rose-600 hover:bg-rose-100 transition-colors"
+                >
+                  <LogOut size={18} />
+                </button>
+             </div>
+          ) : (
+            <Link 
+              to="/login" 
+              className={`flex items-center gap-3 px-8 py-3 rounded-full transition-all text-[10px] font-black uppercase tracking-widest shadow-xl ${
+                scrolled 
+                ? 'bg-slate-900 text-white hover:bg-luxury-gold' 
+                : 'bg-white text-slate-900 hover:bg-luxury-gold hover:text-white'
+              }`}
+            >
+              Sign In
             </Link>
-          </div>
+          )}
+
+          {/* Mobile Menu Toggle */}
+          <button className="lg:hidden text-white">
+             <Menu size={24} className={scrolled ? 'text-slate-900' : 'text-white'} />
+          </button>
         </div>
       </div>
     </nav>

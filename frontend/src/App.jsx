@@ -42,42 +42,6 @@ import ResetPassword from './pages/ResetPassword';
 import BookingSuccess from './pages/BookingSuccess';
 import api from './services/api';
 
-// ─── Server Wake-Up Banner ─────────────────────────────────────────────────────
-const ServerWakeUpBanner = () => {
-  const [status, setStatus] = useState('checking'); // checking | ready | error
-
-  useEffect(() => {
-    let cancelled = false;
-    const check = async () => {
-      try {
-        await api.get('/health', { timeout: 40000 });
-        if (!cancelled) setStatus('ready');
-      } catch {
-        if (!cancelled) setStatus('error');
-      }
-    };
-    check();
-    return () => { cancelled = true; };
-  }, []);
-
-  if (status === 'ready') return null;
-
-  return (
-    <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] px-6 py-3 rounded-full text-sm font-bold shadow-xl animate-fade-in flex items-center gap-3 border ${
-      status === 'error' ? 'bg-rose-50 border-rose-100 text-rose-600' : 'bg-amber-50 border-amber-100 text-amber-700'
-    }`}>
-      {status === 'checking' ? (
-        <>
-          <Loader2 size={16} className="animate-spin text-amber-500" />
-          Server warming up... please wait about 30 seconds
-        </>
-      ) : (
-        <>⚠️ Connection issue — please refresh the page</>
-      )}
-    </div>
-  );
-};
-
 const ProtectedRoute = ({ children, allowedRoles, redirectTo = '/login' }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
@@ -100,9 +64,9 @@ const ProtectedRoute = ({ children, allowedRoles, redirectTo = '/login' }) => {
     
     // Intelligent role-based redirection 
     const targetDashboard = 
-      user.role === 'admin'   ? '/admin/dashboard' : 
-      user.role === 'manager' ? '/manager/dashboard' : 
-      '/customer/dashboard';
+       user.role === 'admin'   ? '/admin/dashboard' : 
+       user.role === 'manager' ? '/manager/dashboard' : 
+       '/customer/dashboard';
 
     return <Navigate to={targetDashboard} replace />;
   }
@@ -122,7 +86,6 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white selection:bg-blue-100 selection:text-blue-900">
-      <ServerWakeUpBanner />
       {!isDashboard && <Navbar />}
 
       <main className="flex-grow pt-0">
