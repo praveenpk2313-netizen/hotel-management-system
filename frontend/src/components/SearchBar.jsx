@@ -7,12 +7,10 @@ import {
   Users, 
   Plus, 
   Minus, 
-  Bed,
   ChevronDown,
-  Sparkles,
   Search,
   Navigation,
-  Globe
+  Check
 } from 'lucide-react';
 
 const SearchBar = ({ onSearch }) => {
@@ -54,380 +52,315 @@ const SearchBar = ({ onSearch }) => {
     }
   };
 
-  const handleSearch = () => {
+  const handleSearch = (e) => {
+    e?.stopPropagation();
     onSearch({ location, startDate, endDate, guests, rooms });
   };
 
   return (
-    <div className="premium-search-wrapper">
-      <div className="premium-search-container animate-slide-up">
+    <div className="search-outer animate-slide-up">
+      <div className="search-grid">
         
-        {/* 1. Destination Segment */}
-        <div className="search-segment destination" ref={suggestionsRef}>
-           <div className="segment-label">
-             <MapPin size={14} className="label-icon" />
-             <span>Location</span>
-           </div>
-           <input 
-             type="text" 
-             placeholder="Where are you going?" 
-             value={location}
-             onChange={handleLocationChange}
-             onFocus={() => location.length >= 2 && setShowSuggestions(true)}
-             className="segment-input"
-           />
-           {showSuggestions && suggestions.length > 0 && (
-             <div className="search-dropdown location-dropdown animate-dropdown">
-                <div className="dropdown-header">Top Destinations</div>
-                {suggestions.map((text, idx) => (
-                  <button 
-                    key={idx} 
-                    onClick={() => { setLocation(text); setShowSuggestions(false); }}
-                    className="dropdown-item"
-                  >
-                    <Navigation size={16} className="item-icon" />
-                    <div className="item-text">
-                       <span className="item-title">{text}</span>
-                       <span className="item-subtitle">Luxury Stay</span>
-                    </div>
-                  </button>
-                ))}
-             </div>
-           )}
+        {/* Destination */}
+        <div className="search-box destination" ref={suggestionsRef}>
+          <div className="search-label">
+            <MapPin size={14} className="text-[#c5a059]" />
+            <span>Destination</span>
+          </div>
+          <input 
+            type="text" 
+            placeholder="Where are you going?" 
+            value={location}
+            onChange={handleLocationChange}
+            onFocus={() => location.length >= 2 && setShowSuggestions(true)}
+            className="search-input"
+          />
+          {showSuggestions && suggestions.length > 0 && (
+            <div className="dropdown-panel location-dropdown animate-fade-in shadow-2xl">
+              <div className="dropdown-title">Recommended Locations</div>
+              {suggestions.map((text, idx) => (
+                <button 
+                  key={idx} 
+                  onClick={() => { setLocation(text); setShowSuggestions(false); }}
+                  className="dropdown-choice"
+                >
+                  <Navigation size={16} className="text-[#c5a059]" />
+                  <div className="flex flex-col">
+                    <span className="font-bold text-slate-900">{text}</span>
+                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none">Global City</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* 2. Stay Period Segment */}
-        <div className="segment-divider"></div>
-        <div className="search-segment stay-period">
-           <div className="segment-label">
-             <Calendar size={14} className="label-icon" />
-             <span>Stay Period</span>
-           </div>
-           <div className="dual-date-wrapper">
-              <DatePicker
-                selected={startDate}
-                onChange={(date) => setStartDate(date)}
-                selectsStart
-                startDate={startDate}
-                endDate={endDate}
-                placeholderText="Check-in"
-                className="date-mini-input"
-                dateFormat="MMM d"
-              />
-              <span className="date-dash">—</span>
-              <DatePicker
-                selected={endDate}
-                onChange={(date) => setEndDate(date)}
-                selectsEnd
-                startDate={startDate}
-                endDate={endDate}
-                minDate={startDate || new Date()}
-                placeholderText="Check-out"
-                className="date-mini-input"
-                dateFormat="MMM d"
-              />
-           </div>
+        {/* Vertical Divider */}
+        <div className="v-divider" />
+
+        {/* Date Picker */}
+        <div className="search-box date-box">
+          <div className="search-label">
+            <Calendar size={14} className="text-[#c5a059]" />
+            <span>Stay Period</span>
+          </div>
+          <div className="date-input-pair">
+            <DatePicker
+              selected={startDate}
+              onChange={(date) => setStartDate(date)}
+              selectsStart
+              startDate={startDate}
+              endDate={endDate}
+              placeholderText="Check-in"
+              className="mini-dp"
+              dateFormat="MMM d"
+              minDate={new Date()}
+            />
+            <span className="dp-dash">-</span>
+            <DatePicker
+              selected={endDate}
+              onChange={(date) => setEndDate(date)}
+              selectsEnd
+              startDate={startDate}
+              endDate={endDate}
+              minDate={startDate || new Date()}
+              placeholderText="Check-out"
+              className="mini-dp"
+              dateFormat="MMM d"
+            />
+          </div>
         </div>
 
-        {/* 3. Guests Segment */}
-        <div className="segment-divider"></div>
-        <div className="search-segment guests-trigger" ref={guestsRef} onClick={() => setShowGuests(!showGuests)}>
-           <div className="segment-label">
-             <Users size={14} className="label-icon" />
-             <span>Guests</span>
-           </div>
-           <div className="trigger-display">
-              <span className="display-text">{guests} Adults, {rooms} Room</span>
-              <ChevronDown size={14} className={`chevron-spin ${showGuests ? 'is-open' : ''}`} />
-           </div>
-           
-           {showGuests && (
-             <div className="search-dropdown guest-dropdown animate-dropdown" onClick={e => e.stopPropagation()}>
-                <div className="guest-selector-row">
-                   <div className="guest-info">
-                      <span className="guest-title">Adults</span>
-                      <span className="guest-meta">Aged 18+</span>
-                   </div>
-                   <div className="counter-controls">
-                      <button onClick={() => setGuests(Math.max(1, guests - 1))} className="mini-counter-btn"><Minus size={12} /></button>
-                      <span className="mini-counter-val">{guests}</span>
-                      <button onClick={() => setGuests(guests + 1)} className="mini-counter-btn"><Plus size={12} /></button>
-                   </div>
+        {/* Vertical Divider */}
+        <div className="v-divider" />
+
+        {/* Guests Selector */}
+        <div className="search-box guests-trigger" ref={guestsRef} onClick={() => setShowGuests(!showGuests)}>
+          <div className="search-label">
+            <Users size={14} className="text-[#c5a059]" />
+            <span>Guests & Rooms</span>
+          </div>
+          <div className="trigger-val">
+            <span className="val-text truncate">{guests} Adults, {rooms} Room</span>
+            <ChevronDown size={14} className={`chevron-ani ${showGuests ? 'rotated' : ''}`} />
+          </div>
+          
+          {showGuests && (
+            <div className="dropdown-panel guest-panel animate-fade-in shadow-2xl" onClick={e => e.stopPropagation()}>
+              <div className="selector-item">
+                <div className="item-info">
+                  <span className="item-name">Adults</span>
+                  <span className="item-sub">Aged 18 and above</span>
                 </div>
-                <div className="guest-selector-row">
-                   <div className="guest-info">
-                      <span className="guest-title">Rooms</span>
-                      <span className="guest-meta">Premium Suites</span>
-                   </div>
-                   <div className="counter-controls">
-                      <button onClick={() => setRooms(Math.max(1, rooms - 1))} className="mini-counter-btn"><Minus size={12} /></button>
-                      <span className="mini-counter-val">{rooms}</span>
-                      <button onClick={() => setRooms(rooms + 1)} className="mini-counter-btn"><Plus size={12} /></button>
-                   </div>
+                <div className="ctrls">
+                  <button onClick={() => setGuests(Math.max(1, guests - 1))} className="ctrl-btn"><Minus size={12} /></button>
+                  <span className="ctrl-val">{guests}</span>
+                  <button onClick={() => setGuests(guests + 1)} className="ctrl-btn"><Plus size={12} /></button>
                 </div>
-                <button onClick={() => setShowGuests(false)} className="dropdown-action-btn">Confirm Selection</button>
-             </div>
-           )}
+              </div>
+              <div className="selector-item">
+                <div className="item-info">
+                  <span className="item-name">Rooms</span>
+                  <span className="item-sub">Select total units</span>
+                </div>
+                <div className="ctrls">
+                  <button onClick={() => setRooms(Math.max(1, rooms - 1))} className="ctrl-btn"><Minus size={12} /></button>
+                  <span className="ctrl-val">{rooms}</span>
+                  <button onClick={() => setRooms(rooms + 1)} className="ctrl-btn"><Plus size={12} /></button>
+                </div>
+              </div>
+              <button onClick={() => setShowGuests(false)} className="confirm-btn">
+                 Confirm Selection <Check size={14} />
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* 4. Action Segment */}
-        <div className="search-action">
-           <button 
-             onClick={handleSearch}
-             className="premium-search-btn"
-           >
-              <Search size={20} />
-              <span>Explore Stays</span>
-           </button>
+        {/* Search Button */}
+        <div className="search-btn-wrap">
+          <button onClick={handleSearch} className="search-action-btn group">
+            <Search size={22} strokeWidth={2.5} className="group-hover:scale-110 transition-transform" />
+            <span>Search</span>
+          </button>
         </div>
       </div>
 
-      <style>{searchBarStyles}</style>
+      <style>{`
+        .search-outer { width: 100%; position: relative; }
+        .search-grid {
+          background: white;
+          border-radius: 100px;
+          display: flex;
+          align-items: center;
+          padding: 8px 12px;
+          border: 1px solid #f1f5f9;
+          box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+          position: relative;
+        }
+
+        .search-box {
+          flex: 1;
+          padding: 12px 24px;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          position: relative;
+          min-width: 0;
+        }
+        .search-box.destination { flex: 1.5; }
+        .search-box.guests-trigger { cursor: pointer; }
+        .search-box.guests-trigger:hover { background: #f8fafc; border-radius: 20px; }
+
+        .search-label {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 0.65rem;
+          font-weight: 900;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          color: #94a3b8;
+        }
+
+        .search-input {
+          width: 100%;
+          border: none !important;
+          outline: none !important;
+          font-size: 1rem;
+          font-weight: 800;
+          color: #0f172a;
+          background: transparent;
+          padding: 0;
+        }
+        .search-input::placeholder { color: #cbd5e1; font-weight: 600; }
+
+        .date-input-pair { display: flex; align-items: center; gap: 4px; }
+        .mini-dp {
+          width: 75px;
+          background: transparent;
+          border: none;
+          outline: none;
+          font-size: 1rem;
+          font-weight: 800;
+          color: #0f172a;
+          cursor: pointer;
+        }
+        .dp-dash { color: #cbd5e1; font-weight: 300; }
+
+        .trigger-val { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .val-text { font-size: 1rem; font-weight: 800; color: #0f172a; }
+        .chevron-ani { color: #cbd5e1; transition: 0.3s; }
+        .chevron-ani.rotated { transform: rotate(180deg); color: #c5a059; }
+
+        .v-divider { width: 1px; height: 35px; background: #f1f5f9; mx-4; }
+
+        .search-action-btn {
+          height: 60px;
+          background: #0f172a;
+          color: white;
+          padding: 0 35px;
+          border-radius: 100px;
+          font-size: 1rem;
+          font-weight: 900;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          transition: all 0.3s;
+          border: none;
+          cursor: pointer;
+          box-shadow: 0 10px 20px rgba(15, 23, 42, 0.2);
+        }
+        .search-action-btn:hover { background: #c5a059; transform: translateY(-2px); box-shadow: 0 15px 30px rgba(197, 160, 89, 0.3); }
+
+        /* Dropdowns */
+        .dropdown-panel {
+          position: absolute;
+          top: calc(100% + 15px);
+          background: white;
+          border-radius: 24px;
+          padding: 16px;
+          z-index: 1000;
+          min-width: 320px;
+          border: 1px solid #f1f5f9;
+        }
+        .location-dropdown { left: 0; }
+        .guest-panel { right: 0; min-width: 300px; border-top: 3px solid #c5a059; }
+
+        .dropdown-title { font-size: 0.65rem; font-weight: 900; color: #94a3b8; text-transform: uppercase; margin-bottom: 12px; padding-left: 12px; }
+        .dropdown-choice {
+          width: 100%;
+          padding: 12px;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          border-radius: 16px;
+          transition: 0.2s;
+          text-align: left;
+          background: none;
+          border: none;
+          cursor: pointer;
+        }
+        .dropdown-choice:hover { background: #f8fafc; }
+
+        .selector-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 16px 12px;
+          border-bottom: 1px solid #f8fafc;
+        }
+        .selector-item:last-of-type { border-bottom: none; }
+        .item-name { display: block; font-weight: 800; color: #0f172a; }
+        .item-sub { display: block; font-size: 0.7rem; color: #94a3b8; font-weight: 700; margin-top: 2px; }
+
+        .ctrls { display: flex; align-items: center; gap: 15px; }
+        .ctrl-btn {
+          width: 32px;
+          height: 32px;
+          border: 2px solid #f1f5f9;
+          background: white;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #94a3b8;
+          transition: 0.2s;
+          cursor: pointer;
+        }
+        .ctrl-btn:hover { border-color: #c5a059; color: #c5a059; }
+        .ctrl-val { font-weight: 900; color: #0f172a; min-width: 20px; text-align: center; }
+
+        .confirm-btn {
+          width: 100%;
+          margin-top: 15px;
+          height: 50px;
+          background: #f8fafc;
+          border-radius: 12px;
+          color: #c5a059;
+          font-weight: 900;
+          font-size: 0.85rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          border: none;
+          cursor: pointer;
+          transition: 0.2s;
+        }
+        .confirm-btn:hover { background: #0f172a; color: white; }
+
+        @media (max-width: 1024px) {
+          .search-grid { flex-direction: column; border-radius: 32px; padding: 12px; }
+          .v-divider { display: none; }
+          .search-box { width: 100%; border-bottom: 1px solid #f1f5f9; }
+          .search-box:last-of-type { border-bottom: none; }
+          .search-btn-wrap { width: 100%; padding-top: 12px; }
+          .search-action-btn { width: 100%; justify-content: center; }
+          .dropdown-panel { position: static; min-width: 100%; box-shadow: none; border: none; padding: 12px 0; }
+        }
+      `}</style>
     </div>
   );
 };
-
-const searchBarStyles = `
-  .premium-search-wrapper {
-    width: 100%;
-    max-width: 1100px;
-    margin: 0 auto;
-    font-family: 'Outfit', 'Inter', sans-serif;
-  }
-
-  /* ── Search Container ─────────────────────────────────────────────────── */
-  .premium-search-container {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(226, 232, 240, 0.8);
-    border-radius: 100px;
-    display: flex;
-    align-items: center;
-    padding: 8px 12px;
-    box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.1);
-    position: relative;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-  .premium-search-container:hover {
-    box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.15);
-    transform: translateY(-2px);
-    border-color: #0284c7;
-  }
-
-  /* ── Segments ─────────────────────────────────────────────────────────── */
-  .search-segment {
-    flex: 1;
-    padding: 12px 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    position: relative;
-    cursor: text;
-  }
-  .search-segment.guests-trigger { cursor: pointer; }
-  .search-segment.destination { flex: 1.5; }
-
-  .segment-label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.65rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #64748b;
-  }
-  .label-icon { color: #0284c7; opacity: 0.8; }
-
-  .segment-input {
-    width: 100%;
-    background: transparent;
-    border: none;
-    outline: none;
-    font-size: 1rem;
-    font-weight: 700;
-    color: #0f172a;
-    padding: 0;
-    line-height: normal;
-  }
-  .segment-input::placeholder { color: #94a3b8; font-weight: 500; }
-
-  .dual-date-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-  .date-mini-input {
-    width: 70px;
-    background: transparent;
-    border: none;
-    outline: none;
-    font-size: 1rem;
-    font-weight: 700;
-    color: #0f172a;
-    cursor: pointer;
-  }
-  .date-dash { color: #e2e8f0; font-weight: 400; }
-
-  .trigger-display {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-  }
-  .display-text {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #0f172a;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .chevron-spin {
-    transition: transform 0.3s ease;
-    color: #94a3b8;
-  }
-  .chevron-spin.is-open { transform: rotate(180deg); color: #0284c7; }
-
-  .segment-divider {
-    width: 1px;
-    height: 32px;
-    background: #e2e8f0;
-    opacity: 0.6;
-  }
-
-  /* ── Action Button ────────────────────────────────────────────────────── */
-  .premium-search-btn {
-    background: #0284c7;
-    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-    color: white;
-    border: none;
-    height: 60px;
-    padding: 0 32px;
-    border-radius: 100px;
-    font-size: 1rem;
-    font-weight: 800;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    transition: all 0.3s;
-    box-shadow: 0 8px 20px -5px rgba(2, 132, 199, 0.4);
-  }
-  .premium-search-btn:hover {
-    transform: scale(1.02);
-    box-shadow: 0 12px 25px -5px rgba(2, 132, 199, 0.5);
-  }
-  .premium-search-btn:active { transform: scale(0.98); }
-
-  /* ── Dropdowns ────────────────────────────────────────────────────────── */
-  .search-dropdown {
-    position: absolute;
-    top: calc(100% + 12px);
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 24px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
-    z-index: 1000;
-    padding: 16px;
-  }
-  .location-dropdown { left: 0; width: 340px; }
-  .guest-dropdown { right: 0; width: 300px; }
-
-  .dropdown-header {
-    font-size: 0.65rem;
-    font-weight: 900;
-    color: #64748b;
-    text-transform: uppercase;
-    margin-bottom: 12px;
-    padding-left: 12px;
-  }
-
-  .dropdown-item {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 12px;
-    border-radius: 16px;
-    cursor: pointer;
-    background: none;
-    border: none;
-    text-align: left;
-    transition: all 0.2s;
-  }
-  .dropdown-item:hover { background: #f0f9ff; }
-  .item-icon { color: #0284c7; }
-  .item-title { display: block; font-weight: 800; color: #0f172a; font-size: 0.95rem; }
-  .item-subtitle { display: block; font-size: 0.75rem; color: #94a3b8; font-weight: 500; }
-
-  .guest-selector-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px;
-    border-bottom: 1px solid #f1f5f9;
-  }
-  .guest-selector-row:last-of-type { border-bottom: none; }
-  .guest-title { display: block; font-weight: 800; color: #0f172a; font-size: 0.95rem; }
-  .guest-meta { display: block; font-size: 0.72rem; color: #94a3b8; font-weight: 500; }
-
-  .counter-controls {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .mini-counter-btn {
-    width: 32px;
-    height: 32px;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    background: white;
-    transition: all 0.2s;
-  }
-  .mini-counter-btn:hover { border-color: #0284c7; color: #0284c7; }
-  .mini-counter-val { font-weight: 900; font-size: 1rem; color: #0f172a; min-width: 15px; text-align: center; }
-
-  .dropdown-action-btn {
-    width: 100%;
-    margin-top: 16px;
-    background: #f0f9ff;
-    color: #0284c7;
-    border: none;
-    padding: 14px;
-    border-radius: 16px;
-    font-weight: 800;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .dropdown-action-btn:hover { background: #e0f2fe; }
-
-  /* ── Animations ───────────────────────────────────────────────────── */
-  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-  .animate-slide-up { animation: slideUp 0.6s cubic-bezier(0.165, 0.84, 0.44, 1) backwards; }
-  
-  @keyframes dropdown { from { opacity: 0; transform: translateY(-10px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
-  .animate-dropdown { animation: dropdown 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); }
-
-  /* ── Responsive ───────────────────────────────────────────────────── */
-  @media (max-width: 1024px) {
-    .premium-search-container {
-      flex-direction: column;
-      border-radius: 32px;
-      padding: 12px;
-    }
-    .segment-divider { display: none; }
-    .search-segment { width: 100%; padding: 16px; border-bottom: 1px solid #f1f5f9; }
-    .search-segment:last-of-type { border-bottom: none; }
-    .search-action { width: 100%; padding-top: 12px; }
-    .premium-search-btn { width: 100%; justify-content: center; }
-    .location-dropdown, .guest-dropdown { width: 100%; position: static; box-shadow: none; border: 1px solid #f1f5f9; margin-top: 8px; }
-  }
-`;
 
 export default SearchBar;

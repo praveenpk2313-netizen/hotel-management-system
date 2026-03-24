@@ -1,19 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import SearchBar from '../components/SearchBar';
 import HotelCard from '../components/HotelCard';
 import { fetchHotels } from '../services/api';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ArrowRight, Sparkles, Building2, ShieldCheck, Mail, MapPin } from 'lucide-react';
 
 const Home = () => {
   const [popularHotels, setPopularHotels] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.scrollTo) {
+      const element = document.getElementById(location.state.scrollTo);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+        // Clear state to prevent scrolling again on navigation/refresh
+        window.history.replaceState({}, document.title);
+      }
+    }
+  }, [location.state]);
 
   useEffect(() => {
     const loadHotels = async () => {
       try {
-        const { data } = await fetchHotels(); // Retrieves admin-approved hotels added by managers
-        setPopularHotels(data.slice(0, 6)); // Display top 6
+        const { data } = await fetchHotels();
+        setPopularHotels(data.slice(0, 6));
       } catch (err) {
         console.error('Failed to fetch hotels:', err);
       } finally {
@@ -22,170 +35,182 @@ const Home = () => {
     };
     loadHotels();
   }, []);
-  const navigate = useNavigate();
 
   const handleSearch = (query) => {
-    const checkin = query.startDate ? new Date(query.startDate.getTime() - (query.startDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0] : '';
-    const checkout = query.endDate ? new Date(query.endDate.getTime() - (query.endDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0] : '';
-
+    const checkin = query.startDate ? query.startDate.toISOString().split('T')[0] : '';
+    const checkout = query.endDate ? query.endDate.toISOString().split('T')[0] : '';
     const params = new URLSearchParams();
     if (query.location) params.append('location', query.location);
     if (checkin) params.append('checkin', checkin);
     if (checkout) params.append('checkout', checkout);
     if (query.guests) params.append('guests', query.guests);
-
     navigate(`/hotels?${params.toString()}`);
   };
 
   return (
-    <div className="animate-fade" style={{ background: '#ffffff', minHeight: '100vh', paddingBottom: '4rem' }}>
+    <div className="animate-fade-in bg-white min-h-screen">
       
-      {/* Hero Section Container */}
-      <section style={{ padding: '0 4%', marginTop: '1rem', position: 'relative' }}>
-        <div style={{
-          height: '70vh',
-          minHeight: '600px',
-          width: '100%',
-          borderRadius: '3rem',
-          position: 'relative', 
-          display: 'flex', 
-          flexDirection: 'column',
-          alignItems: 'flex-start', 
-          justifyContent: 'center',
-          padding: '0 5%',
-          background: 'linear-gradient(to right, rgba(0,0,0,0.5), rgba(0,0,0,0.1)), url("https://images.unsplash.com/photo-1537565266752-959c9d5bead5?auto=format&fit=crop&q=80&w=1920")',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          color: 'white',
-          overflow: 'hidden'
-        }}>
-          
-          <div style={{ zIndex: 5, maxWidth: '700px', marginTop: '-100px' }}>
-            <h1 style={{ 
-              fontSize: '4.5rem', 
-              fontWeight: '700', 
-              marginBottom: '1.5rem', 
-              letterSpacing: '-1px', 
-              lineHeight: '1.1',
-              textShadow: '0 10px 30px rgba(0,0,0,0.3)'
-            }}>
-              Book Your Dream Stay<br />at the Best Prices
+      {/* Hero Section */}
+      <section className="relative h-[92vh] min-h-[700px] overflow-hidden">
+        <div className="absolute inset-0">
+          <img 
+            src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=2000" 
+            className="w-full h-full object-cover grayscale-[20%] brightness-[0.7]" 
+            alt="Luxury Hotel"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-900/40 to-transparent" />
+        </div>
+
+        <div className="relative z-10 h-full max-w-[1400px] mx-auto px-[6%] flex flex-col justify-center items-start pb-20">
+          <div className="space-y-6 animate-slide-up">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-[#c5a059] text-[10px] font-black uppercase tracking-[3px]">
+              <Sparkles size={14} /> The Elite Collection
+            </div>
+            <h1 className="text-6xl md:text-8xl font-serif text-white font-black leading-[0.9] tracking-tighter">
+              Discover <br />
+              <span className="text-[#c5a059] italic">Refinement.</span>
             </h1>
-            <p style={{ 
-              fontSize: '1.1rem', 
-              opacity: 0.9, 
-              margin: 0, 
-              lineHeight: '1.6', 
-              maxWidth: '600px',
-              textShadow: '0 5px 15px rgba(0,0,0,0.2)'
-            }}>
-              Find the perfect place to stay, from luxury resorts to budget-friendly options. Hassle-free booking, exclusive deals, and unforgettable experiences await you!
+            <p className="max-w-xl text-lg text-slate-200 font-medium leading-relaxed opacity-90">
+              Curating architectural marvels and heritage stays for the modern traveler. 
+              Experience the convergence of industrial chic and timeless luxury.
             </p>
           </div>
+        </div>
 
-          {/* Floating Search Bar overlapping bottom */}
-          <div style={{ 
-            position: 'absolute', 
-            bottom: '2rem', 
-            left: '50%', 
-            transform: 'translateX(-50%)', 
-            width: '90%', 
-            maxWidth: '1000px',
-            zIndex: 10
-          }}>
+        {/* Floating Search Bar */}
+        <div className="absolute bottom-16 left-0 w-full px-[4%] z-20">
+          <div className="max-w-[1100px] mx-auto animate-slide-up animation-delay-300">
             <SearchBar onSearch={handleSearch} />
           </div>
         </div>
       </section>
 
-      {/* Popular Hotels Section */}
-      <section id="deals" style={{ marginTop: '5rem', padding: '0 4%' }}>
-        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-           <h2 style={{ fontSize: '2rem', fontWeight: '800', color: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}>
-             <span style={{ height: '3px', width: '40px', background: 'linear-gradient(90deg, transparent, #22d3ee)' }}></span>
-             Popular Hotels
-             <span style={{ height: '3px', width: '40px', background: 'linear-gradient(-90deg, transparent, #22d3ee)' }}></span>
-           </h2>
+      {/* Curated Properties Section */}
+      <section className="py-32 px-[6%] max-w-[1400px] mx-auto">
+        <div className="flex flex-col md:flex-row justify-between items-end gap-8 mb-16">
+          <div className="space-y-4">
+             <div className="text-[11px] font-black text-[#c5a059] uppercase tracking-[4px]">Featured Portfolio</div>
+             <h2 className="text-4xl md:text-5xl font-serif text-slate-900 font-black tracking-tight leading-none">
+                Popular <br />
+                <span className="italic opacity-50 underline decoration-1 underline-offset-8">Properties</span>
+             </h2>
+          </div>
+          <button onClick={() => navigate('/hotels')} className="group flex items-center gap-3 text-sm font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-colors">
+             View Entire Collection <ArrowRight className="group-hover:translate-x-2 transition-transform text-[#c5a059]" size={20} />
+          </button>
         </div>
 
         {loading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '4rem 0' }}>
-            <Loader2 className="animate-spin" size={40} color="var(--primary)" />
+          <div className="py-20 flex justify-center">
+            <Loader2 className="animate-spin text-[#c5a059]" size={42} />
           </div>
         ) : popularHotels.length > 0 ? (
-          <div className="hotels-grid">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             {popularHotels.map((hotel) => (
               <HotelCard key={hotel._id || hotel.id} hotel={hotel} />
             ))}
           </div>
         ) : (
-          <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>
-            No hotels available at the moment.
-          </div>
+          <div className="py-20 text-center text-slate-400 font-medium">No properties currently available in the collection.</div>
         )}
       </section>
-      {/* About Us Section */}
-      <section id="about" style={{ marginTop: '5rem', padding: '4rem 4%', background: '#f8fafc' }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-           <h2 style={{ fontSize: '2rem', fontWeight: '800', color: '#0f172a', marginBottom: '1.5rem' }}>About PK UrbanStay</h2>
-           <p style={{ fontSize: '1.1rem', color: '#475569', lineHeight: '1.8' }}>
-             We are a premium hospitality network dedicated to providing world-class stays in the heart of the city. 
-             Since our inception, we have curated unique, industrial-chic luxury properties tailored for the modern traveler. 
-             Whether you're looking for a peaceful retreat or a central hub for business, our verified hotels promise an unforgettable experience.
-           </p>
+
+      {/* About Section (Our Heritage) */}
+      <section id="about" className="py-32 bg-slate-50 border-y border-slate-100 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-1/3 h-full bg-slate-100 -skew-x-12 translate-x-1/2 opacity-50" />
+        
+        <div className="max-w-[1400px] mx-auto px-[6%] grid lg:grid-cols-2 gap-20 items-center">
+           <div className="space-y-10 relative z-10">
+              <div className="space-y-4">
+                 <div className="text-[11px] font-black text-[#c5a059] uppercase tracking-[4px]">Our Heritage</div>
+                 <h2 className="text-5xl md:text-6xl font-serif text-slate-900 font-black leading-tight tracking-tight">
+                    Sophisticated Stays <br />
+                    for the <span className="italic text-[#c5a059]">Discerning.</span>
+                 </h2>
+              </div>
+              <p className="text-slate-500 text-lg leading-relaxed max-w-xl">
+                 Founded in 2020, PK UrbanStay began with a single vision: to transform industrial spaces into 
+                 chic, high-luxury havens. Today, we are a premier gateway to the world's most unique properties, 
+                 blending raw architectural beauty with elite hospitality standards. Every property in our portfolio 
+                 is hand-verified for quality, aesthetics, and safety.
+              </p>
+              <div className="grid grid-cols-2 gap-8 pt-6">
+                 <div>
+                    <div className="text-3xl font-serif font-black text-slate-900 mb-1">500+</div>
+                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Global Properties</div>
+                 </div>
+                 <div>
+                    <div className="text-3xl font-serif font-black text-slate-900 mb-1">24/7</div>
+                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Concierge Support</div>
+                 </div>
+              </div>
+           </div>
+           
+           <div className="relative">
+              <img 
+                src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80&w=1200" 
+                className="rounded-[3rem] shadow-2xl relative z-10 grayscale-[30%]" 
+                alt="Architecture"
+              />
+              <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-[#c5a059]/10 rounded-full blur-3xl" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] border border-slate-200 rounded-full -z-10" />
+           </div>
         </div>
       </section>
 
-      {/* Contact & Help Grid */}
-      <section style={{ padding: '5rem 4%' }}>
-         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '3rem', maxWidth: '1000px', margin: '0 auto' }}>
-            
-            <div id="contact" style={{ background: 'white', padding: '3rem', borderRadius: '1.5rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', textAlign: 'center' }}>
-               <div style={{ width: '60px', height: '60px', background: '#e0f2fe', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0284c7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+      {/* Trust & Support Section */}
+      <section className="py-32 px-[6%] max-w-[1400px] mx-auto">
+         <div className="grid md:grid-cols-3 gap-16">
+            <div id="contact" className="space-y-6">
+               <div className="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center text-[#c5a059] shadow-xl">
+                  <Mail size={28} />
                </div>
-               <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#0f172a', marginBottom: '1rem' }}>Contact Us</h3>
-               <p style={{ color: '#64748b', fontSize: '0.95rem', marginBottom: '1.5rem' }}>Our elite customer service team is available 24/7 to assist with your reservations and special requests.</p>
-               <a href="mailto:support@pkurbanstay.com" style={{ display: 'inline-block', fontWeight: 'bold', color: '#0284c7' }}>support@pkurbanstay.com</a>
+               <h3 className="text-2xl font-serif font-black text-slate-900">Get in Touch</h3>
+               <p className="text-slate-500 text-sm leading-relaxed">Dedicated support for reservations and property inquiries available 24/7.</p>
+               <a href="mailto:support@pkurbanstay.com" className="block text-sm font-black uppercase tracking-widest text-[#c5a059] hover:underline">support@pkurbanstay.com</a>
             </div>
 
-            <div id="help" style={{ background: 'white', padding: '3rem', borderRadius: '1.5rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', textAlign: 'center' }}>
-               <div style={{ width: '60px', height: '60px', background: '#fef3c7', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            <div className="space-y-6">
+               <div className="w-16 h-16 bg-white border border-slate-100 rounded-2xl shadow-premium flex items-center justify-center text-slate-400">
+                  <ShieldCheck size={28} />
                </div>
-               <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#0f172a', marginBottom: '1rem' }}>Help & FAQs</h3>
-               <p style={{ color: '#64748b', fontSize: '0.95rem', marginBottom: '1.5rem' }}>Need help managing a booking or understanding cancellation policies? We have all the answers.</p>
-               <a href="/#help" style={{ display: 'inline-block', fontWeight: 'bold', color: '#d97706' }}>Visit Help Center</a>
+               <h3 className="text-2xl font-serif font-black text-slate-900">Verified Stays</h3>
+               <p className="text-slate-500 text-sm leading-relaxed">Every property undergoes a rigorous 50-point audit to ensure global luxury standards.</p>
+               <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                  Secure Payments <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+               </div>
             </div>
 
+            <div id="help" className="space-y-6">
+               <div className="w-16 h-16 bg-white border border-slate-100 rounded-2xl shadow-premium flex items-center justify-center text-slate-400">
+                  <MapPin size={28} />
+               </div>
+               <h3 className="text-2xl font-serif font-black text-slate-900">Global Coverage</h3>
+               <p className="text-slate-500 text-sm leading-relaxed">Strategic locations in 40+ countries, focusing on metropolitan and heritage hubs.</p>
+               <button className="text-sm font-black uppercase tracking-widest text-slate-900 hover:text-[#c5a059] transition-all">Explore Locations</button>
+            </div>
          </div>
       </section>
+
+      {/* Footer Branding */}
+      <footer className="py-20 border-t border-slate-100 px-[6%] text-center">
+         <div className="flex items-center justify-center gap-2 mb-6">
+            <Building2 className="text-[#c5a059]" size={24} />
+            <span className="text-xl font-serif font-black text-slate-900 tracking-tight">UrbanStay<span className="text-[#c5a059]">.</span></span>
+         </div>
+         <p className="text-slate-400 text-xs font-medium max-w-sm mx-auto leading-relaxed">
+            &copy; 2026 PK UrbanStay global hospitality collection. <br />
+            Architectural heritage meets modern luxury.
+         </p>
+      </footer>
+
       <style>{`
-        .hotels-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 2rem;
-        }
-
-        .animate-spin {
-          animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 1024px) {
-          .hotels-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
-        }
-
-        @media (max-width: 768px) {
-          .hotels-grid {
-            grid-template-columns: 1fr;
-          }
-        }
+        @keyframes fade-in { 0% { opacity: 0; } 100% { opacity: 1; } }
+        @keyframes slide-up { 0% { opacity: 0; transform: translateY(30px); } 100% { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fade-in 1s ease-out forwards; }
+        .animate-slide-up { animation: slide-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+        .animation-delay-300 { animation-delay: 300ms; }
+        .shadow-premium { box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05); }
       `}</style>
     </div>
   );
