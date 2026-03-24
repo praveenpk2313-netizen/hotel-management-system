@@ -2,78 +2,81 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Facebook, 
-  Twitter, 
   Instagram, 
+  Twitter, 
+  Globe,
+  Building2,
   ShieldCheck,
-  CheckCircle2,
-  Globe
+  Zap
 } from 'lucide-react';
 
 const Footer = () => {
   return (
-    <footer id="about" className="bg-booking-blue text-white pt-16 pb-12 mt-auto">
-      <div className="container-booking space-y-12">
-        
-        {/* Upper Footer: Simplified Links */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 border-b border-white/10 pb-12">
+    <footer className="py-20 bg-[#1a1a1a] border-t border-white/5 text-white">
+      <div className="max-w-[1440px] mx-auto px-[4%]">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-20 mb-20 text-center md:text-left">
           
-          <div className="space-y-4">
-             <Link to="/" className="text-2xl font-black tracking-tight flex items-center gap-2">
-                PK <span className="text-secondary font-black">UrbanStay</span>
-             </Link>
-             <p className="text-xs opacity-60 leading-relaxed font-medium">
-                Your premier destination for luxury stays and urban escapes. Experience the city like never before.
-             </p>
+          <div className="space-y-8">
+            <Link to="/" className="text-3xl font-serif font-black tracking-tight flex justify-center md:justify-start">
+               UrbanStay<span className="text-[#c5a059]">.</span>
+            </Link>
+            <p className="text-slate-500 text-sm font-medium leading-relaxed max-w-xs mx-auto md:mx-0">
+               Founded on architectural preservation, we connect travelers with historic havens reimagined for luxury.
+            </p>
+            <div className="flex items-center justify-center md:justify-start gap-6">
+              <a href="#" className="w-10 h-10 border border-white/10 rounded-full flex items-center justify-center text-slate-400 hover:text-[#c5a059] hover:border-[#c5a059] transition-all"><Facebook size={18} /></a>
+              <a href="#" className="w-10 h-10 border border-white/10 rounded-full flex items-center justify-center text-slate-400 hover:text-[#c5a059] hover:border-[#c5a059] transition-all"><Instagram size={18} /></a>
+              <a href="#" className="w-10 h-10 border border-white/10 rounded-full flex items-center justify-center text-slate-400 hover:text-[#c5a059] hover:border-[#c5a059] transition-all"><Twitter size={18} /></a>
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-2 col-span-2 gap-8">
-             <div className="space-y-4">
-                <h4 className="text-sm font-bold uppercase tracking-widest opacity-80">Quick Links</h4>
-                <ul className="text-sm space-y-3 font-bold">
-                   <li><Link to="/" className="hover:text-blue-200 transition-colors">Home</Link></li>
-                   <li><Link to="/hotels" className="hover:text-blue-200 transition-colors">Find Hotels</Link></li>
-                   <li><Link to="/register" className="hover:text-blue-200 transition-colors">List Property</Link></li>
-                </ul>
-             </div>
-             <div className="space-y-4">
-                <h4 className="text-sm font-bold uppercase tracking-widest opacity-80">Support</h4>
-                <ul className="text-sm space-y-3 font-bold">
-                   <li><Link to="/manager/login" className="hover:text-blue-200 transition-colors">Manager Login</Link></li>
-                   <li><Link to="/admin/login" className="hover:text-blue-200 transition-colors">Admin Portal</Link></li>
-                   <li><Link to="/" className="hover:text-blue-200 transition-colors">Help Center</Link></li>
-                </ul>
-             </div>
+          <div>
+             <h4 className="text-[#c5a059] text-[10px] font-black uppercase tracking-[0.3em] mb-10">Quick Links</h4>
+             <ul className="space-y-6 text-sm font-bold">
+                <li><Link to="/" className="hover:text-[#c5a059] transition-colors">Home Experience</Link></li>
+                <li><Link to="/hotels" className="hover:text-[#c5a059] transition-colors">Portfolio Search</Link></li>
+                <li><Link to="/booking-history" className="hover:text-[#c5a059] transition-colors">Manage Reservations</Link></li>
+             </ul>
           </div>
 
-          <div className="space-y-6">
-             <h4 className="text-sm font-bold uppercase tracking-widest opacity-80">Follow Us</h4>
-             <div className="flex items-center gap-6">
-                <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all"><Facebook size={20} /></a>
-                <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all"><Instagram size={20} /></a>
-                <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all"><Twitter size={20} /></a>
+          <div>
+             <h4 className="text-[#c5a059] text-[10px] font-black uppercase tracking-[0.3em] mb-10">Support Hub</h4>
+             <ul className="space-y-6 text-sm font-bold text-slate-400">
+                <li><Link to="/manager/login" className="hover:text-white transition-colors">Manager Portal</Link></li>
+                <li><Link to="/admin/login" className="hover:text-white transition-colors">Admin Console</Link></li>
+                <li><a href="#contact" className="hover:text-white transition-colors">Concierge Desk</a></li>
+             </ul>
+          </div>
+
+          <div>
+             <h4 className="text-[#c5a059] text-[10px] font-black uppercase tracking-[0.3em] mb-10">Global Presence</h4>
+             <div className="space-y-6 text-sm font-bold text-slate-400">
+                <div className="flex items-start justify-center md:justify-start gap-4">
+                   <Building2 size={16} className="text-[#c5a059] flex-shrink-0" />
+                   <span>120 Baker Street, London, <br />W1U 6TU, United Kingdom</span>
+                </div>
+                <div className="flex items-center justify-center md:justify-start gap-4">
+                   <Globe size={16} className="text-[#c5a059]" />
+                   <span>support@urbanstay.com</span>
+                </div>
              </div>
           </div>
         </div>
 
-        {/* Lower Footer: Trust & Copyright */}
-        <div className="flex flex-col lg:flex-row justify-between items-center gap-10">
-           <div className="flex flex-wrap items-center justify-center lg:justify-start gap-8 opacity-60">
-              <div className="flex items-center gap-2">
-                 <ShieldCheck size={18} />
-                 <span className="text-[10px] font-black uppercase tracking-widest">SSL Secured</span>
+        <div className="pt-20 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-10">
+           <div className="flex flex-wrap items-center justify-center gap-8 opacity-40 grayscale">
+              <div className="flex items-center gap-3">
+                 <ShieldCheck size={16} />
+                 <span className="text-[10px] font-black uppercase tracking-widest">SSL Secure Haven</span>
               </div>
-              <div className="flex items-center gap-2">
-                 <CheckCircle2 size={18} />
-                 <span className="text-[10px] font-black uppercase tracking-widest">Verified Payment</span>
-              </div>
-              <div className="flex items-center gap-2">
-                 <Globe size={18} />
-                 <span className="text-[10px] font-black uppercase tracking-widest">Global Partners</span>
+              <div className="flex items-center gap-3">
+                 <Zap size={16} />
+                 <span className="text-[10px] font-black uppercase tracking-widest">Instant Confirmation</span>
               </div>
            </div>
            
-           <p className="text-[11px] font-black opacity-40 uppercase tracking-widest text-center">
-              © 2026-2030 PK URBANSTAY.COM™. ALL RIGHTS RESERVED.
+           <p className="text-slate-500 text-[9px] font-black uppercase tracking-[0.5em] text-center">
+              © 2026 URBANSTAY COLLECTION. WORLDWIDE RIGHTS RESERVED.
            </p>
         </div>
       </div>

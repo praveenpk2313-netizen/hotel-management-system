@@ -156,11 +156,6 @@ const Home = () => {
          </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-20 border-t border-white/5 bg-[#1a1a1a] text-center">
-         <p className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.6em]">© 2026 UrbanStay Collection. Worldwide Rights Reserved.</p>
-      </footer>
-
       <style>{`
         .hex-shape {
           clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
