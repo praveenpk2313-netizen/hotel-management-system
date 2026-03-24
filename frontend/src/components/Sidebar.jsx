@@ -51,15 +51,13 @@ const Sidebar = ({ isOpen, activeSection, onSectionChange, onClose }) => {
       `}>
         {/* Brand Architecture */}
         <div className="h-24 flex items-center justify-between px-6 border-b border-white/5">
-          <div className="flex items-center gap-4">
-             <div className="w-11 h-11 bg-primary rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/20">
+             <div className="w-11 h-11 bg-[#006ce4] rounded-xl flex items-center justify-center text-white shadow-lg shadow-[#006ce4]/20">
                 <ShieldCheck size={24} />
              </div>
              <div>
-                <h2 className="text-lg font-serif font-black italic tracking-tighter leading-none">StayNow</h2>
-                <p className="text-[8px] font-black text-primary uppercase tracking-[3px] mt-1">Partner Portal</p>
+                <h2 className="text-lg font-black tracking-tighter leading-none text-white">PK UrbanStay</h2>
+                <p className="text-[8px] font-black text-[#006ce4] uppercase tracking-[3px] mt-1">Partner Portal</p>
              </div>
-          </div>
           <button onClick={onClose} className="lg:hidden text-gray-500 hover:text-white transition-colors">
             <X size={24} />
           </button>

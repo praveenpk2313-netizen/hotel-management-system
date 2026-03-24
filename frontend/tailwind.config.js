@@ -8,17 +8,21 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#c5a059',
-          dark: '#a68549',
-          light: '#d4b06a',
+          DEFAULT: '#003b95', // Booking Blue
+          dark: '#002663',
+          light: '#006ce4',
         },
         secondary: {
           DEFAULT: '#0f172a',
           dark: '#020617',
           light: '#1e293b',
         },
-        accent: '#f59e0b',
-        background: '#fdfcfb',
+        accent: {
+          DEFAULT: '#ffb700', // Booking Yellow
+          dark: '#e0a100',
+          light: '#ffc840',
+        },
+        background: '#ffffff',
         surface: '#ffffff',
       },
       fontFamily: {
@@ -29,10 +33,12 @@ export default {
         'xl': '12px',
         '2xl': '16px',
         '3xl': '24px',
+        'booking': '8px',
       },
       boxShadow: {
-        'premium': '0 10px 30px -5px rgba(0, 0, 0, 0.1), 0 8px 15px -6px rgba(0, 0, 0, 0.05)',
-        'gold': '0 10px 20px -5px rgba(197, 160, 89, 0.3)',
+        'premium': '0 10px 30px -5px rgba(0, 59, 149, 0.1), 0 8px 15px -6px rgba(0, 0, 0, 0.05)',
+        'booking': '0 4px 16px rgba(0, 0, 0, 0.15)',
+        'gold': '0 10px 20px -5px rgba(255, 183, 0, 0.3)',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out forwards',

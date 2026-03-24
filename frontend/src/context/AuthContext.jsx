@@ -30,7 +30,7 @@ const getInitialAuthState = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(getInitialAuthState);
-  const [loading, setLoading] = useState(false); // Starts as false because we hydrate sync
+  const [loading, setLoading] = useState(false); 
   const dispatch = useDispatch();
 
   // 1. Double-check synchronization with Redux on mount
@@ -58,8 +58,11 @@ export const AuthProvider = ({ children }) => {
     const fullUserData = { ...userToStore, token };
     setUser(fullUserData);
 
-    // 4. Update Redux (Sync in RTK)
+    // 4. Update Redux (Sync in RTK) ──────────────
     dispatch(loginSuccess(fullUserData));
+    
+    // 5. Audit Log
+    console.log('Session established for:', role);
   }, [dispatch]);
 
   const logout = useCallback(() => {

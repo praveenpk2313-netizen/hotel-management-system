@@ -63,6 +63,7 @@ const PaymentPage = () => {
     if (!bookingData || !hotel) {
       if (!success) navigate('/hotels');
     }
+    window.scrollTo(0, 0);
   }, [bookingData, hotel, navigate, success]);
 
   // Load Razorpay Script
@@ -115,7 +116,7 @@ const PaymentPage = () => {
           }
         },
         prefill: { name: user?.name, email: user?.email },
-        theme: { color: "#C5A059" },
+        theme: { color: "#003b95" },
         modal: { ondismiss: () => setLoading(false) }
       };
 
@@ -135,177 +136,127 @@ const PaymentPage = () => {
   if (!bookingData || !hotel) return null;
 
   return (
-    <div className="bg-background-light min-h-screen pb-20 pt-10">
-      <div className="max-w-7xl mx-auto px-4 md:px-10 space-y-12 animate-fade-in">
+    <div className="bg-white min-h-screen pb-24 pt-32 lg:pt-40">
+      <div className="container-booking space-y-10 animate-fade-in">
         
         {/* Navigation & Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-premium group relative overflow-hidden">
-           {/* Decoration */}
-           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-32 -mt-32 blur-3xl" />
-           
-           <div className="space-y-4 relative z-10">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 pb-6 border-b border-gray-100">
+           <div className="space-y-2">
               <button 
                 onClick={() => navigate(-1)}
-                className="flex items-center gap-3 text-gray-400 font-black text-[10px] uppercase tracking-[3px] hover:text-primary transition-colors mb-2"
+                className="flex items-center gap-2 text-xs font-bold text-[#006ce4] hover:underline mb-2"
               >
-                 <ArrowLeft size={16} /> Return to Resort
+                 <ArrowLeft size={16} /> Back to property
               </button>
-              <h1 className="text-4xl md:text-5xl font-serif text-secondary-dark font-black tracking-tight leading-none">
-                 Secure <span className="text-primary italic">Checkout</span>
-              </h1>
+              <h1 className="text-3xl font-black text-gray-900 tracking-tight">Review and Pay</h1>
+              <p className="text-gray-500 font-medium">Fast, secure and encrypted checkout</p>
            </div>
-
-           <div className="flex items-center gap-4 relative z-10">
-              <div className="px-6 h-14 bg-emerald-50 rounded-2xl flex items-center gap-3 text-emerald-600 font-black text-[10px] uppercase tracking-[2px] border border-emerald-100">
-                 <Lock size={16} /> Encrypted Gateway
-              </div>
-              <div className="hidden lg:flex px-6 h-14 bg-primary/10 rounded-2xl items-center gap-3 text-primary font-black text-[10px] uppercase tracking-[2px]">
-                 <ShieldCheck size={18} /> Verified Vault
+           
+           <div className="flex items-center gap-3">
+              <div className="bg-emerald-50 px-4 py-2 rounded-lg border border-emerald-100 flex items-center gap-2 text-emerald-700 text-xs font-bold">
+                 <Lock size={16} /> Secure checkout
               </div>
            </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
            
-           {/* Left: Operations (Col 7) */}
-           <div className="lg:col-span-7 space-y-10">
+           {/* Left Column: Guest info & Payment */}
+           <div className="lg:col-span-8 space-y-10">
               
-              {/* Trip Audit */}
-              <section className="bg-white p-10 md:p-12 rounded-[3.5rem] border border-gray-50 shadow-premium space-y-10 group">
-                 <div className="flex justify-between items-center pb-6 border-b border-gray-50">
-                    <h2 className="text-2xl font-serif text-secondary-dark font-black flex items-center gap-3">
-                       <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary text-sm font-black">01</div>
-                       Your Itinerary
-                    </h2>
-                    <button onClick={() => navigate(-1)} className="text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-primary transition-colors">Adjust Scope</button>
-                 </div>
+              {/* Trip Summary Card */}
+              <section className="bg-white rounded-lg border border-gray-200 p-8 space-y-8 shadow-sm">
+                 <h2 className="text-xl font-black text-gray-900 flex items-center gap-2">
+                    <CheckCircle2 size={24} className="text-emerald-500" /> Confirm your details
+                 </h2>
 
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-gray-100">
                     <div className="space-y-6">
-                       <div className="flex items-center gap-4 group/item">
-                          <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-primary border border-gray-200 group-hover/item:bg-primary group-hover/item:text-white transition-all">
+                       <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-gray-50 rounded-lg flex items-center justify-center text-[#006ce4] border border-gray-200">
                              <Calendar size={20} />
                           </div>
                           <div>
-                             <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Temporal Window</p>
-                             <p className="text-sm font-bold text-secondary-dark uppercase tracking-tight">{formatDate(bookingData.checkInDate)} — {formatDate(bookingData.checkOutDate)}</p>
+                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Dates</p>
+                             <p className="text-sm font-bold text-gray-900">{formatDate(bookingData.checkInDate)} — {formatDate(bookingData.checkOutDate)}</p>
                           </div>
                        </div>
-                       <div className="flex items-center gap-4 group/item">
-                          <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-primary border border-gray-200 group-hover/item:bg-primary group-hover/item:text-white transition-all">
-                             <UserCheck size={20} />
+                       <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-gray-50 rounded-lg flex items-center justify-center text-[#006ce4] border border-gray-200">
+                             <Users size={20} />
                           </div>
                           <div>
-                             <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Guest Commitment</p>
-                             <p className="text-sm font-bold text-secondary-dark uppercase tracking-tight">{bookingData.numGuests} Verified Guest{bookingData.numGuests > 1 ? 's' : ''}</p>
+                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Guests</p>
+                             <p className="text-sm font-bold text-gray-900">{bookingData.numGuests} adult{bookingData.numGuests > 1 ? 's' : ''}</p>
                           </div>
                        </div>
                     </div>
 
-                    <div className="bg-gray-50 p-8 rounded-[2.5rem] border border-gray-100 flex flex-col justify-center space-y-3 relative overflow-hidden">
-                       <div className="absolute top-0 right-0 p-4 opacity-5">
-                          <Moon size={100} />
-                       </div>
-                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Duration Audit</p>
-                       <p className="text-3xl font-black text-secondary-dark italic font-serif leading-none">
-                          {nights} <span className="text-primary italic opacity-80">Nights</span>
-                       </p>
-                       <div className="flex items-center gap-2 text-[10px] font-bold text-emerald-500 uppercase tracking-widest">
+                    <div className="bg-gray-50 p-6 rounded-lg border border-gray-100 space-y-2">
+                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Stay Duration</p>
+                       <p className="text-2xl font-black text-gray-900">{nights} night{nights > 1 ? 's' : ''}</p>
+                       <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 uppercase">
                           <CheckCircle2 size={12} /> Flexible Policy Applied
                        </div>
                     </div>
                  </div>
               </section>
 
-              {/* Dev Notice */}
-              {MOCK_PAYMENT && (
-                <div className="bg-amber-50 p-8 rounded-[2.5rem] border border-amber-100 flex items-center gap-6 animate-slide-up group">
-                   <div className="w-14 h-14 bg-white rounded-3xl flex items-center justify-center text-amber-500 shadow-sm border border-amber-100 group-hover:rotate-12 transition-transform">
-                      <Zap size={28} className="animate-pulse" />
-                   </div>
-                   <div className="space-y-1">
-                      <h4 className="text-xs font-black text-amber-800 uppercase tracking-widest">Protocol Intelligence: Simulation Active</h4>
-                      <p className="text-sm text-amber-600 font-medium">This transaction cycle is a simulation. No financial settlement is required for heritage verification.</p>
-                   </div>
-                </div>
-              )}
-
               {/* Step 2: Protocol Selection */}
-              <section className="bg-white p-10 md:p-12 rounded-[3.5rem] border border-gray-50 shadow-premium space-y-10 overflow-hidden">
-                 <div className="flex justify-between items-center pb-6 border-b border-gray-50">
-                    <h2 className="text-2xl font-serif text-secondary-dark font-black flex items-center gap-3">
-                       <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary text-sm font-black">02</div>
-                       Settlement Protocol
-                    </h2>
-                    <div className="flex items-center gap-2 px-3 py-1 bg-gray-50 rounded-full text-[9px] font-black text-gray-400 uppercase tracking-widest">
-                       <Shield size={12} /> PCI Level 1
-                    </div>
-                 </div>
+              <section className="bg-white rounded-lg border border-gray-200 p-8 space-y-8 shadow-sm">
+                 <h2 className="text-xl font-black text-gray-900">How would you like to pay?</h2>
 
                  {error && (
-                   <div className="p-6 bg-rose-50 border border-rose-100 rounded-[2rem] flex items-center gap-4 text-rose-700 text-sm font-bold animate-shake">
-                      <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-rose-500 shadow-sm"><Info size={20} /></div>
-                      {error}
+                   <div className="p-4 bg-rose-50 border border-rose-100 rounded-lg text-rose-700 text-sm font-bold flex items-center gap-2">
+                      <Info size={18} /> {error}
                    </div>
                  )}
 
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Stripe Choice */}
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <button 
                       onClick={() => setPaymentMethod('stripe')}
-                      className={`p-10 rounded-[2.5rem] border-2 transition-all duration-500 text-left space-y-4 relative group ${
-                        paymentMethod === 'stripe' 
-                        ? 'border-primary bg-primary/5 shadow-xl shadow-primary/10' 
-                        : 'border-gray-100 bg-white hover:border-gray-300'
+                      className={`p-6 rounded-lg border-2 text-left space-y-4 transition-all ${
+                        paymentMethod === 'stripe' ? 'border-[#006ce4] bg-blue-50/50' : 'border-gray-100 hover:border-gray-200'
                       }`}
                     >
-                       <div className="flex justify-between items-start">
-                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border transition-all ${
-                            paymentMethod === 'stripe' ? 'bg-primary text-white border-primary shadow-lg shadow-primary/30' : 'bg-gray-50 text-gray-300 border-gray-200'
-                          }`}>
-                             <CreditCard size={24} />
+                       <div className="flex justify-between items-center">
+                          <div className={`p-3 rounded-lg flex items-center justify-center border ${paymentMethod === 'stripe' ? 'bg-[#006ce4] text-white' : 'bg-gray-50 text-gray-400'}`}>
+                             <CreditCard size={20} />
                           </div>
-                          {paymentMethod === 'stripe' && <CheckCircle2 size={24} className="text-primary animate-scale-in" />}
+                          {paymentMethod === 'stripe' && <CheckCircle2 size={24} className="text-[#006ce4]" />}
                        </div>
                        <div>
-                          <h4 className={`text-lg font-bold transition-colors ${paymentMethod === 'stripe' ? 'text-secondary-dark' : 'text-gray-400'}`}>Global Card</h4>
-                          <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">VISA / MASTERCARD / AMEX</p>
-                       </div>
-                       <div className="flex gap-2 group-hover:opacity-100 opacity-50 transition-opacity">
-                          <img src="https://img.icons8.com/color/48/000000/visa.png" className="h-6 object-contain" alt="Visa" />
-                          <img src="https://img.icons8.com/color/48/000000/mastercard.png" className="h-6 object-contain" alt="MC" />
+                          <p className="font-bold text-gray-900">Debit or Credit Card</p>
+                          <div className="flex gap-1 mt-1 opacity-70">
+                             <img src="https://img.icons8.com/color/48/000000/visa.png" className="h-4" alt="Visa" />
+                             <img src="https://img.icons8.com/color/48/000000/mastercard.png" className="h-4" alt="MC" />
+                          </div>
                        </div>
                     </button>
 
-                    {/* Razorpay Choice */}
                     <button 
                       onClick={() => setPaymentMethod('razorpay')}
-                      className={`p-10 rounded-[2.5rem] border-2 transition-all duration-500 text-left space-y-4 relative group ${
-                        paymentMethod === 'razorpay' 
-                        ? 'border-primary bg-primary/5 shadow-xl shadow-primary/10' 
-                        : 'border-gray-100 bg-white hover:border-gray-300'
+                      className={`p-6 rounded-lg border-2 text-left space-y-4 transition-all ${
+                        paymentMethod === 'razorpay' ? 'border-[#006ce4] bg-blue-50/50' : 'border-gray-100 hover:border-gray-200'
                       }`}
                     >
-                       <div className="flex justify-between items-start">
-                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border transition-all ${
-                            paymentMethod === 'razorpay' ? 'bg-primary text-white border-primary shadow-lg shadow-primary/30' : 'bg-gray-50 text-gray-300 border-gray-200'
-                          }`}>
-                             <Zap size={24} />
+                       <div className="flex justify-between items-center">
+                          <div className={`p-3 rounded-lg flex items-center justify-center border ${paymentMethod === 'razorpay' ? 'bg-[#006ce4] text-white' : 'bg-gray-50 text-gray-400'}`}>
+                             <Zap size={20} />
                           </div>
-                          {paymentMethod === 'razorpay' && <CheckCircle2 size={24} className="text-primary animate-scale-in" />}
+                          {paymentMethod === 'razorpay' && <CheckCircle2 size={24} className="text-[#006ce4]" />}
                        </div>
                        <div>
-                          <h4 className={`text-lg font-bold transition-colors ${paymentMethod === 'razorpay' ? 'text-secondary-dark' : 'text-gray-400'}`}>Instant Multi-Rail</h4>
-                          <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">UPI / NETBANKING / WALLET</p>
-                       </div>
-                       <div className="flex gap-2 group-hover:opacity-100 opacity-50 transition-opacity items-center">
-                          <img src="https://razorpay.com/favicon.png" className="h-6 object-contain" alt="Razorpay" />
-                          <span className="text-[9px] font-black text-secondary-dark/40 uppercase tracking-widest">RAZORPAY SECURE</span>
+                          <p className="font-bold text-gray-900">Instant UPI / NetBanking</p>
+                          <div className="flex items-center gap-1 mt-1 opacity-70">
+                             <img src="https://razorpay.com/favicon.png" className="h-4" alt="Razorpay" />
+                             <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Razorpay Secure</span>
+                          </div>
                        </div>
                     </button>
                  </div>
 
-                 <div className="pt-10 border-t border-gray-50">
+                 <div className="pt-8 border-t border-gray-100">
                     {paymentMethod === 'stripe' ? (
                       <Elements stripe={stripePromise}>
                         <StripeCheckoutForm 
@@ -319,108 +270,74 @@ const PaymentPage = () => {
                         />
                       </Elements>
                     ) : (
-                      <div className="space-y-8">
-                         <div className="bg-gray-50 p-6 rounded-2xl border border-dashed border-gray-200 text-center">
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-relaxed">Razorpay initiates a multi-rail sequence for instant validation.</p>
+                      <div className="space-y-6">
+                         <div className="bg-blue-50/50 p-6 rounded-lg text-center border border-blue-100">
+                            <p className="text-xs font-bold text-[#003b95] leading-relaxed">Pay instantly using UPI, Wallet or Bank Transfer with Razorpay's secure checkout.</p>
                          </div>
                          <button 
                            onClick={handleRazorpayCheckout}
                            disabled={loading}
-                           className="w-full h-18 bg-secondary-dark text-white rounded-[1.5rem] font-black text-xs uppercase tracking-[3px] shadow-2xl shadow-secondary/20 hover:bg-primary transition-all flex items-center justify-center gap-4 group active:scale-[0.98]"
+                           className="w-full h-14 bg-[#006ce4] text-white rounded-lg font-bold shadow-lg shadow-blue-500/10 hover:bg-[#0052ad] transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-70"
                          >
-                            {loading ? <Loader2 className="animate-spin text-primary" size={24} /> : <ShieldCheck size={24} className="text-primary group-hover:text-white transition-colors" />}
-                            {loading ? 'Sychronizing...' : `Finalize ${formatCurrency(bookingData.totalPrice)}`}
+                            {loading ? <Loader2 className="animate-spin" size={20} /> : <ShieldCheck size={20} />}
+                            {loading ? 'Processing...' : `Pay ${formatCurrency(bookingData.totalPrice)}`}
                          </button>
                       </div>
                     )}
                  </div>
               </section>
-
-              {/* Trust Section */}
-              <div className="flex flex-wrap items-center justify-center gap-12 py-10 opacity-30 group grayscale hover:grayscale-0 transition-all duration-700">
-                 <div className="flex items-center gap-3">
-                    <ShieldCheck size={24} />
-                    <span className="text-[10px] font-black uppercase tracking-[3px]">SSL Encrypted</span>
-                 </div>
-                 <div className="w-px h-6 bg-gray-300 hidden md:block" />
-                 <div className="flex items-center gap-3">
-                    <Lock size={24} />
-                    <span className="text-[10px] font-black uppercase tracking-[3px]">Financial Covenant</span>
-                 </div>
-                 <div className="w-px h-6 bg-gray-300 hidden md:block" />
-                 <div className="flex items-center gap-3">
-                    <CheckCircle2 size={24} />
-                    <span className="text-[10px] font-black uppercase tracking-[3px]">Guarantee Applied</span>
-                 </div>
-              </div>
            </div>
 
-           {/* Right: Summary Hub (Col 5) */}
-           <div className="lg:col-span-5 relative lg:sticky lg:top-10 space-y-10">
-              <div className="bg-secondary-dark rounded-[4rem] shadow-premium-dark overflow-hidden group">
-                 
-                 {/* Visual Media */}
-                 <div className="relative h-72 overflow-hidden">
+           {/* Right Column: Price Summary Sidebar */}
+           <div className="lg:col-span-4 lg:sticky lg:top-40 space-y-6">
+              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+                 <div className="relative h-40">
                     <img 
-                      src={hotel.images?.[0] || "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=1200"} 
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[4s]" 
+                      src={hotel.images?.[0] || ""} 
+                      className="w-full h-full object-cover" 
                       alt="Hotel" 
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-secondary-dark via-secondary-dark/10 to-transparent" />
-                    <div className="absolute top-8 left-8">
-                       <div className="px-4 py-1.5 bg-primary/20 backdrop-blur-xl border border-white/20 rounded-full text-primary font-black text-[9px] uppercase tracking-[3px] flex items-center gap-2">
-                          <Award size={12} /> Heritage Elite
-                       </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent" />
+                    <div className="absolute bottom-4 left-4 right-4 text-white">
+                       <h3 className="font-bold text-lg truncate">{hotel.name}</h3>
+                       <p className="text-xs flex items-center gap-1 opacity-80"><MapPin size={12} /> {hotel.location}</p>
                     </div>
                  </div>
 
-                 {/* Intellectual Info */}
-                 <div className="p-10 md:p-14 space-y-10 text-white relative z-10">
+                 <div className="p-6 space-y-6">
                     <div className="space-y-3">
-                       <h3 className="text-3xl font-serif font-black tracking-tight leading-none truncate group-hover:text-primary transition-all">
-                          {hotel.name}
-                       </h3>
-                       <div className="flex items-center gap-3 text-xs text-gray-500 font-bold uppercase tracking-widest">
-                          <MapPin size={16} className="text-primary" /> {hotel.location || hotel.city}
+                       <h4 className="text-sm font-black text-gray-900 uppercase tracking-tight">Price Details</h4>
+                       <div className="space-y-3 text-sm">
+                          <div className="flex justify-between items-center">
+                             <span className="text-gray-500 font-medium">{selectedRoom?.type}</span>
+                             <span className="font-bold text-gray-900">{formatCurrency(selectedRoom?.price)}</span>
+                          </div>
+                          <div className="flex justify-between items-center pb-3 border-b border-gray-100">
+                             <span className="text-gray-500 font-medium">Nights count</span>
+                             <span className="font-bold text-gray-900">x {nights}</span>
+                          </div>
+                          <div className="flex justify-between items-center pt-2">
+                             <span className="text-gray-900 font-black text-lg">Total Amount</span>
+                             <span className="text-2xl font-black text-gray-900">{formatCurrency(bookingData.totalPrice)}</span>
+                          </div>
                        </div>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-2 border-y border-white/5 py-10">
-                       <div className="flex justify-between items-center group/line">
-                          <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest group-hover/line:text-primary transition-colors">Suite Specification</p>
-                          <p className="text-sm font-bold tracking-tight">{selectedRoom?.type || 'Luxury Suite'}</p>
-                       </div>
-                       <div className="flex justify-between items-center group/line">
-                          <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest group-hover/line:text-primary transition-colors">Global Rate / Night</p>
-                          <p className="text-sm font-bold tracking-tight">{formatCurrency(selectedRoom?.price)}</p>
-                       </div>
-                       <div className="flex justify-between items-center group/line">
-                          <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest group-hover/line:text-primary transition-colors">Temporal Span</p>
-                          <p className="text-sm font-bold tracking-tight italic text-primary font-serif">{nights} Nights</p>
-                       </div>
+                    <div className="bg-emerald-50 p-4 rounded-lg flex items-center gap-3 text-emerald-800 border border-emerald-100">
+                       <Shield size={20} className="text-emerald-500" />
+                       <p className="text-xs font-bold leading-tight">No hidden fees. Best price guaranteed.</p>
                     </div>
+                 </div>
+              </div>
 
-                    <div className="space-y-6">
-                       <div className="flex justify-between items-end">
-                          <div className="space-y-1">
-                             <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Total Investment</p>
-                             <p className="text-[9px] font-bold text-emerald-500 uppercase tracking-[2px]">Taxes & Fees Applied</p>
-                          </div>
-                          <p className="text-5xl font-black text-primary font-serif italic tracking-tighter leading-none">
-                             {formatCurrency(bookingData.totalPrice)}
-                          </p>
-                       </div>
-                       
-                       <div className="bg-white/5 border border-white/10 p-6 rounded-[2rem] flex items-center gap-4 group/support">
-                          <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-primary border border-white/10 group-hover/support:rotate-12 transition-transform">
-                             <Sparkles size={24} />
-                          </div>
-                          <div>
-                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Elite Covenant</p>
-                             <p className="text-xs font-medium text-white/60">Includes priority concierge response.</p>
-                          </div>
-                       </div>
-                    </div>
+              <div className="flex flex-col items-center gap-4 py-4 opacity-50">
+                 <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
+                    <CheckCircle2 size={14} className="text-emerald-500" /> Secure Payment System
+                 </div>
+                 <div className="flex gap-4 grayscale opacity-60">
+                    <img src="https://img.icons8.com/color/48/000000/visa.png" className="h-6" alt="Visa" />
+                    <img src="https://img.icons8.com/color/48/000000/mastercard.png" className="h-6" alt="MC" />
+                    <img src="https://razorpay.com/favicon.png" className="h-6" alt="Razorpay" />
                  </div>
               </div>
            </div>
@@ -429,16 +346,8 @@ const PaymentPage = () => {
       </div>
 
       <style>{`
-        @keyframes scale-in { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .animate-scale-in { animation: scale-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        @keyframes fade-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in { animation: fade-in 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        @keyframes slide-up { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-slide-up { animation: slide-up 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        @keyframes slide-right { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
-        .animate-slide-right { animation: slide-right 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
-        .animate-shake { animation: shake 0.4s ease-in-out; }
+        @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fade-in 0.6s ease-out forwards; }
       `}</style>
     </div>
   );
@@ -489,24 +398,23 @@ const StripeCheckoutForm = ({ bookingData, stripeTxnId, navigate, onSuccess, onE
          navigate('/booking-success', { state: { booking: finalBooking } });
       }
     } catch (err) {
-      onError(err.response?.data?.message || 'Protocol synchronization failure. Please audit and retry.');
+      onError(err.response?.data?.message || 'Payment system error. Please try again.');
       setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-10">
-      <div className="space-y-4">
-        <label className="text-[10px] font-black text-secondary-dark uppercase tracking-[3px] ml-1">Card Intelligence</label>
-        <div className="bg-gray-50 p-6 rounded-[2rem] border-2 border-gray-100 focus-within:border-primary focus-within:bg-white transition-all shadow-sm">
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-2">
+        <label className="text-xs font-black text-gray-900 uppercase">Card Details</label>
+        <div className="p-4 border border-gray-200 rounded-lg bg-gray-50 focus-within:border-[#006ce4] focus-within:bg-white transition-all">
           <CardElement options={{
             style: {
               base: {
-                fontSize: '16px',
+                fontSize: '15px',
                 fontFamily: "'Outfit', sans-serif",
-                color: '#0F172A',
-                letterSpacing: '0.025em',
-                '::placeholder': { color: '#94A3B8' },
+                color: '#111827',
+                '::placeholder': { color: '#9CA3AF' },
               },
               invalid: { color: '#ef4444' }
             },
@@ -517,11 +425,14 @@ const StripeCheckoutForm = ({ bookingData, stripeTxnId, navigate, onSuccess, onE
       <button 
         type="submit" 
         disabled={!stripe || loading}
-        className="w-full h-18 bg-secondary-dark text-white rounded-[1.5rem] font-black text-xs uppercase tracking-[3px] shadow-2xl shadow-secondary/20 hover:bg-primary transition-all flex items-center justify-center gap-4 group active:scale-[0.98]"
+        className="w-full h-14 bg-[#006ce4] text-white rounded-lg font-bold shadow-lg shadow-blue-500/10 hover:bg-[#0052ad] transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-70"
       >
-        {loading ? <Loader2 className="animate-spin text-primary" size={24} /> : <Lock size={24} className="text-primary group-hover:text-white transition-colors" />}
-        {loading ? 'Validating...' : `Secure Finalize ${formatCurrency(bookingData.totalPrice)}`}
+        {loading ? <Loader2 className="animate-spin" size={20} /> : <Lock size={18} />}
+        {loading ? 'Validating...' : `Pay ${formatCurrency(bookingData.totalPrice)}`}
       </button>
+      <div className="flex items-center justify-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+         <ShieldCheck size={14} className="text-emerald-500" /> Encrypted by Stripe.com
+      </div>
     </form>
   );
 };

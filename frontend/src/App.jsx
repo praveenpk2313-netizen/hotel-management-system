@@ -93,8 +93,18 @@ const ProtectedRoute = ({ children, allowedRoles, redirectTo = '/login' }) => {
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    const dashboard = user.role === 'admin' ? '/admin/dashboard' : user.role === 'manager' ? '/manager/dashboard' : '/customer/dashboard';
-    return <Navigate to={dashboard} replace />;
+    // Elevate admin permissions to include manager-level access
+    if (user.role === 'admin' && allowedRoles.includes('manager')) {
+      return children;
+    }
+    
+    // Intelligent role-based redirection 
+    const targetDashboard = 
+      user.role === 'admin'   ? '/admin/dashboard' : 
+      user.role === 'manager' ? '/manager/dashboard' : 
+      '/customer/dashboard';
+
+    return <Navigate to={targetDashboard} replace />;
   }
 
   return children;
