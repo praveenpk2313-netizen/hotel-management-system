@@ -131,7 +131,7 @@ const Navbar = () => {
           </button>
         </div>
 
-        {/* Categories Row (Booking.com style) */}
+        {/* Categories Row (Simplified) */}
         <div className="hidden lg:flex items-center gap-1 font-bold text-sm h-12 border-t border-white/5">
            {navLinks.map((link) => (
              <Link 
@@ -143,16 +143,12 @@ const Navbar = () => {
                    : 'border-transparent hover:bg-white/5'
                }`}
              >
-                <div className="flex items-center gap-2 opacity-80 group-hover:opacity-100">
+                <div className="flex items-center gap-2 opacity-80 group-hover:opacity-100 uppercase tracking-widest text-[10px]">
                    {link.icon}
                    {link.name}
                 </div>
              </Link>
            ))}
-           <a href="#" className="h-full px-5 flex items-center gap-2 opacity-50 hover:bg-white/5 cursor-not-allowed">Flights</a>
-           <a href="#" className="h-full px-5 flex items-center gap-2 opacity-50 hover:bg-white/5 cursor-not-allowed">Car rentals</a>
-           <a href="#" className="h-full px-5 flex items-center gap-2 opacity-50 hover:bg-white/5 cursor-not-allowed">Attractions</a>
-           <a href="#" className="h-full px-5 flex items-center gap-2 opacity-50 hover:bg-white/5 cursor-not-allowed">Airport taxis</a>
         </div>
       </div>
 

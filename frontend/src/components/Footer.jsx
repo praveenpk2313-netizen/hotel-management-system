@@ -4,106 +4,77 @@ import {
   Facebook, 
   Twitter, 
   Instagram, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Globe, 
-  ChevronRight,
   ShieldCheck,
-  CheckCircle2
+  CheckCircle2,
+  Globe
 } from 'lucide-react';
 
 const Footer = () => {
   return (
-    <footer className="bg-[#003b95] text-white pt-16 pb-8 mt-auto">
+    <footer className="bg-booking-blue text-white pt-16 pb-12 mt-auto">
       <div className="container-booking space-y-12">
         
-        {/* Upper Footer: Links Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 border-b border-white/10 pb-12">
+        {/* Upper Footer: Simplified Links */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 border-b border-white/10 pb-12">
           
           <div className="space-y-4">
-            <h4 className="text-sm font-bold">Support</h4>
-            <ul className="text-[13px] space-y-2 opacity-80 font-medium">
-              <li><Link to="/" className="hover:underline">Coronavirus (COVID-19) FAQs</Link></li>
-              <li><Link to="/" className="hover:underline">Manage your trips</Link></li>
-              <li><Link to="/" className="hover:underline">Customer Service Help</Link></li>
-              <li><Link to="/" className="hover:underline">Safety Resource centre</Link></li>
-            </ul>
+             <Link to="/" className="text-2xl font-black tracking-tight flex items-center gap-2">
+                PK <span className="text-secondary font-black">UrbanStay</span>
+             </Link>
+             <p className="text-xs opacity-60 leading-relaxed font-medium">
+                Your premier destination for luxury stays and urban escapes. Experience the city like never before.
+             </p>
           </div>
 
-          <div className="space-y-4">
-            <h4 className="text-sm font-bold">Discover</h4>
-            <ul className="text-[13px] space-y-2 opacity-80 font-medium">
-              <li><Link to="/hotels" className="hover:underline">Genius loyalty programme</Link></li>
-              <li><Link to="/hotels" className="hover:underline">Seasonal and holiday deals</Link></li>
-              <li><Link to="/hotels" className="hover:underline">Travel articles</Link></li>
-              <li><Link to="/hotels" className="hover:underline">Booking.com for Business</Link></li>
-            </ul>
+          <div className="grid grid-cols-2 lg:grid-cols-2 col-span-2 gap-8">
+             <div className="space-y-4">
+                <h4 className="text-sm font-bold uppercase tracking-widest opacity-80">Quick Links</h4>
+                <ul className="text-sm space-y-3 font-bold">
+                   <li><Link to="/" className="hover:text-blue-200 transition-colors">Home</Link></li>
+                   <li><Link to="/hotels" className="hover:text-blue-200 transition-colors">Find Hotels</Link></li>
+                   <li><Link to="/register" className="hover:text-blue-200 transition-colors">List Property</Link></li>
+                </ul>
+             </div>
+             <div className="space-y-4">
+                <h4 className="text-sm font-bold uppercase tracking-widest opacity-80">Support</h4>
+                <ul className="text-sm space-y-3 font-bold">
+                   <li><Link to="/manager/login" className="hover:text-blue-200 transition-colors">Manager Login</Link></li>
+                   <li><Link to="/admin/login" className="hover:text-blue-200 transition-colors">Admin Portal</Link></li>
+                   <li><Link to="/" className="hover:text-blue-200 transition-colors">Help Center</Link></li>
+                </ul>
+             </div>
           </div>
 
-          <div className="space-y-4">
-            <h4 className="text-sm font-bold">Terms and settings</h4>
-            <ul className="text-[13px] space-y-2 opacity-80 font-medium">
-              <li><Link to="/" className="hover:underline">Privacy & cookies</Link></li>
-              <li><Link to="/" className="hover:underline">Terms and conditions</Link></li>
-              <li><Link to="/" className="hover:underline">Partner dispute</Link></li>
-              <li><Link to="/" className="hover:underline">Modern Slavery Statement</Link></li>
-            </ul>
-          </div>
-
-          <div className="space-y-4">
-            <h4 className="text-sm font-bold">Partners</h4>
-            <ul className="text-[13px] space-y-2 opacity-80 font-medium">
-              <li><Link to="/manager/login" className="hover:underline">Extranet login</Link></li>
-              <li><Link to="/manager/register" className="hover:underline">Partner help</Link></li>
-              <li><Link to="/register" className="hover:underline">List your property</Link></li>
-              <li><Link to="/" className="hover:underline">Become an affiliate</Link></li>
-            </ul>
-          </div>
-
-          <div className="space-y-4">
-            <h4 className="text-sm font-bold">About</h4>
-            <ul className="text-[13px] space-y-2 opacity-80 font-medium">
-              <li><Link to="/" className="hover:underline">About PK UrbanStay</Link></li>
-              <li><Link to="/" className="hover:underline">Careers</Link></li>
-              <li><Link to="/" className="hover:underline">Sustainability</Link></li>
-              <li><Link to="/" className="hover:underline">Corporate contact</Link></li>
-            </ul>
+          <div className="space-y-6">
+             <h4 className="text-sm font-bold uppercase tracking-widest opacity-80">Follow Us</h4>
+             <div className="flex items-center gap-6">
+                <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all"><Facebook size={20} /></a>
+                <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all"><Instagram size={20} /></a>
+                <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all"><Twitter size={20} /></a>
+             </div>
           </div>
         </div>
 
-        {/* Lower Footer: Brand & Social */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-           <div className="space-y-2 text-center md:text-left">
-              <Link to="/" className="text-2xl font-black tracking-tight flex items-center gap-2 justify-center md:justify-start">
-                 PK <span className="text-sky-400">UrbanStay</span>
-              </Link>
-              <p className="text-[11px] opacity-60 font-medium">
-                 PK UrbanStay is part of the global travel network. © 2026-2030 PK UrbanStay.com™. All rights reserved.
-              </p>
+        {/* Lower Footer: Trust & Copyright */}
+        <div className="flex flex-col lg:flex-row justify-between items-center gap-10">
+           <div className="flex flex-wrap items-center justify-center lg:justify-start gap-8 opacity-60">
+              <div className="flex items-center gap-2">
+                 <ShieldCheck size={18} />
+                 <span className="text-[10px] font-black uppercase tracking-widest">SSL Secured</span>
+              </div>
+              <div className="flex items-center gap-2">
+                 <CheckCircle2 size={18} />
+                 <span className="text-[10px] font-black uppercase tracking-widest">Verified Payment</span>
+              </div>
+              <div className="flex items-center gap-2">
+                 <Globe size={18} />
+                 <span className="text-[10px] font-black uppercase tracking-widest">Global Partners</span>
+              </div>
            </div>
-
-           <div className="flex items-center gap-6">
-              <a href="#" className="opacity-70 hover:opacity-100 transition-opacity"><Facebook size={20} /></a>
-              <a href="#" className="opacity-70 hover:opacity-100 transition-opacity"><Instagram size={20} /></a>
-              <a href="#" className="opacity-70 hover:opacity-100 transition-opacity"><Twitter size={20} /></a>
-           </div>
-        </div>
-
-        {/* Trust Row */}
-        <div className="flex flex-wrap items-center justify-center gap-8 pt-4">
-           <div className="flex items-center gap-2 opacity-50 grayscale hover:grayscale-0 hover:opacity-80 transition-all cursor-default">
-              <ShieldCheck size={16} />
-              <span className="text-[10px] font-bold uppercase tracking-wider">Secured by SSL</span>
-           </div>
-           <div className="flex items-center gap-2 opacity-50 grayscale hover:grayscale-0 hover:opacity-80 transition-all cursor-default">
-              <CheckCircle2 size={16} />
-              <span className="text-[10px] font-bold uppercase tracking-wider">Verified Merchant</span>
-           </div>
-           <div className="flex items-center gap-2 opacity-50 grayscale hover:grayscale-0 hover:opacity-80 transition-all cursor-default">
-              <Globe size={16} />
-              <span className="text-[10px] font-bold uppercase tracking-wider">Global Partner network</span>
-           </div>
+           
+           <p className="text-[11px] font-black opacity-40 uppercase tracking-widest text-center">
+              © 2026-2030 PK URBANSTAY.COM™. ALL RIGHTS RESERVED.
+           </p>
         </div>
       </div>
     </footer>
