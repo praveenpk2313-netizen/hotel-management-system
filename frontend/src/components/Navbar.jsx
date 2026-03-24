@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, Menu, X, Bell, User, Layout, History, MapPin, Sparkles, ShieldCheck, ChevronDown } from 'lucide-react';
+import { LogOut, Menu, X, Bell, User, Layout, History, MapPin, Sparkles, ShieldCheck, ChevronDown, ArrowRight } from 'lucide-react';
 import NotificationBell from './NotificationBell';
 
 const Navbar = () => {
