@@ -23,6 +23,7 @@ import {
   AlertCircle,
   BedDouble,
   ChevronRight,
+  ChevronDown,
   ArrowLeft,
   Users,
   Bed,
