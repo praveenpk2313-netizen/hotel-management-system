@@ -119,8 +119,8 @@ const confirmAfterPayment = async (req, res) => {
     res.status(201).json({ ...booking.toObject(), emailSent: false });
 
     // ── 6. Fire-and-forget: email + in-app notification ──────────────────────
-    //    This runs AFTER the response has been sent.
-    //    Any failure here never affects the client.
+    //    This runs AFTER the response has been sent to the user.
+    //    Any failure here never affects the client's booking success.
     setImmediate(async () => {
       try {
         const fullBooking = await Booking
@@ -138,33 +138,41 @@ const confirmAfterPayment = async (req, res) => {
           email: fullBooking.userId.email,
         };
 
-        console.log(`📧 [EMAIL] Sending confirmation for booking ${booking._id} → ${customer.email}`);
-
         // 6a. PDF invoice (non-fatal)
         let pdfBuf = null;
         try {
           pdfBuf = await generateInvoice(fullBooking);
-          console.log(`📄 [PDF] Invoice generated for booking ${booking._id}`);
+          console.log(`[PDF] Invoice generated for booking ${booking._id}`);
         } catch (pdfErr) {
-          console.error('⚠️  [PDF] Failed (email will send without it):', pdfErr.message);
+          console.error('[PDF] Generation failed (email will send without it):', pdfErr.message);
         }
 
         // 6b. Confirmation email
-        const emailResult = await sendBookingConfirmationEmail(fullBooking, customer, pdfBuf);
-        if (emailResult.success) {
-          console.log(`✅ [EMAIL] Confirmation sent for booking ${booking._id}`);
-        } else {
-          console.error(`❌ [EMAIL] Failed for booking ${booking._id}:`, emailResult.error);
+        console.log(`[EMAIL] Sending booking confirmation email to ${customer.email}...`);
+        
+        try {
+          const emailResult = await sendBookingConfirmationEmail(fullBooking, customer, pdfBuf);
+          if (emailResult.success) {
+            console.log('[EMAIL] Booking confirmation email sent successfully');
+          } else {
+            console.error(`[EMAIL] Booking confirmation email failed: ${emailResult.error}`);
+          }
+        } catch (emailErr) {
+          console.error(`[EMAIL] Booking confirmation email failed: ${emailErr.message}`);
         }
 
         // 6c. In-app notification
-        await sendNotification({
-          userId:   customer._id,
-          title:    'Booking Confirmed ✅',
-          message:  `Your booking for ${booking.hotelName} is confirmed (${booking.checkInDate.toLocaleDateString()} – ${booking.checkOutDate.toLocaleDateString()}).${emailResult.success ? ' Confirmation email sent.' : ''}`,
-          type:     'booking',
-          metaData: { bookingId: booking._id }
-        });
+        try {
+          await sendNotification({
+            userId:   customer._id,
+            title:    'Booking Confirmed ✅',
+            message:  `Your booking for ${booking.hotelName} is confirmed. ${pdfBuf ? 'Invoice attached to email.' : ''}`,
+            type:     'booking',
+            metaData: { bookingId: booking._id }
+          });
+        } catch (notifErr) {
+          console.error('[NOTIFICATION] Failed:', notifErr.message);
+        }
 
       } catch (postErr) {
         console.error('❌ [POST-BOOKING] Async handler error:', postErr.message);

@@ -18,7 +18,7 @@ const passport = require('./config/passport');
 const path = require('path');
 const generateToken = require('./utils/generateToken');
 const { sendNotification } = require('./utils/socket');
-const { sendEmail, getLoginTemplate } = require('./utils/emailService');
+const { sendEmail, getLoginTemplate, sendTestEmail } = require('./utils/emailService');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -85,6 +85,51 @@ app.get('/', (req, res) => {
 // (Render free tier spins down after inactivity; this endpoint resolves the cold start)
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Test email — verify SMTP config independently from booking flow
+// GET /api/test-email         → sends to SMTP_USER (default)
+// GET /api/test-email?to=X    → sends to X
+app.get('/api/test-email', async (req, res) => {
+  try {
+    const recipient = req.query.to || process.env.SMTP_USER;
+    console.log(`[TEST-EMAIL] Sending test email to ${recipient}`);
+    const result = await sendTestEmail(recipient);
+    if (result.success) {
+      res.json({
+        status: 'ok',
+        message: `Test email sent successfully to ${recipient}`,
+        messageId: result.messageId,
+        smtpConfig: {
+          host: process.env.SMTP_HOST,
+          port: process.env.SMTP_PORT,
+          user: process.env.SMTP_USER,
+          from_name: process.env.FROM_NAME,
+          from_email: process.env.FROM_EMAIL,
+        }
+      });
+    } else {
+      res.status(500).json({
+        status: 'error',
+        message: 'Test email failed',
+        error: result.error,
+        smtpConfig: {
+          host: process.env.SMTP_HOST,
+          port: process.env.SMTP_PORT,
+          user: process.env.SMTP_USER,
+          pass_set: !!process.env.SMTP_PASS,
+          from_name: process.env.FROM_NAME,
+          from_email: process.env.FROM_EMAIL,
+        }
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Test email route error',
+      error: err.message
+    });
+  }
 });
 
 app.get('/auth/google', (req, res, next) => {
