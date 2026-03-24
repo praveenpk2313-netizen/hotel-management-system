@@ -21,7 +21,7 @@ import {
   Award,
   Zap
 } from 'lucide-react';
-import { fetchHotelById, fetchRoomsByHotelId, submitBooking } from '../services/api';
+import { fetchHotelById, fetchRooms, createBooking } from '../services/api';
 import { formatCurrency, formatDate } from '../utils/helpers';
 import { useAuth } from '../context/AuthContext';
 import RoomCard from '../components/RoomCard';
@@ -42,7 +42,7 @@ const HotelDetails = () => {
       try {
         const [hotelRes, roomsRes] = await Promise.all([
           fetchHotelById(id),
-          fetchRoomsByHotelId(id)
+          fetchRooms(id)
         ]);
         setHotel(hotelRes.data);
         setRooms(roomsRes.data);
