@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
 import { 
   MapPin, 
   Wifi, 
@@ -25,12 +25,15 @@ import { fetchHotelById, fetchRooms, createBooking } from '../services/api';
 import { formatCurrency, formatDate } from '../utils/helpers';
 import { useAuth } from '../context/AuthContext';
 import RoomCard from '../components/RoomCard';
+import BookingForm from '../components/BookingForm';
+import DatePicker from 'react-datepicker';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 
 const HotelDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   
   const [hotel, setHotel] = useState(null);
@@ -42,6 +45,40 @@ const HotelDetails = () => {
   const [checkOut, setCheckOut] = useState(null);
   const [guests, setGuests] = useState(2);
   const [dateError, setDateError] = useState('');
+  const [selectedRoomId, setSelectedRoomId] = useState('');
+
+  useEffect(() => {
+    if (rooms.length > 0 && !selectedRoomId) {
+       setSelectedRoomId(rooms[0]._id);
+    }
+  }, [rooms, selectedRoomId]);
+
+  const activeRoom = rooms.find(r => r._id === selectedRoomId) || rooms[0];
+  const nights = checkIn && checkOut ? Math.max(1, Math.ceil(Math.abs(checkOut - checkIn) / (1000 * 60 * 60 * 24))) : 1;
+  const totalPrice = activeRoom ? activeRoom.price * nights : 0;
+
+  const handleBookingSubmit = (bookingDetails) => {
+    if (!user) {
+       navigate('/login', { state: { from: location.pathname } });
+       return;
+    }
+
+    navigate('/payment', { 
+      state: { 
+        selectedRoom: rooms.find(r => r._id === bookingDetails.roomId),
+        hotel: hotel,
+        bookingData: {
+          hotel: id,
+          room: bookingDetails.roomId,
+          checkInDate: bookingDetails.checkInDate.toISOString(),
+          checkOutDate: bookingDetails.checkOutDate.toISOString(),
+          numGuests: bookingDetails.numGuests,
+          totalPrice: bookingDetails.totalPrice,
+          userName: user?.name || 'Guest'
+        }
+      } 
+    });
+  };
 
   useEffect(() => {
     const loadHotelData = async () => {
@@ -181,44 +218,6 @@ const HotelDetails = () => {
                <section id="availability" className="space-y-8 pt-8 border-t border-slate-200">
                   <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Availability</h2>
                   
-                  {/* Select Dates Form */}
-                  <div className="bg-white p-6 rounded-[24px] border border-slate-200 shadow-sm space-y-4">
-                     <h3 className="text-lg font-bold text-slate-900">Select your dates</h3>
-                     {dateError && <div className="p-3 bg-rose-50 border border-rose-100 rounded-lg text-sm text-rose-600 font-bold">{dateError}</div>}
-                     <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                        <div className="space-y-2">
-                           <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Check-in Date</label>
-                           <DatePicker 
-                             selected={checkIn}
-                             onChange={date => { setCheckIn(date); setDateError(''); }}
-                             minDate={new Date()}
-                             className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-cyan-500 focus:bg-white transition-all font-bold text-slate-900"
-                             placeholderText="Select check-in"
-                           />
-                        </div>
-                        <div className="space-y-2">
-                           <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Check-out Date</label>
-                           <DatePicker 
-                             selected={checkOut}
-                             onChange={date => { setCheckOut(date); setDateError(''); }}
-                             minDate={checkIn || new Date()}
-                             className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-cyan-500 focus:bg-white transition-all font-bold text-slate-900"
-                             placeholderText="Select check-out"
-                           />
-                        </div>
-                        <div className="space-y-2">
-                           <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Guests</label>
-                           <select 
-                             value={guests} 
-                             onChange={(e) => setGuests(parseInt(e.target.value))}
-                             className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-cyan-500 focus:bg-white transition-all font-bold text-slate-900 appearance-none cursor-pointer"
-                           >
-                             {[1,2,3,4,5,6].map(n => <option key={n} value={n}>{n} Adult{n>1?'s':''}</option>)}
-                           </select>
-                        </div>
-                     </div>
-                  </div>
-
                   <div className="bg-cyan-50/50 p-6 rounded-[24px] border border-cyan-100 flex items-center gap-4">
                      <Info size={28} className="text-cyan-600 flex-shrink-0" />
                      <p className="text-sm font-bold text-slate-800">These prices are exclusive to our members. Sign in to save even more on your stay.</p>
@@ -274,32 +273,18 @@ const HotelDetails = () => {
 
             {/* R: Dynamic Sidebar Info */}
             <div className="lg:col-span-4 space-y-8">
-               <div className="sticky top-32 space-y-8">
+               <div className="sticky top-32 space-y-6">
                   
-                  {/* Property Highlights */}
-                  <div className="glass-card bg-cyan-50/30 p-8 rounded-[24px] border border-cyan-100 space-y-8 shadow-soft">
-                     <h3 className="text-xl font-bold text-slate-900">Property highlights</h3>
-                     <div className="space-y-5">
-                        <div className="flex items-start gap-4">
-                           <div className="mt-1 bg-white p-2 rounded-lg shadow-sm"><Zap size={20} className="text-cyan-600" fill="currentColor" /></div>
-                           <p className="text-sm font-bold text-slate-700 leading-relaxed pt-1.5">Perfect for a 1-night stay!</p>
-                        </div>
-                        <div className="flex items-start gap-4">
-                           <div className="mt-1 bg-white p-2 rounded-lg shadow-sm"><MapPin size={20} className="text-cyan-600" /></div>
-                           <p className="text-sm font-bold text-slate-700 leading-relaxed pt-1.5">Located in the heart of {hotel.city || 'the city'}, this property has an excellent location score of 9.3!</p>
-                        </div>
-                        <div className="flex items-start gap-4">
-                           <div className="mt-1 bg-white p-2 rounded-lg shadow-sm"><Clock size={20} className="text-cyan-600" /></div>
-                           <p className="text-sm font-bold text-slate-700 leading-relaxed pt-1.5">24-hour front desk - assistance whenever you need it.</p>
-                        </div>
-                     </div>
-                     <button 
-                        onClick={() => document.getElementById('availability').scrollIntoView({ behavior: 'smooth' })}
-                        className="w-full h-14 bg-cyan-600 text-white rounded-xl font-bold text-base hover:bg-cyan-700 transition-all shadow-md active:scale-[0.98]"
-                     >
-                        Reserve your stay
-                     </button>
-                  </div>
+                  {/* Sticky Booking Widget */}
+                  <BookingForm 
+                    hotel={hotel}
+                    rooms={rooms}
+                    onSubmit={handleBookingSubmit}
+                    initialCheckIn={checkIn}
+                    initialCheckOut={checkOut}
+                    initialGuests={guests}
+                    initialRoomId={selectedRoomId}
+                  />
 
                   {/* Trust Factors */}
                   <div className="bg-white p-8 rounded-[24px] border border-slate-200 space-y-5 grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-500 shadow-sm">

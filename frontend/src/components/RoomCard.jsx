@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { formatCurrency } from '../utils/helpers';
 
-const RoomCard = ({ room, hotelId, hotelName, hotel, checkIn, checkOut, guests, onBookError }) => {
+const RoomCard = ({ room, hotelId, hotelName, hotel, checkIn, checkOut, guests, onBookError, isSelected, onSelect }) => {
   const navigate = useNavigate();
 
   const handleBookNow = () => {
@@ -45,8 +45,20 @@ const RoomCard = ({ room, hotelId, hotelName, hotel, checkIn, checkOut, guests, 
     });
   };
 
+  const handleSelect = () => {
+    if (onSelect) {
+      onSelect(room._id);
+      document.getElementById('booking-widget')?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      handleBookNow();
+    }
+  };
+
   return (
-    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:border-[#006ce4] transition-all group flex flex-col md:flex-row shadow-sm hover:shadow-md">
+    <div 
+      className={`bg-white border rounded-xl overflow-hidden transition-all group flex flex-col md:flex-row shadow-sm hover:shadow-md ${isSelected ? 'border-cyan-600 ring-2 ring-cyan-600/10' : 'border-gray-200 hover:border-cyan-600'}`}
+      onClick={() => onSelect && onSelect(room._id)}
+    >
       
       {/* 1. Room Image Section */}
       <div className="md:w-72 h-48 md:h-auto relative overflow-hidden shrink-0">
@@ -112,11 +124,12 @@ const RoomCard = ({ room, hotelId, hotelName, hotel, checkIn, checkOut, guests, 
          </div>
 
          <button 
-           onClick={handleBookNow}
-           className="w-full h-12 bg-[#006ce4] text-white font-black rounded-lg hover:bg-[#0052ad] transition-all flex items-center justify-center gap-2 group/btn active:scale-95 shadow-lg shadow-blue-500/10"
+           onClick={(e) => { e.stopPropagation(); handleSelect(); }}
+           className={`w-full h-12 font-black rounded-lg transition-all flex items-center justify-center gap-2 group/btn active:scale-95 shadow-lg shadow-blue-500/10 ${isSelected ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-[#006ce4] text-white hover:bg-[#0052ad]'}`}
          >
-            Select & Stay
-            <ChevronRight size={18} className="group-hover/btn:translate-x-1 transition-transform" />
+            {isSelected ? 'Selected' : 'Select & Stay'}
+            {!isSelected && <ChevronRight size={18} className="group-hover/btn:translate-x-1 transition-transform" />}
+            {isSelected && <CheckCircle size={18} />}
          </button>
          
          <p className="text-[9px] font-black text-[#003b95] uppercase tracking-widest opacity-60">

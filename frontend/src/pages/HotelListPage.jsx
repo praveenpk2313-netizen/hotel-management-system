@@ -12,7 +12,11 @@ import {
   X, 
   Star,
   ChevronRight,
-  Loader2
+  Loader2,
+  Calendar,
+  Sparkles,
+  Zap,
+  Filter
 } from 'lucide-react';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
@@ -61,7 +65,7 @@ const HotelListPage = () => {
       setError('');
     } catch (err) {
       console.error('Failed to fetch hotels:', err);
-      setError('Could not load hotels. Please try again later.');
+      setError('Could not load luxury properties. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -97,253 +101,208 @@ const HotelListPage = () => {
   };
 
   return (
-    <div style={{ background: '#f8fafc', minHeight: '100vh', padding: '2rem 1rem' }}>
-      <div className="container" style={{ maxWidth: '1400px' }}>
+    <div className="premium-list-container">
+      <div className="container" style={{ maxWidth: '1440px' }}>
         
         {/* Header Section */}
-        <div style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1.5rem' }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--primary)', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px' }}>
-              <ChevronRight size={16} /> Explore
+        <div className="premium-list-header">
+          <div className="header-meta">
+            <div className="header-badge animate-slide-up">
+              <Sparkles size={14} className="text-amber-500" />
+              <span>Curated Selection</span>
             </div>
-            <h1 className="luxury-font" style={{ fontSize: '2.5rem', color: '#0f172a', margin: 0 }}>Discover Luxury Stays</h1>
-            <p style={{ color: '#64748b', marginTop: '0.5rem' }}>Indulge in unparalleled comfort across the world's most premium destinations.</p>
+            <h1 className="header-title animate-slide-up" style={{ animationDelay: '0.1s' }}>Find Your Perfect Escape</h1>
+            <p className="header-subtitle animate-slide-up" style={{ animationDelay: '0.2s' }}>Discover unique accommodations hand-picked for their exceptional quality and service.</p>
           </div>
           
           <button 
             onClick={() => setShowMobileFilters(true)}
-            style={{ 
-              display: 'none', 
-              background: 'white', 
-              padding: '0.6rem 1.2rem', 
-              borderRadius: '10px', 
-              border: '1px solid #e2e8f0',
-              fontWeight: '600',
-              gap: '0.5rem',
-              alignItems: 'center'
-            }}
-            className="mobile-filter-btn"
+            className="mobile-filter-trigger"
           >
-            <SlidersHorizontal size={18} /> Filters
+            <Filter size={18} /> Filters
           </button>
         </div>
 
-        <div style={{ display: 'flex', gap: '2rem', position: 'relative' }}>
+        <div className="premium-layout-grid">
           
           {/* Sidebar Filters */}
-          <aside className={`filter-sidebar ${showMobileFilters ? 'mobile-open' : ''}`} style={{
-            width: '320px',
-            flexShrink: 0,
-            background: 'white',
-            borderRadius: '24px',
-            padding: '2rem',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.03)',
-            height: 'fit-content',
-            position: 'sticky',
-            top: '100px',
-            zIndex: 10
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: '700', margin: 0 }}>Filters</h3>
-              <button onClick={clearFilters} style={{ background: 'none', color: 'var(--primary)', fontWeight: '600', fontSize: '0.85rem' }}>Reset All</button>
-              <button onClick={() => setShowMobileFilters(false)} className="mobile-close-btn" style={{ display: 'none' }}><X /></button>
+          <aside className={`premium-sidebar ${showMobileFilters ? 'is-mobile-open' : ''}`}>
+            <div className="sidebar-header">
+              <div className="sidebar-title-group">
+                <SlidersHorizontal size={20} className="text-sky-600" />
+                <h3>Refine Search</h3>
+              </div>
+              <button onClick={clearFilters} className="reset-btn">Reset</button>
+              <button onClick={() => setShowMobileFilters(false)} className="mobile-close-btn"><X /></button>
             </div>
 
-            {/* Location Search */}
-            <div style={{ marginBottom: '2rem' }}>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', color: '#64748b', marginBottom: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Location</label>
-              <div style={{ position: 'relative' }}>
-                <MapPin size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+            <div className="sidebar-content">
+              {/* Location Input */}
+              <div className="filter-group">
+                <label className="filter-label">Destination</label>
+                <div className="input-with-icon">
+                  <MapPin size={18} className="input-icon" />
+                  <input 
+                    type="text" 
+                    placeholder="Where are you going?"
+                    value={filters.location}
+                    onChange={(e) => setFilters({...filters, location: e.target.value})}
+                    className="premium-input"
+                  />
+                </div>
+              </div>
+
+              {/* Price Slider */}
+              <div className="filter-group">
+                <div className="label-row">
+                  <label className="filter-label">Price Range</label>
+                  <span className="price-indicator">max {formatCurrency(filters.maxPrice)}</span>
+                </div>
                 <input 
-                  type="text" 
-                  placeholder="Where are you going?"
-                  value={filters.location}
-                  onChange={(e) => setFilters({...filters, location: e.target.value})}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem 1rem 0.75rem 2.5rem',
-                    borderRadius: '12px',
-                    border: '1.5px solid #e2e8f0',
-                    outline: 'none',
-                    fontSize: '0.95rem'
-                  }}
+                  type="range" 
+                  min="0" 
+                  max="5000" 
+                  step="50"
+                  value={filters.maxPrice}
+                  onChange={(e) => setFilters({...filters, maxPrice: e.target.value})}
+                  className="premium-range"
                 />
+                <div className="range-labels">
+                  <span>$0</span>
+                  <span>$5,000+</span>
+                </div>
               </div>
-            </div>
 
-            {/* Price Range */}
-            <div style={{ marginBottom: '2rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <label style={{ fontSize: '0.85rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Price Range</label>
-                <span style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--primary)' }}>
-                  Max: {formatCurrency(filters.maxPrice)}
-                </span>
+              {/* Enhanced Dates */}
+              <div className="filter-group">
+                <label className="filter-label">Stay Period</label>
+                <div className="date-selection-grid">
+                   <div className="date-input-box">
+                      <Calendar size={14} className="box-icon" />
+                      <DatePicker
+                        selected={filters.startDate}
+                        onChange={(date) => setFilters({...filters, startDate: date})}
+                        placeholderText="Check-in"
+                        className="box-datepicker"
+                        minDate={new Date()}
+                      />
+                   </div>
+                   <div className="date-input-box">
+                      <Calendar size={14} className="box-icon" />
+                      <DatePicker
+                        selected={filters.endDate}
+                        onChange={(date) => setFilters({...filters, endDate: date})}
+                        placeholderText="Check-out"
+                        className="box-datepicker"
+                        minDate={filters.startDate || new Date()}
+                      />
+                   </div>
+                </div>
               </div>
-              <input 
-                type="range" 
-                min="0" 
-                max="5000" 
-                step="50"
-                value={filters.maxPrice}
-                onChange={(e) => setFilters({...filters, maxPrice: e.target.value})}
-                style={{ width: '100%', accentColor: 'var(--primary)' }}
-              />
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', color: '#94a3b8', fontSize: '0.75rem' }}>
-                <span>$0</span>
-                <span>$5,000+</span>
-              </div>
-            </div>
 
-            {/* Date Range */}
-            <div style={{ marginBottom: '2rem' }}>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', color: '#64748b', marginBottom: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Dates</label>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <DatePicker
-                  selected={filters.startDate}
-                  onChange={(date) => setFilters({...filters, startDate: date})}
-                  placeholderText="Check-in Date"
-                  className="datepicker-input"
-                  minDate={new Date()}
-                />
-                <DatePicker
-                  selected={filters.endDate}
-                  onChange={(date) => setFilters({...filters, endDate: date})}
-                  placeholderText="Check-out Date"
-                  className="datepicker-input"
-                  minDate={filters.startDate || new Date()}
-                />
+              {/* Amenities - Visual Checkboxes */}
+              <div className="filter-group">
+                <label className="filter-label">Amenities</label>
+                <div className="amenities-selection-grid">
+                  {AMENITIES_OPTIONS.map(amenity => (
+                    <label key={amenity.id} className={`amenity-pill ${filters.amenities.includes(amenity.id) ? 'is-selected' : ''}`}>
+                      <input 
+                        type="checkbox" 
+                        checked={filters.amenities.includes(amenity.id)}
+                        onChange={() => handleAmenityToggle(amenity.id)}
+                        style={{ display: 'none' }}
+                      />
+                      <amenity.icon size={16} />
+                      <span>{amenity.name}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Amenities */}
-            <div style={{ marginBottom: '2rem' }}>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', color: '#64748b', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Amenities</label>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                {AMENITIES_OPTIONS.map(amenity => (
-                  <label key={amenity.id} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', transition: '0.2s' }}>
-                    <div 
-                      onClick={() => handleAmenityToggle(amenity.id)}
-                      style={{
-                        width: '20px',
-                        height: '20px',
-                        borderRadius: '6px',
-                        border: '2px solid',
-                        borderColor: filters.amenities.includes(amenity.id) ? 'var(--primary)' : '#cbd5e1',
-                        background: filters.amenities.includes(amenity.id) ? 'var(--primary)' : 'transparent',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        transition: '0.2s'
-                      }}
+              {/* Rating Group */}
+              <div className="filter-group">
+                <label className="filter-label">Guest Rating</label>
+                <div className="rating-selection-grid">
+                  {[3, 4, 5].map(star => (
+                    <button
+                      key={star}
+                      onClick={() => setFilters({...filters, rating: filters.rating === star ? 0 : star})}
+                      className={`rating-btn ${filters.rating === star ? 'is-active' : ''}`}
                     >
-                      {filters.amenities.includes(amenity.id) && <X size={14} color="white" />}
-                    </div>
-                    <span style={{ fontSize: '0.95rem', color: filters.amenities.includes(amenity.id) ? '#0f172a' : '#64748b', fontWeight: filters.amenities.includes(amenity.id) ? '600' : '400' }}>
-                      {amenity.name}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Rating Filter */}
-            <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', color: '#64748b', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Minimum Rating</label>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                {[3, 4, 5].map(star => (
-                  <button
-                    key={star}
-                    onClick={() => setFilters({...filters, rating: filters.rating === star ? 0 : star})}
-                    style={{
-                      flex: 1,
-                      padding: '0.6rem',
-                      borderRadius: '10px',
-                      border: '1.5px solid',
-                      borderColor: filters.rating === star ? 'var(--primary)' : '#e2e8f0',
-                      background: filters.rating === star ? 'rgba(197, 160, 89, 0.1)' : 'white',
-                      color: filters.rating === star ? 'var(--primary)' : '#64748b',
-                      fontWeight: '700',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '0.3rem'
-                    }}
-                  >
-                    {star}+ <Star size={14} fill={filters.rating === star ? 'var(--primary)' : 'none'} />
-                  </button>
-                ))}
+                      {star}+ <Star size={14} fill={filters.rating === star ? 'currentColor' : 'none'} />
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </aside>
 
           {/* Hotel Grid */}
-          <main style={{ flexGrow: 1 }}>
+          <main className="premium-main-content">
             
-            {/* Search Summary */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', background: 'white', padding: '1rem 1.5rem', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
-              <div style={{ fontWeight: '600', color: '#0f172a' }}>
-                {loading ? 'Searching...' : `${hotels.length} hotels found`}
-                {filters.location && <span style={{ color: '#94a3b8', fontWeight: '400' }}> in {filters.location}</span>}
+            {/* Search Summary & Sort */}
+            <div className="results-toolbar">
+              <div className="results-count">
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 size={16} className="animate-spin text-sky-600" />
+                    <span>Updating properties...</span>
+                  </div>
+                ) : (
+                  <>
+                    <span className="count-number">{hotels.length}</span>
+                    <span className="count-text">properties found</span>
+                  </>
+                )}
               </div>
               
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Sort by:</span>
-                <select style={{ border: 'none', background: 'none', fontWeight: '600', color: 'var(--primary)', outline: 'none', cursor: 'pointer' }}>
-                  <option>Recommended</option>
+              <div className="sort-controls">
+                <label>Sort by:</label>
+                <select className="premium-select">
+                  <option>Top Recommendations</option>
                   <option>Price: Low to High</option>
                   <option>Price: High to Low</option>
-                  <option>Top Rated</option>
+                  <option>Review Score</option>
                 </select>
               </div>
             </div>
 
             {loading && hotels.length === 0 ? (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}>
+              <div className="loading-grid">
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} className="skeleton" style={{ height: '420px', borderRadius: '16px', background: 'white' }}></div>
+                  <div key={i} className="skeleton-card"></div>
                 ))}
               </div>
             ) : error ? (
-              <div style={{ textAlign: 'center', padding: '5rem 0', background: 'white', borderRadius: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
-                <X size={48} color="var(--error)" style={{ marginBottom: '1rem' }} />
-                <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{error}</h3>
-                <button onClick={loadHotels} className="btn-primary" style={{ marginTop: '1rem' }}>Try Again</button>
+              <div className="empty-state-card error">
+                <Zap size={48} className="text-rose-500 mb-4" />
+                <h3>Oops! Something went wrong</h3>
+                <p>{error}</p>
+                <button onClick={loadHotels} className="premium-action-btn">Try Again</button>
               </div>
             ) : hotels.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '5rem 2rem', background: 'white', borderRadius: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
-                <div style={{ 
-                  width: '80px', height: '80px', background: '#f1f5f9', borderRadius: '50%', 
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' 
-                }}>
-                  <Search size={32} color="#94a3b8" />
+              <div className="empty-state-card">
+                <div className="empty-state-icon">
+                  <Search size={32} />
                 </div>
-                <h3 className="luxury-font" style={{ fontSize: '1.8rem', marginBottom: '1rem' }}>No Hotels Found</h3>
-                <p style={{ color: '#64748b', maxWidth: '400px', margin: '0 auto 2rem' }}>
-                  We couldn't find any properties matching your current filters. Try adjusting your search or resetting filters.
-                </p>
-                <button onClick={clearFilters} className="btn-primary">View All Hotels</button>
+                <h3>No exact matches found</h3>
+                <p>Try broadening your filters or clearing them to see all available luxury stays.</p>
+                <button onClick={clearFilters} className="premium-action-btn">Show All Properties</button>
               </div>
             ) : (
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', 
-                gap: '2rem' 
-              }}>
+              <div className="hotels-display-grid">
                 {hotels.map(hotel => (
-                  <HotelCard key={hotel._id} hotel={hotel} />
+                  <div key={hotel._id} className="animate-fade-in">
+                    <HotelCard hotel={hotel} />
+                  </div>
                 ))}
               </div>
             )}
             
             {loading && hotels.length > 0 && (
-              <div style={{ 
-                position: 'fixed', bottom: '3rem', left: '50%', transform: 'translateX(-50%)',
-                background: 'white', padding: '0.75rem 1.5rem', borderRadius: '30px',
-                boxShadow: '0 10px 30px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: '0.75rem',
-                zIndex: 100
-              }}>
-                <Loader2 size={18} className="animate-spin" style={{ color: 'var(--primary)' }} />
-                <span style={{ fontWeight: '600', fontSize: '0.9rem' }}>Updating results...</span>
+              <div className="floating-update-toast animate-slide-up">
+                <Loader2 size={18} className="animate-spin text-sky-500" />
+                <span>Refreshing availability...</span>
               </div>
             )}
           </main>
@@ -351,49 +310,385 @@ const HotelListPage = () => {
       </div>
 
       <style>{`
-        .datepicker-input {
-          width: 100%;
-          padding: 0.75rem 1rem;
-          border-radius: 12px;
-          border: 1.5px solid #e2e8f0;
-          outline: none;
-          font-size: 0.95rem;
+        .premium-list-container {
+          background: #fdfdfd;
+          min-height: 100vh;
+          padding: 120px 24px 60px;
+          font-family: 'Outfit', sans-serif;
+        }
+
+        /* ── Header ───────────────────────────────────────────────────────── */
+        .premium-list-header {
+          margin-bottom: 40px;
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+          gap: 24px;
+        }
+        .header-meta {
+          display: flex;
+          flex-direction: column;
+        }
+        .header-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          background: #f8fafc;
+          padding: 8px 16px;
+          border-radius: 100px;
+          border: 1px solid #e2e8f0;
+          font-size: 0.75rem;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          color: #64748b;
+          margin-bottom: 16px;
+          width: fit-content;
+        }
+        .header-title {
+          font-size: 3.5rem;
+          font-weight: 900;
+          color: #0f172a;
+          margin: 0;
+          letter-spacing: -0.04em;
+          line-height: 1.1;
+        }
+        .header-subtitle {
+          font-size: 1.15rem;
+          color: #64748b;
+          margin-top: 12px;
+          max-width: 600px;
+          font-weight: 500;
+        }
+
+        /* ── Layout Grid ──────────────────────────────────────────────────── */
+        .premium-layout-grid {
+          display: flex;
+          gap: 40px;
+          align-items: flex-start;
+        }
+
+        /* ── Sidebar ──────────────────────────────────────────────────────── */
+        .premium-sidebar {
+          width: 340px;
+          flex-shrink: 0;
+          background: rgba(255, 255, 255, 0.85);
+          backdrop-filter: blur(20px);
+          border: 1px solid #e2e8f0;
+          border-radius: 28px;
+          padding: 32px;
+          position: sticky;
+          top: 120px;
+          box-shadow: 0 4px 25px rgba(0,0,0,0.03);
+          transition: all 0.3s ease;
+        }
+        .sidebar-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 32px;
+        }
+        .sidebar-title-group {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+        .sidebar-title-group h3 {
+          font-size: 1.25rem;
+          font-weight: 800;
+          color: #0f172a;
+          margin: 0;
+        }
+        .reset-btn {
+          font-size: 0.85rem;
+          font-weight: 700;
+          color: #0284c7;
+          background: none;
+          border: none;
           cursor: pointer;
+          opacity: 0.8;
         }
-        .datepicker-input:focus {
-          border-color: var(--primary);
+        .reset-btn:hover { opacity: 1; text-decoration: underline; }
+
+        .filter-group {
+          margin-bottom: 28px;
         }
-        .animate-spin {
-          animation: spin 1s linear infinite;
+        .filter-label {
+          display: block;
+          font-size: 0.65rem;
+          font-weight: 900;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          color: #64748b;
+          margin-bottom: 12px;
         }
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+
+        .input-with-icon {
+          position: relative;
         }
-        .skeleton {
-          background: linear-gradient(90deg, #f0f0f0 25%, #f8f8f8 50%, #f0f0f0 75%);
+        .input-icon {
+          position: absolute;
+          left: 16px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #0284c7;
+          opacity: 0.6;
+        }
+        .premium-input {
+          width: 100%;
+          padding: 14px 16px 14px 44px;
+          background: #f8fafc;
+          border: 1.5px solid #e2e8f0;
+          border-radius: 16px;
+          outline: none;
+          font-family: inherit;
+          font-weight: 600;
+          font-size: 0.95rem;
+          transition: all 0.2s;
+        }
+        .premium-input:focus {
+          border-color: #0284c7;
+          background: white;
+          box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.1);
+        }
+
+        .premium-range {
+          width: 100%;
+          accent-color: #0284c7;
+          margin: 12px 0;
+        }
+        .label-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+        }
+        .price-indicator {
+          font-size: 0.9rem;
+          font-weight: 800;
+          color: #0284c7;
+        }
+        .range-labels {
+          display: flex;
+          justify-content: space-between;
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: #94a3b8;
+        }
+
+        .date-selection-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+        }
+        .date-input-box {
+          background: #f8fafc;
+          border: 1.5px solid #e2e8f0;
+          border-radius: 14px;
+          padding: 10px 14px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .box-icon { color: #0284c7; opacity: 0.6; }
+        .box-datepicker {
+          width: 100%;
+          background: transparent;
+          border: none;
+          outline: none;
+          font-size: 0.85rem;
+          font-weight: 700;
+          color: #0f172a;
+          font-family: inherit;
+        }
+
+        .amenities-selection-grid {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+        .amenity-pill {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 10px 16px;
+          background: #f8fafc;
+          border: 1.5px solid #e2e8f0;
+          border-radius: 100px;
+          font-size: 0.82rem;
+          font-weight: 700;
+          color: #64748b;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .amenity-pill:hover { border-color: #0284c7; color: #0f172a; }
+        .amenity-pill.is-selected {
+          background: #f0f9ff;
+          border-color: #0284c7;
+          color: #0284c7;
+        }
+
+        .rating-selection-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 8px;
+        }
+        .rating-btn {
+          padding: 12px;
+          background: white;
+          border: 1.5px solid #e2e8f0;
+          border-radius: 12px;
+          font-weight: 800;
+          color: #64748b;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .rating-btn:hover { border-color: #0284c7; }
+        .rating-btn.is-active {
+          background: #0284c7;
+          border-color: #0284c7;
+          color: white;
+        }
+
+        /* ── Main Content ─────────────────────────────────────────────────── */
+        .premium-main-content {
+          flex: 1;
+        }
+        .results-toolbar {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          background: white;
+          padding: 16px 24px;
+          border-radius: 20px;
+          border: 1px solid #e2e8f0;
+          margin-bottom: 24px;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        }
+        .results-count {
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .count-number { font-weight: 900; color: #0f172a; font-size: 1.1rem; }
+        .count-text { color: #64748b; font-size: 0.9rem; }
+
+        .sort-controls {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+        .sort-controls label { font-size: 0.85rem; font-weight: 700; color: #94a3b8; }
+        .premium-select {
+          border: none;
+          background: none;
+          color: #0284c7;
+          font-weight: 800;
+          font-size: 0.9rem;
+          outline: none;
+          cursor: pointer;
+          font-family: inherit;
+        }
+
+        .hotels-display-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+          gap: 32px;
+        }
+
+        /* ── State Cards ──────────────────────────────────────────────────── */
+        .empty-state-card {
+          text-align: center;
+          padding: 80px 40px;
+          background: white;
+          border-radius: 32px;
+          border: 1px solid #e2e8f0;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+        }
+        .empty-state-icon {
+          width: 80px;
+          height: 80px;
+          background: #f8fafc;
+          border-radius: 100px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 24px;
+          color: #94a3b8;
+        }
+        .empty-state-card h3 { font-size: 1.75rem; font-weight: 900; margin-bottom: 12px; color: #0f172a; }
+        .empty-state-card p { color: #64748b; max-width: 400px; margin: 0 auto 24px; line-height: 1.6; }
+        
+        .premium-action-btn {
+          background: #0284c7;
+          color: white;
+          border: none;
+          padding: 14px 28px;
+          border-radius: 14px;
+          font-weight: 800;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .premium-action-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(2, 132, 199, 0.25); }
+
+        .floating-update-toast {
+          position: fixed;
+          bottom: 40px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: white;
+          padding: 12px 24px;
+          border-radius: 100px;
+          box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          z-index: 100;
+          font-weight: 800;
+          font-size: 0.9rem;
+          border: 1px solid #e2e8f0;
+        }
+
+        /* ── Animations ───────────────────────────────────────────────────── */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out backwards; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-slide-up { animation: slideUp 0.6s cubic-bezier(0.165, 0.84, 0.44, 1) backwards; }
+        .animate-spin { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .skeleton-card {
+          height: 480px;
+          background: linear-gradient(90deg, #f1f5f9 25%, #f8fafc 50%, #f1f5f9 75%);
           background-size: 200% 100%;
           animation: loading 1.5s infinite;
+          border-radius: 24px;
         }
-        @keyframes loading {
-          0% { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
+        @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        /* ── Responsive ───────────────────────────────────────────────────── */
         @media (max-width: 1024px) {
-          .filter-sidebar {
-            display: none;
-          }
-          .filter-sidebar.mobile-open {
+          .premium-sidebar { display: none; }
+          .premium-sidebar.is-mobile-open {
             display: block;
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             width: 100%; height: 100%;
             border-radius: 0;
+            z-index: 200;
+            background: white;
             overflow-y: auto;
-            margin: 0;
           }
-          .mobile-filter-btn { display: flex !important; }
-          .mobile-close-btn { display: block !important; }
+          .mobile-filter-trigger { display: flex; align-items: center; gap: 8px; background: white; border: 1.5px solid #e2e8f0; padding: 10px 20px; border-radius: 12px; font-weight: 700; color: #0f172a; cursor: pointer; }
+          .mobile-close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; }
+          .header-title { font-size: 2.5rem; }
+        }
+        @media (min-width: 1025px) {
+          .mobile-filter-trigger, .mobile-close-btn { display: none; }
         }
       `}</style>
     </div>
