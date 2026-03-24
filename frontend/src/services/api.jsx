@@ -26,26 +26,39 @@ const api = axios.create({
   timeout: 30000, // 30 seconds — Render free-tier cold starts can take 15-20s
 });
 
+// Request interceptor — Always attach fresh token from localStorage before any call
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 // Response interceptor — handles timeouts and unauthorised responses globally
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.code === 'ECONNABORTED') {
-      console.error('API Error: Request timed out');
+    if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+      console.error('API Error: Static cluster re-evaluating (Render cold start or timeout).');
     }
 
-    // If the server says the token is invalid / expired, fire a global logout event.
-    // AuthContext listens for this event and clears the session — no circular imports needed.
+    // Force logout on genuine authentication failures
     if (error.response?.status === 401) {
       const msg = error.response?.data?.message || '';
-      // Only auto-logout on hard auth failures (not role-mismatch 401s from login attempts)
-      const isAuthFailure =
-        msg.includes('Session expired') ||
-        msg.includes('Invalid token') ||
+      
+      // These messages signify that the session is invalid (not just a permission check)
+      const shouldLogout = 
+        msg.includes('expired') || 
+        msg.includes('invalid') || 
+        msg.includes('no token') ||
         msg.includes('Not authorized') ||
-        msg.includes('no token');
+        msg.includes('failed');
 
-      if (isAuthFailure) {
+      if (shouldLogout) {
         window.dispatchEvent(new CustomEvent('auth:logout', { detail: { reason: msg } }));
       }
     }
@@ -53,15 +66,6 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-// Attach JWT to every request automatically
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 

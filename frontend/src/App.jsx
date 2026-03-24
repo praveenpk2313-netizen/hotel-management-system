@@ -122,16 +122,21 @@ const ProtectedRoute = ({ children, allowedRoles, redirectTo = '/login' }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
 
-  // Wait for localStorage rehydration before deciding
-  if (loading) return null;
+  // Wait for rehydration to finish
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-background">
+       <Loader2 size={40} className="animate-spin text-primary" />
+    </div>
+  );
 
-  // Not logged in → send to login, preserving the state (including bookingData!)
+  // Not logged in → send to login, preserving the state
   if (!user) {
     return <Navigate to={redirectTo} state={{ from: location.pathname, ...location.state }} replace />;
   }
 
-  // Wrong role → send to their own dashboard
+  // Wrong role → redirect to their home
   if (allowedRoles && !allowedRoles.includes(user.role)) {
+    console.warn(`Access denied: User role '${user.role}' not permitted for this route.`);
     return <Navigate to={roleDashboard(user.role)} replace />;
   }
 
@@ -186,11 +191,12 @@ function App() {
           
           {/* Manager Portal */}
           <Route path="/manager">
-            <Route index element={user?.role === 'manager' || user?.role === 'admin' ? <Navigate to="dashboard" replace /> : <ManagerLoginPage />} />
-            <Route path="login" element={user?.role === 'manager' || user?.role === 'admin' ? <Navigate to="dashboard" replace /> : <ManagerLoginPage />} />
-            <Route path="register" element={user?.role === 'manager' || user?.role === 'admin' ? <Navigate to="dashboard" replace /> : <ManagerRegisterPage />} />
+            {/* Index/Login routes: check specific role to avoid manager/admin leakage */}
+            <Route index element={user?.role === 'manager' ? <Navigate to="dashboard" replace /> : <ManagerLoginPage />} />
+            <Route path="login" element={user?.role === 'manager' ? <Navigate to="dashboard" replace /> : <ManagerLoginPage />} />
+            <Route path="register" element={user?.role === 'manager' ? <Navigate to="dashboard" replace /> : <ManagerRegisterPage />} />
             
-            <Route element={<ProtectedRoute allowedRoles={['manager', 'admin']} redirectTo="/manager/login"><ManagerLayout /></ProtectedRoute>}>
+            <Route element={<ProtectedRoute allowedRoles={['manager']} redirectTo="/manager/login"><ManagerLayout /></ProtectedRoute>}>
               <Route path="dashboard" element={<ManagerDashboardPage />} />
               <Route path="hotels" element={<ManagerHotels />} />
               <Route path="add-hotel" element={<AddHotel />} />

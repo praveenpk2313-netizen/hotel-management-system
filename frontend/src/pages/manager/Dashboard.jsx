@@ -34,9 +34,12 @@ const ManagerDashboard = () => {
   const { user } = useAuth();
 
   useEffect(() => {
-    dispatch(getManagerStats());
-    dispatch(getManagerAnalytics());
-  }, [dispatch]);
+    // Only fetch if we have a valid manager/admin session ready
+    if (user && (user.role === 'manager' || user.role === 'admin')) {
+      dispatch(getManagerStats());
+      dispatch(getManagerAnalytics());
+    }
+  }, [dispatch, user]);
 
   const statCards = [
     { title: 'Gross Revenue', value: stats ? formatCurrency(stats.totalRevenue) : '$0', icon: DollarSign, trend: '+12.5%', color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },

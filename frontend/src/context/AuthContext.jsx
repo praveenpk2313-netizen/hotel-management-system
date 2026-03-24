@@ -4,71 +4,62 @@ import { loginSuccess, logout as logoutAction } from '../redux/slices/authSlice'
 
 const AuthContext = createContext();
 
+/**
+ * Rehydrates auth state synchronously from localStorage.
+ * Used during initialization to prevent "flash of unauthenticated" on refresh.
+ */
+const getInitialAuthState = () => {
+  try {
+    const savedUser = localStorage.getItem('user');
+    const savedToken = localStorage.getItem('token');
+    const savedRole = localStorage.getItem('role');
+
+    if (savedUser && savedToken && savedUser !== 'undefined') {
+      const parsed = JSON.parse(savedUser);
+      return { 
+        ...parsed, 
+        token: savedToken, 
+        role: savedRole || parsed.role 
+      };
+    }
+  } catch (err) {
+    console.error('Initial auth rehydration failed:', err);
+  }
+  return null;
+};
+
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(getInitialAuthState);
+  const [loading, setLoading] = useState(false); // Starts as false because we hydrate sync
   const dispatch = useDispatch();
 
-  // 1. Initial rehydration from localStorage
+  // 1. Double-check synchronization with Redux on mount
   useEffect(() => {
-    const initAuth = () => {
-      try {
-        const savedUser = localStorage.getItem('user');
-        const savedToken = localStorage.getItem('token');
-        const savedRole = localStorage.getItem('role');
-
-        if (savedUser && savedToken && savedUser !== 'undefined') {
-          let parsed;
-          try {
-            parsed = JSON.parse(savedUser);
-          } catch (parseErr) {
-            // Only clear the corrupted key — keep the token and role intact
-            console.warn('Corrupted user data in localStorage, clearing only user key');
-            localStorage.removeItem('user');
-            setLoading(false);
-            return;
-          }
-
-          const userData = { ...parsed, token: savedToken, role: savedRole || parsed.role };
-          setUser(userData);
-          dispatch(loginSuccess(userData));
-        }
-      } catch (err) {
-        console.error('Auth rehydration failed:', err);
-        // Only remove individual keys — never use localStorage.clear() which wipes everything
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
-        localStorage.removeItem('role');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    initAuth();
-  }, [dispatch]);
+    if (user) {
+      dispatch(loginSuccess(user));
+    }
+  }, [dispatch]); // Only run on first mount
 
   const login = useCallback((userData) => {
-    // Ensure we start with a clean slate to avoid role leakage
+    // 1. Wipe everything to ensure no cross-role leakage
     localStorage.removeItem('user');
     localStorage.removeItem('token');
     localStorage.removeItem('role');
 
     const { token, role, ...rest } = userData;
-
-    // Include role in the stored user object as a fallback for rehydration
     const userToStore = { ...rest, role };
 
-    // Save to localStorage
+    // 2. Persist to storage immediately (Sync)
     localStorage.setItem('user', JSON.stringify(userToStore));
     localStorage.setItem('token', token);
     localStorage.setItem('role', role || '');
 
-    // Update internal state (include token for in-memory use)
-    const cleanUser = { ...userToStore, token };
-    setUser(cleanUser);
+    // 3. Update Sync context state 
+    const fullUserData = { ...userToStore, token };
+    setUser(fullUserData);
 
-    // Sync with Redux
-    dispatch(loginSuccess(cleanUser));
+    // 4. Update Redux (Sync in RTK)
+    dispatch(loginSuccess(fullUserData));
   }, [dispatch]);
 
   const logout = useCallback(() => {
@@ -77,10 +68,13 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('role');
     setUser(null);
     dispatch(logoutAction());
+    
+    // Explicitly reset other slices if they shouldn't persist
+    dispatch({ type: 'manager/clearManagerData' });
+    dispatch({ type: 'admin/clearAdminData' });
   }, [dispatch]);
 
-  // 2. Listen for global auth failure events emitted by the axios interceptor
-  //    (fired when any API call receives a 401 with an auth-failure message)
+  // Listen for global auth failure events (e.g. from axios 401 interceptor)
   useEffect(() => {
     const handleForcedLogout = (e) => {
       console.warn('Session invalidated by server:', e.detail?.reason);
@@ -105,4 +99,10 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

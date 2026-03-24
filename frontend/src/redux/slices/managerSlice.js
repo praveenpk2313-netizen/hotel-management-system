@@ -30,10 +30,23 @@ const managerSlice = createSlice({
   reducers: {
     clearManagerError: (state) => {
       state.error = null;
+    },
+    clearManagerData: (state) => {
+      state.stats = null;
+      state.analytics = [];
+      state.loading = false;
+      state.error = null;
     }
   },
   extraReducers: (builder) => {
     builder
+      // Force clear stats on logout to prevent cross-account leakage
+      .addCase('auth/logout', (state) => {
+        state.stats = null;
+        state.analytics = [];
+        state.loading = false;
+        state.error = null;
+      })
       .addCase(getManagerStats.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -47,17 +60,16 @@ const managerSlice = createSlice({
         state.error = action.payload?.message || 'Failed to fetch manager stats';
       })
       .addCase(getManagerAnalytics.pending, (state) => {
-        // No loading flag needed — analytics loads independently
+        // Analytics can load in background
       })
       .addCase(getManagerAnalytics.fulfilled, (state, action) => {
         state.analytics = action.payload;
       })
       .addCase(getManagerAnalytics.rejected, (state, action) => {
-        // Analytics failure is non-critical — just log it
         console.warn('Analytics fetch failed:', action.payload?.message);
       });
   },
 });
 
-export const { clearManagerError } = managerSlice.actions;
+export const { clearManagerError, clearManagerData } = managerSlice.actions;
 export default managerSlice.reducer;
