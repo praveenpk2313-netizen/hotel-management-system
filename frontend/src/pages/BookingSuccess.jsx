@@ -53,9 +53,9 @@ const BookingSuccess = () => {
            </div>
 
            <div className="space-y-2">
-              <h1 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight">Your booking is confirmed!</h1>
+              <h1 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight">Payment Successful!</h1>
               <p className="text-gray-500 font-medium">
-                 We've sent a confirmation email to your primary address.
+                 Your booking is confirmed. We've sent a confirmation email to your primary address.
               </p>
            </div>
            
