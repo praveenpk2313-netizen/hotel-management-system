@@ -4,15 +4,16 @@ import {
   Menu, 
   X, 
   HelpCircle, 
-  User, 
   LogOut, 
-  Bell, 
   Briefcase, 
   Globe,
   Settings,
   LayoutDashboard,
   ShieldCheck,
-  Building
+  Building,
+  Plane,
+  Car,
+  Camera
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import NotificationBell from './NotificationBell';
@@ -32,6 +33,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
+    setIsOpen(false);
     navigate('/login');
   };
 
@@ -60,47 +62,27 @@ const Navbar = () => {
                 <button className="flex items-center gap-1 hover:bg-white/10 px-3 py-2 rounded-md transition-colors">
                    <span>INR</span>
                 </button>
-                <button className="flex items-center gap-1 hover:bg-white/10 px-3 py-2 rounded-md transition-colors">
-                   <Globe size={18} />
-                </button>
-                <button className="flex items-center gap-1 hover:bg-white/10 px-3 py-2 rounded-md transition-colors">
+                <div className="w-6 h-4 bg-[url('https://flagcdn.com/in.svg')] bg-cover bg-center rounded-sm" />
+                <button className="flex items-center gap-1 hover:bg-white/10 px-2 py-2 rounded-md transition-colors">
                    <HelpCircle size={18} />
                 </button>
-                <button className="flex items-center gap-1 hover:bg-white/10 px-3 py-2 rounded-md transition-colors text-white font-black">
+                <button className="text-sm font-bold hover:bg-white/10 px-3 py-2 rounded-md transition-colors">
                    List your property
                 </button>
              </div>
 
-             <div className="h-6 w-px bg-white/20 mx-2" />
-
              {user ? (
                <div className="flex items-center gap-4">
                   <NotificationBell />
-                  
-                  {/* Role Specific Shortcuts */}
-                  {user.role === 'admin' && (
-                    <Link to="/admin/dashboard" className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-md text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2">
-                       <ShieldCheck size={14} className="text-primary-booking" /> Admin Shell
-                    </Link>
-                  )}
-                  {user.role === 'manager' && (
-                    <Link to="/manager/dashboard" className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-md text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2">
-                       <Settings size={14} /> Partner Central
-                    </Link>
-                  )}
-
-                  {/* Profile Cluster */}
-                  <div className="flex items-center gap-3 pl-4 border-l border-white/20">
+                  <div className="flex items-center gap-3 pl-4 border-l border-white/20 font-bold">
                      <div className="text-right hidden xl:block">
-                        <p className="text-[10px] font-black uppercase tracking-widest opacity-70">Welcome back</p>
-                        <p className="text-xs font-black truncate max-w-[120px]">{user.name}</p>
+                        <p className="text-xs">{user.name}</p>
                      </div>
                      <button 
                        onClick={handleLogout}
-                       className="w-10 h-10 rounded-lg bg-white/10 hover:bg-rose-500/20 text-white flex items-center justify-center transition-all group"
-                       title="Sign Out"
+                       className="w-10 h-10 rounded bg-white/10 hover:bg-rose-500/20 text-white flex items-center justify-center transition-all group"
                      >
-                        <LogOut size={18} className="group-hover:translate-x-0.5 transition-transform" />
+                        <LogOut size={18} />
                      </button>
                   </div>
                </div>
@@ -108,13 +90,13 @@ const Navbar = () => {
                <div className="flex items-center gap-3">
                   <Link 
                     to="/register" 
-                    className="h-10 px-6 bg-white text-[#006ce4] font-bold rounded-md hover:bg-gray-50 flex items-center justify-center shadow-sm text-sm"
+                    className="nav-btn-white"
                   >
                     Register
                   </Link>
                   <Link 
                     to="/login" 
-                    className="h-10 px-6 bg-white text-[#006ce4] font-bold rounded-md hover:bg-gray-50 flex items-center justify-center shadow-sm text-sm"
+                    className="nav-btn-white"
                   >
                     Sign in
                   </Link>
@@ -131,33 +113,31 @@ const Navbar = () => {
           </button>
         </div>
 
-        {/* Categories Row (Simplified) */}
-        <div className="hidden lg:flex items-center gap-1 font-bold text-sm h-12 border-t border-white/5">
+        {/* Categories Row (Booking.com style) */}
+        <div className="hidden lg:flex items-center gap-2 font-bold text-sm h-14">
            {navLinks.map((link) => (
              <Link 
                key={link.to} 
                to={link.to}
-               className={`h-full px-5 flex items-center gap-3 border-b-2 transition-all group ${
-                 location.pathname === link.to || (link.to === '/' && location.pathname === '/')
-                   ? 'border-white bg-white/10' 
-                   : 'border-transparent hover:bg-white/5'
-               }`}
+               className={location.pathname === link.to ? 'nav-link-capsule-active' : 'nav-link-capsule'}
              >
-                <div className="flex items-center gap-2 opacity-80 group-hover:opacity-100 uppercase tracking-widest text-[10px]">
-                   {link.icon}
-                   {link.name}
-                </div>
+                {link.icon}
+                {link.name}
              </Link>
            ))}
+           <a href="#" className="nav-link-capsule opacity-50 cursor-not-allowed"><Plane size={20} /> Flights</a>
+           <a href="#" className="nav-link-capsule opacity-50 cursor-not-allowed"><Car size={20} /> Car rentals</a>
+           <a href="#" className="nav-link-capsule opacity-50 cursor-not-allowed"><Camera size={20} /> Attractions</a>
+           <a href="#" className="nav-link-capsule opacity-50 cursor-not-allowed hover:bg-transparent">Airport taxis</a>
         </div>
       </div>
 
       {/* Mobile Interaction Engine */}
       <div className={`
-        lg:hidden fixed inset-0 top-[64px] bg-booking-blue/95 backdrop-blur-3xl transition-all duration-500 z-[999]
+        lg:hidden fixed inset-0 top-[64px] bg-booking-blue/98 backdrop-blur-3xl transition-all duration-500 z-[999]
         ${isOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}
       `}>
-        <div className="flex flex-col p-8 space-y-6">
+        <div className="flex flex-col p-8 h-full">
            <div className="space-y-2 mb-10 border-b border-white/10 pb-6">
               <p className="text-[10px] font-black uppercase tracking-widest opacity-60">Directory</p>
               {navLinks.map((link) => (
@@ -172,10 +152,10 @@ const Navbar = () => {
               ))}
            </div>
 
-           <div className="space-y-4">
+           <div className="space-y-6">
               {user ? (
                 <>
-                   <div className="flex items-center gap-4 p-4 bg-white/10 rounded-2xl mb-6">
+                   <div className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl mb-6">
                       <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-xl font-black">
                          {user.name.charAt(0)}
                       </div>
@@ -186,7 +166,7 @@ const Navbar = () => {
                    </div>
                    <button 
                      onClick={handleLogout}
-                     className="w-full h-16 bg-white/10 text-white rounded-2xl font-black tracking-widest flex items-center justify-center gap-3"
+                     className="w-full h-16 bg-white/10 text-white rounded-2xl font-black tracking-widest flex items-center justify-center gap-3 active:scale-95 transition-all"
                    >
                       <LogOut size={20} /> SIGN OUT
                    </button>
