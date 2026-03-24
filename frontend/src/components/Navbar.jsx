@@ -66,7 +66,7 @@ const Navbar = () => {
           <button onClick={scrollToTop} className="hover:text-luxury-gold transition-colors">Home</button>
           <button onClick={() => scrollToSection('about')} className="hover:text-luxury-gold transition-colors">About</button>
           <button onClick={() => scrollToSection('hotels')} className="hover:text-luxury-gold transition-colors">Properties</button>
-          <button className="hover:text-luxury-gold transition-colors">Contact</button>
+          <button onClick={() => scrollToSection('contact')} className="hover:text-luxury-gold transition-colors">Contact</button>
         </div>
 
         {/* Auth & Actions */}

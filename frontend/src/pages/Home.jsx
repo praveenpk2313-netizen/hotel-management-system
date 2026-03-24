@@ -190,21 +190,72 @@ const Home = () => {
       {/* Contact Section */}
       <section id="contact" className="py-40 bg-slate-900 relative overflow-hidden">
          <div className="absolute top-0 right-0 w-1/3 h-full bg-luxury-gold opacity-5 skew-x-12 translate-x-20" />
-         <div className="max-w-7xl mx-auto px-6 text-center relative z-10">
-            <div className="inline-flex p-4 rounded-full bg-white/5 border border-white/10 mb-8">
-               <Globe className="text-luxury-gold" size={24} />
-            </div>
-            <h2 className="text-5xl md:text-7xl font-serif text-white leading-tight mb-8">Let's Plan Your Next <br />Great Escape</h2>
-            <p className="text-slate-400 text-lg max-w-2xl mx-auto mb-16 font-medium">
-               Whether you have questions about a specific property or need assistance with a complex booking, our elite concierge team is ready to assist you.
-            </p>
-            <div className="flex flex-wrap justify-center gap-8">
-                <button className="px-12 py-5 bg-luxury-gold text-white font-black uppercase tracking-widest text-[10px] rounded-full hover:bg-white hover:text-slate-900 transition-all shadow-2xl">
-                   Speak with Concierge
-                </button>
-                <button className="px-12 py-5 border border-white/20 text-white font-black uppercase tracking-widest text-[10px] rounded-full hover:bg-white/10 transition-all">
-                   Contact Support
-                </button>
+         <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-white/5 blur-[120px] rounded-full -translate-x-1/2 translate-y-1/2" />
+         
+         <div className="max-w-7xl mx-auto px-6 relative z-10">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-start">
+               <div className="text-left">
+                  <div className="inline-flex p-4 rounded-2xl bg-white/5 border border-white/10 mb-8">
+                     <Globe className="text-luxury-gold" size={32} />
+                  </div>
+                  <h2 className="text-5xl md:text-7xl font-serif text-white leading-tight mb-8">Let's Design Your <br />Perfect Escape</h2>
+                  <p className="text-slate-400 text-lg max-w-xl mb-12 font-medium leading-relaxed">
+                     Our personal concierges are available 24/7 to curate your unique stay. 
+                     From historic suites to modern penthouses, your sanctuary awaits.
+                  </p>
+                  
+                  <div className="space-y-10">
+                     <div className="flex items-center gap-6 group cursor-pointer">
+                        <div className="w-14 h-14 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-luxury-gold group-hover:border-luxury-gold transition-all duration-500 text-white">
+                           <Globe size={20} />
+                        </div>
+                        <div>
+                           <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Global Headquarters</p>
+                           <p className="text-white font-serif text-xl tracking-wide">12th Ave, Mayfair, London, UK</p>
+                        </div>
+                     </div>
+                     <div className="flex items-center gap-6 group cursor-pointer">
+                        <div className="w-14 h-14 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-luxury-gold group-hover:border-luxury-gold transition-all duration-500 text-white">
+                           <Sparkles size={20} />
+                        </div>
+                        <div>
+                           <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Direct Assistance</p>
+                           <p className="text-white font-serif text-xl tracking-wide">+44 20 7946 0123 / stay@urbanstay.com</p>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+
+               <div className="bg-white/5 backdrop-blur-3xl p-10 md:p-14 rounded-[3rem] border border-white/10 shadow-2xl">
+                  <form className="space-y-8">
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="space-y-3">
+                           <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Full Name</label>
+                           <input type="text" placeholder="John Doe" className="w-full h-14 bg-white/5 border border-white/10 rounded-xl px-5 text-white placeholder:text-white/20 outline-none focus:border-luxury-gold transition-colors font-sans font-bold" />
+                        </div>
+                        <div className="space-y-3">
+                           <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Email</label>
+                           <input type="email" placeholder="john@sanctuary.com" className="w-full h-14 bg-white/5 border border-white/10 rounded-xl px-5 text-white placeholder:text-white/20 outline-none focus:border-luxury-gold transition-colors font-sans font-bold" />
+                        </div>
+                     </div>
+                     <div className="space-y-3">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Inquiry Type</label>
+                        <select className="w-full h-14 bg-white/5 border border-white/10 rounded-xl px-5 text-white outline-none focus:border-luxury-gold transition-colors font-sans font-black uppercase text-xs appearance-none cursor-pointer">
+                           <option>General Concierge</option>
+                           <option>Booking Request</option>
+                           <option>VIP Experiences</option>
+                           <option>Event Planning</option>
+                        </select>
+                     </div>
+                     <div className="space-y-3">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Message</label>
+                        <textarea placeholder="Describe your dream stay..." rows="4" className="w-full bg-white/5 border border-white/10 rounded-xl p-5 text-white placeholder:text-white/20 outline-none focus:border-luxury-gold transition-colors font-sans font-bold"></textarea>
+                     </div>
+                     <button type="submit" className="w-full h-16 bg-luxury-gold text-white font-black uppercase tracking-[0.2em] text-xs rounded-xl hover:bg-white hover:text-slate-900 transition-all shadow-xl shadow-luxury-gold/20">
+                        Inquire Now
+                     </button>
+                  </form>
+               </div>
             </div>
          </div>
       </section>
