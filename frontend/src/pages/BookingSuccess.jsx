@@ -15,6 +15,7 @@ const BookingSuccess = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { booking } = location.state || {};
+  const emailSent = booking?.emailSent === true;
 
   useEffect(() => {
     // Redirect if direct access without booking data
@@ -48,8 +49,10 @@ const BookingSuccess = () => {
           </div>
           <h1 className="luxury-font" style={{ fontSize: '3.5rem', color: '#0f172a', marginBottom: '1rem' }}>Booking Confirmed!</h1>
           <p style={{ color: '#64748b', fontSize: '1.2rem', maxWidth: '600px', margin: '0 auto' }}>
-            Your reservation at <strong>{booking.hotelName}</strong> is verified. 
-            A professional confirmation invoice has been dispatched to your registered email.
+            Your reservation at <strong>{booking.hotelName}</strong> is verified and ready.
+            {emailSent
+              ? ' A confirmation invoice has been dispatched to your registered email.'
+              : ' Check your booking details below.'}
           </p>
         </div>
 
@@ -116,16 +119,18 @@ const BookingSuccess = () => {
             <div style={{ 
               marginTop: '3rem', 
               padding: '1.5rem', 
-              background: 'rgba(16, 185, 129, 0.05)', 
+              background: emailSent ? 'rgba(16, 185, 129, 0.05)' : 'rgba(245, 158, 11, 0.05)', 
               borderRadius: '20px', 
-              border: '1px solid rgba(16, 185, 129, 0.1)',
+              border: `1px solid ${emailSent ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.15)'}`,
               display: 'flex',
               alignItems: 'center',
               gap: '1rem'
             }}>
-               <Mail size={24} color="#10b981" />
-               <p style={{ margin: 0, color: '#065f46', fontSize: '0.95rem' }}>
-                 A confirmation email has been sent to your inbox. Please check your spam folder if you don't see it within 5 minutes.
+               <Mail size={24} color={emailSent ? '#10b981' : '#f59e0b'} />
+               <p style={{ margin: 0, color: emailSent ? '#065f46' : '#92400e', fontSize: '0.95rem' }}>
+                 {emailSent
+                   ? 'A confirmation email with your invoice has been sent to your inbox. Please check your spam folder if you don\'t see it within 5 minutes.'
+                   : 'Your booking is confirmed. Email delivery is pending or temporarily unavailable — your booking details are saved and you can view them in your dashboard.'}
                </p>
             </div>
           </div>
