@@ -4,6 +4,23 @@ import axios from 'axios';
 
 export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
+/**
+ * Returns a human-readable error message from an axios error.
+ * Correctly distinguishes between:
+ *   - Timeout (ECONNABORTED) — server is waking up (Render free tier)
+ *   - Network error (no response) — backend unreachable
+ *   - HTTP error — actual server response with a message
+ */
+export const getApiErrorMessage = (err, fallback = 'Something went wrong. Please try again.') => {
+  if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
+    return 'Our server is waking up — this can take up to 30 seconds on the first request. Please wait a moment and try again.';
+  }
+  if (!err.response) {
+    return 'Cannot connect to the server. Please check your internet connection and try again.';
+  }
+  return err.response?.data?.message || fallback;
+};
+
 const api = axios.create({
   baseURL: `${API_BASE_URL}/api`,
   timeout: 30000, // 30 seconds — Render free-tier cold starts can take 15-20s

@@ -39,6 +39,64 @@ import VerifyEmail from './pages/VerifyEmail';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import BookingSuccess from './pages/BookingSuccess';
+import api from './services/api';
+import { useState, useEffect } from 'react';
+
+// ─── Server Wake-Up Banner ─────────────────────────────────────────────────────
+// Render free tier spins down after 15 min. This pings the backend on first load
+// and shows a friendly banner while it's waking up.
+
+const ServerWakeUpBanner = () => {
+  const [status, setStatus] = useState('checking'); // checking | ready | error
+
+  useEffect(() => {
+    let cancelled = false;
+    const check = async () => {
+      try {
+        await api.get('/health', { timeout: 40000 });
+        if (!cancelled) setStatus('ready');
+      } catch {
+        if (!cancelled) setStatus('error');
+      }
+    };
+    check();
+    return () => { cancelled = true; };
+  }, []);
+
+  if (status === 'ready') return null;
+
+  return (
+    <div style={{
+      position: 'fixed',
+      bottom: '1.5rem',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      zIndex: 9999,
+      background: status === 'error' ? '#fef2f2' : '#fffbeb',
+      border: `1px solid ${status === 'error' ? '#fecaca' : '#fde68a'}`,
+      color: status === 'error' ? '#b91c1c' : '#92400e',
+      padding: '0.75rem 1.5rem',
+      borderRadius: '50px',
+      fontSize: '0.85rem',
+      fontWeight: '600',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.75rem',
+      boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+      whiteSpace: 'nowrap',
+      animation: 'slideUpFade 0.4s ease-out'
+    }}>
+      {status === 'checking' ? (
+        <>
+          <span style={{ display: 'inline-block', width: '14px', height: '14px', border: '2px solid #f59e0b', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+          Server warming up — first request may take up to 30 seconds&hellip;
+        </>
+      ) : (
+        <>⚠️ Server connection issue — please refresh the page</>
+      )}
+    </div>
+  );
+};
 
 // ─── Role → dashboard mapping ────────────────────────────────────────────────
 
@@ -95,6 +153,7 @@ function App() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <ServerWakeUpBanner />
       {!isDashboard && <Navbar />}
 
       <main style={{ flexGrow: 1 }}>

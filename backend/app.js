@@ -81,6 +81,12 @@ app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
+// Health check — used by the frontend to detect if the server has woken up
+// (Render free tier spins down after inactivity; this endpoint resolves the cold start)
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 app.get('/auth/google', (req, res, next) => {
   const from = req.query.from || '';
   const state = from ? Buffer.from(JSON.stringify({ from })).toString('base64') : undefined;

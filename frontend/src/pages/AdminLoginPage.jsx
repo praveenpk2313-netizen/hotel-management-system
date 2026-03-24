@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useDispatch } from 'react-redux';
 import { loginStart, loginFailure } from '../redux/slices/authSlice';
 import { AlertCircle, CheckCircle2, Eye, EyeOff, Github, X } from 'lucide-react';
-import api from '../services/api';
+import api, { getApiErrorMessage } from '../services/api';
 
 const AdminLoginPage = () => {
   const [email,    setEmail]    = useState('');
@@ -81,7 +81,7 @@ const AdminLoginPage = () => {
       login(data);
       navigate('/admin/dashboard');
     } catch (err) {
-      const msg = err.response?.data?.message || 'Login failed. Please check your credentials.';
+      const msg = getApiErrorMessage(err, 'Login failed. Please check your credentials.');
       setError(msg);
       dispatch(loginFailure(msg));
     } finally {

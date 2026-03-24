@@ -3,8 +3,8 @@ import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-do
 import { useAuth } from '../context/AuthContext';
 import { useDispatch } from 'react-redux';
 import { loginStart, loginFailure } from '../redux/slices/authSlice';
-import { AlertCircle, Eye, EyeOff, Mail, Lock, ShieldCheck } from 'lucide-react';
-import api, { API_BASE_URL } from '../services/api';
+import { AlertCircle, Eye, EyeOff, Mail, Lock, Loader2 } from 'lucide-react';
+import api, { API_BASE_URL, getApiErrorMessage } from '../services/api';
 
 const Login = () => {
   const [email,       setEmail]       = useState('');
@@ -73,7 +73,7 @@ const Login = () => {
       );
       navigate(from, { state: location.state, replace: true });
     } catch (err) {
-      const msg = err.response?.data?.message || 'Login failed. Please check your credentials.';
+      const msg = getApiErrorMessage(err, 'Login failed. Please check your credentials.');
       setError(msg);
       dispatch(loginFailure(msg));
     } finally {
@@ -176,8 +176,8 @@ const Login = () => {
                 </div>
              </div>
 
-             <button type="submit" disabled={loading} className="clean-submit">
-                {loading ? 'Authenticating...' : 'Sign In To Account'}
+             <button type="submit" disabled={loading} className="clean-submit" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem' }}>
+                {loading ? <><Loader2 size={20} className="spin-icon" /> Authenticating...</> : 'Sign In To Account'}
              </button>
           </form>
 
