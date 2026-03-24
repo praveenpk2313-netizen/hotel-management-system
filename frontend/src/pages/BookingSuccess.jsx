@@ -11,7 +11,15 @@ import {
   Users,
   CreditCard,
   Copy,
-  ExternalLink
+  ExternalLink,
+  Sparkles,
+  Award,
+  Zap,
+  ShieldCheck,
+  Globe,
+  Star,
+  ArrowUpRight,
+  History
 } from 'lucide-react';
 import { formatCurrency, formatDate } from '../utils/helpers';
 
@@ -38,494 +46,184 @@ const BookingSuccess = () => {
   };
 
   return (
-    <div className="bsuccess animate-fade">
-      <div className="bsuccess__container">
+    <div className="bg-background-light min-h-screen pb-24 pt-12 px-4 md:px-0 relative overflow-hidden">
+      
+      {/* Background Ambience */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[600px] bg-primary/5 rounded-full blur-[120px] -mt-40 -z-10" />
+      
+      <div className="max-w-4xl mx-auto space-y-12 animate-fade-in">
         
-        {/* ── Success Hero ────────────────────────────────────────── */}
-        <div className="bsuccess__hero">
-          <div className="bsuccess__check-ring">
-            <div className="bsuccess__check-inner">
-              <CheckCircle size={48} color="#059669" strokeWidth={2.5} />
-            </div>
-          </div>
-          <h1 className="bsuccess__heading">Booking Confirmed!</h1>
-          <p className="bsuccess__subheading">
-            Your reservation at <strong>{booking.hotelName}</strong> is confirmed.
-            {emailSent
-              ? ' A confirmation has been sent to your email.'
-              : ' You can view details in your dashboard.'}
-          </p>
-        </div>
-
-        {/* ── Main Card ───────────────────────────────────────────── */}
-        <div className="bsuccess__card">
-
-          {/* Booking ID Bar */}
-          <div className="bsuccess__id-bar">
-            <div className="bsuccess__id-left">
-              <span className="bsuccess__id-label">Booking Reference</span>
-              <span className="bsuccess__id-value">#{bookingRef}</span>
-            </div>
-            <button className="bsuccess__copy-btn" onClick={copyBookingId} title="Copy ID">
-              <Copy size={16} /> Copy
-            </button>
-          </div>
-
-          {/* Card Content */}
-          <div className="bsuccess__body">
-            <div className="bsuccess__grid">
-              
-              {/* Left: Hotel Info */}
-              <div className="bsuccess__info-section">
-                <div className="bsuccess__section-header">
-                  <Hotel size={20} color="var(--primary)" />
-                  <h3>Property Details</h3>
-                </div>
-                <div className="bsuccess__hotel-name">{booking.hotelName}</div>
-                <div className="bsuccess__hotel-location">
-                  <MapPin size={15} /> {booking.location}
-                </div>
-                <div className="bsuccess__room-badge">{booking.roomType}</div>
+        {/* Celebratory Hero */}
+        <div className="text-center space-y-8 py-10">
+           <div className="relative inline-block">
+              <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping opacity-20" />
+              <div className="relative w-32 h-32 bg-white rounded-[3rem] shadow-premium flex items-center justify-center text-primary border-4 border-white transform rotate-3 animate-slide-up">
+                 <CheckCircle size={56} strokeWidth={1.5} className="animate-bounce-slow" />
               </div>
-
-              {/* Right: Stay Summary */}
-              <div className="bsuccess__summary-section">
-                {/* Dates */}
-                <div className="bsuccess__detail-block">
-                  <div className="bsuccess__detail-row">
-                    <div className="bsuccess__detail-icon"><Calendar size={16} /></div>
-                    <div>
-                      <div className="bsuccess__detail-label">Check-in</div>
-                      <div className="bsuccess__detail-value">{formatDate(booking.checkInDate)}</div>
-                    </div>
-                  </div>
-                  <div className="bsuccess__detail-arrow">→</div>
-                  <div className="bsuccess__detail-row">
-                    <div className="bsuccess__detail-icon"><Calendar size={16} /></div>
-                    <div>
-                      <div className="bsuccess__detail-label">Check-out</div>
-                      <div className="bsuccess__detail-value">{formatDate(booking.checkOutDate)}</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bsuccess__divider"></div>
-
-                {/* Duration & Price */}
-                <div className="bsuccess__meta-row">
-                  <div className="bsuccess__meta-item">
-                    <Clock size={16} />
-                    <span>{nights} Night{nights > 1 ? 's' : ''}</span>
-                  </div>
-                  <div className="bsuccess__meta-item">
-                    <Users size={16} />
-                    <span>{booking.numGuests || 1} Guest{(booking.numGuests || 1) > 1 ? 's' : ''}</span>
-                  </div>
-                </div>
-
-                <div className="bsuccess__divider"></div>
-
-                {/* Total */}
-                <div className="bsuccess__total-row">
-                  <span className="bsuccess__total-label">Amount Paid</span>
-                  <span className="bsuccess__total-value">{formatCurrency(booking.totalPrice)}</span>
-                </div>
+              <div className="absolute -top-4 -right-4 w-12 h-12 bg-secondary-dark rounded-2xl flex items-center justify-center text-primary shadow-xl animate-bounce-slow delay-300">
+                 <Sparkles size={24} />
               </div>
-            </div>
+           </div>
 
-            {/* Email Alert */}
-            <div className={`bsuccess__alert ${emailSent ? 'bsuccess__alert--success' : 'bsuccess__alert--warning'}`}>
-              <Mail size={20} />
-              <p>
-                {emailSent
-                  ? 'A confirmation email with your invoice has been sent. Check your spam folder if you don\'t see it within 5 minutes.'
-                  : 'Your booking is confirmed. Email delivery is pending — your details are saved and accessible from your dashboard.'}
+           <div className="space-y-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 rounded-full text-emerald-600 font-black text-[10px] uppercase tracking-[3px]">
+                 <ShieldCheck size={14} /> Journey Confirmed
+              </div>
+              <h1 className="text-5xl md:text-7xl font-serif text-secondary-dark font-black tracking-tight leading-none">
+                 Heritage <span className="text-primary italic">Secured</span>
+              </h1>
+              <p className="text-gray-400 font-medium text-lg max-w-lg mx-auto leading-relaxed">
+                 Your official covenant with <span className="text-secondary-dark font-bold underline decoration-primary/30">{booking.hotelName}</span> is now active in the global ledger.
               </p>
-            </div>
-          </div>
+           </div>
         </div>
 
-        {/* ── Actions ─────────────────────────────────────────────── */}
-        <div className="bsuccess__actions">
-          <button 
-            onClick={() => navigate('/customer/dashboard')}
-            className="bsuccess__btn bsuccess__btn--primary"
-          >
-            View My Bookings <ArrowRight size={18} />
-          </button>
-          <Link to="/hotels" className="bsuccess__btn bsuccess__btn--secondary">
-            <ExternalLink size={18} /> Browse More Hotels
-          </Link>
+        {/* Global Confirmation Terminal */}
+        <div className="bg-white rounded-[4rem] border border-gray-100 shadow-premium overflow-hidden group">
+           
+           {/* Terminal Header: ID Bar */}
+           <div className="bg-secondary-dark p-8 md:p-10 flex flex-col md:flex-row justify-between items-center gap-8 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-32 -mt-32 blur-3xl opacity-50" />
+              
+              <div className="flex items-center gap-6 relative z-10">
+                 <div className="w-14 h-14 bg-white/5 rounded-2xl border border-white/10 flex items-center justify-center text-primary">
+                    <Zap size={24} />
+                 </div>
+                 <div>
+                    <p className="text-[10px] font-black text-gray-500 uppercase tracking-[4px]">Booking Reference</p>
+                    <p className="text-2xl font-black text-white italic font-serif tracking-widest uppercase">#{bookingRef}</p>
+                 </div>
+              </div>
+
+              <div className="flex items-center gap-4 relative z-10">
+                 <button onClick={copyBookingId} className="h-12 px-6 bg-white/5 border border-white/10 rounded-xl text-white font-black text-[10px] uppercase tracking-widest hover:bg-white hover:text-secondary-dark transition-all flex items-center gap-2">
+                    <Copy size={14} /> Copy Reference
+                 </button>
+                 <div className="w-px h-8 bg-white/10 hidden md:block" />
+                 <div className="flex items-center gap-2">
+                    <Globe size={18} className="text-primary" />
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Global Register</span>
+                 </div>
+              </div>
+           </div>
+
+           {/* Terminal Body */}
+           <div className="p-10 md:p-16 space-y-16">
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+                 
+                 {/* Property Manifest */}
+                 <div className="space-y-8">
+                    <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[4px] flex items-center gap-3">
+                       <Hotel size={16} className="text-primary" /> Property Manifest
+                    </h3>
+                    <div className="space-y-6">
+                       <div className="space-y-2">
+                          <h4 className="text-3xl font-serif text-secondary-dark font-black tracking-tight group-hover:text-primary transition-colors">
+                             {booking.hotelName}
+                          </h4>
+                          <p className="text-gray-400 font-bold text-sm flex items-center gap-2 uppercase tracking-widest">
+                             <MapPin size={16} className="text-primary" /> {booking.location}
+                          </p>
+                       </div>
+                       <div className="inline-flex items-center gap-3 px-6 py-3 bg-primary/5 rounded-2xl border border-primary/10 text-primary font-black text-[10px] uppercase tracking-[2px]">
+                          <Award size={14} /> {booking.roomType}
+                       </div>
+                    </div>
+                 </div>
+
+                 {/* Stay Intelligence */}
+                 <div className="bg-gray-50 p-10 rounded-[3rem] border border-gray-100 flex flex-col justify-center space-y-8 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-8 opacity-5">
+                       <Star size={120} className="text-secondary-dark" />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                       <div className="space-y-1">
+                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Arrival</p>
+                          <p className="text-sm font-bold text-secondary-dark uppercase tracking-tight">{formatDate(booking.checkInDate)}</p>
+                       </div>
+                       <ArrowRight size={24} className="text-primary opacity-30" />
+                       <div className="space-y-1 text-right">
+                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Departure</p>
+                          <p className="text-sm font-bold text-secondary-dark uppercase tracking-tight">{formatDate(booking.checkOutDate)}</p>
+                       </div>
+                    </div>
+
+                    <div className="pt-8 border-t border-gray-200 flex justify-between items-center">
+                       <div className="flex items-center gap-6">
+                          <div className="flex flex-col">
+                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Span</p>
+                             <p className="text-lg font-black text-secondary-dark italic font-serif leading-none tracking-tighter">{nights} Nights</p>
+                          </div>
+                          <div className="w-px h-6 bg-gray-200" />
+                          <div className="flex flex-col">
+                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Party</p>
+                             <p className="text-lg font-black text-secondary-dark italic font-serif leading-none tracking-tighter">{booking.numGuests || 1} Guests</p>
+                          </div>
+                       </div>
+                       <div className="text-right">
+                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Settlement</p>
+                          <p className="text-2xl font-black text-primary italic font-serif tracking-tighter leading-none">{formatCurrency(booking.totalPrice)}</p>
+                       </div>
+                    </div>
+                 </div>
+              </div>
+
+              {/* Courier Status */}
+              <div className={`p-8 rounded-[2.5rem] border flex flex-col md:flex-row items-center gap-8 ${
+                 emailSent 
+                 ? 'bg-emerald-50 border-emerald-100 text-emerald-700' 
+                 : 'bg-amber-50 border-amber-100 text-amber-700'
+              }`}>
+                 <div className={`w-16 h-16 bg-white rounded-[1.5rem] flex items-center justify-center shadow-sm border ${
+                    emailSent ? 'text-emerald-500 border-emerald-100' : 'text-amber-500 border-amber-100'
+                 }`}>
+                    <Mail size={32} />
+                 </div>
+                 <div className="space-y-1 flex-1 text-center md:text-left">
+                    <h4 className="text-[10px] font-black uppercase tracking-[3px]">Official Digital Courier</h4>
+                    <p className="text-sm font-medium leading-relaxed">
+                       {emailSent
+                         ? 'A high-fidelity confirmation and fiscal invoice have been synchronized with your primary inbox. Check your priority folders.'
+                         : 'Covenant confirmed. Digital courier is presently synchronizing with the mail server. You can view all heritage records in your archive.'}
+                    </p>
+                 </div>
+                 {emailSent && <CheckCircle className="text-emerald-500 ml-auto hidden md:block" size={24} />}
+              </div>
+           </div>
+        </div>
+
+        {/* Operational Actions */}
+        <div className="flex flex-col md:flex-row justify-center items-center gap-6 animate-slide-up delay-700">
+           <button 
+             onClick={() => navigate('/customer/dashboard')}
+             className="w-full md:w-auto px-12 h-18 bg-secondary-dark text-white font-black rounded-2xl shadow-xl shadow-secondary/20 hover:bg-primary transition-all flex items-center justify-center gap-4 uppercase tracking-[3px] text-xs group"
+           >
+              Manage Journey <History size={20} className="text-primary group-hover:text-white transition-colors" />
+           </button>
+           <Link 
+             to="/hotels" 
+             className="w-full md:w-auto px-12 h-18 bg-white border-2 border-dashed border-gray-200 text-secondary-dark font-black rounded-2xl hover:border-primary hover:text-primary transition-all flex items-center justify-center gap-4 uppercase tracking-[3px] text-xs group"
+           >
+              Continue Exploring <ExternalLink size={20} className="text-primary group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+           </Link>
         </div>
 
       </div>
 
-      <style>{successStyles}</style>
+      <style>{`
+        @keyframes fade-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fade-in 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes slide-up { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-slide-up { animation: slide-up 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes bounce-slow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .animate-bounce-slow { animation: bounce-slow 4s ease-in-out infinite; }
+        @keyframes check-bounce { 0% { transform: scale(0); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        .animate-check-bounce { animation: check-bounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+      `}</style>
     </div>
   );
 };
-
-const successStyles = `
-  /* ── Page ───────────────────────────────────────────────────────────────── */
-  .bsuccess {
-    background: #f7f7f7;
-    min-height: 100vh;
-    padding: 3rem 1rem 5rem;
-  }
-  .bsuccess__container {
-    max-width: 780px;
-    margin: 0 auto;
-  }
-
-  /* ── Hero ───────────────────────────────────────────────────────────────── */
-  .bsuccess__hero {
-    text-align: center;
-    margin-bottom: 2.5rem;
-  }
-  .bsuccess__check-ring {
-    width: 96px;
-    height: 96px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 1.5rem;
-    animation: checkPulse 2s ease-in-out infinite;
-  }
-  @keyframes checkPulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.15); }
-    50% { box-shadow: 0 0 0 16px rgba(5, 150, 105, 0); }
-  }
-  .bsuccess__check-inner {
-    animation: checkBounce 0.6s ease-out;
-  }
-  @keyframes checkBounce {
-    0% { transform: scale(0); }
-    50% { transform: scale(1.2); }
-    100% { transform: scale(1); }
-  }
-  .bsuccess__heading {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: #0f172a;
-    margin: 0 0 0.75rem 0;
-    font-family: 'Playfair Display', serif;
-  }
-  .bsuccess__subheading {
-    color: #6b7280;
-    font-size: 1.05rem;
-    max-width: 520px;
-    margin: 0 auto;
-    line-height: 1.6;
-  }
-
-  /* ── Card ───────────────────────────────────────────────────────────────── */
-  .bsuccess__card {
-    background: white;
-    border-radius: 20px;
-    border: 1px solid #e5e7eb;
-    overflow: hidden;
-    margin-bottom: 2rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-  }
-
-  /* ── ID Bar ────────────────────────────────────────────────────────────── */
-  .bsuccess__id-bar {
-    background: #0f172a;
-    color: white;
-    padding: 16px 28px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .bsuccess__id-left {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-  .bsuccess__id-label {
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #94a3b8;
-  }
-  .bsuccess__id-value {
-    font-size: 1rem;
-    font-weight: 700;
-    font-family: 'SF Mono', 'Fira Code', monospace;
-  }
-  .bsuccess__copy-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: white;
-    padding: 6px 14px;
-    border-radius: 8px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s;
-    font-family: 'Outfit', sans-serif;
-  }
-  .bsuccess__copy-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-  }
-
-  /* ── Body ───────────────────────────────────────────────────────────────── */
-  .bsuccess__body {
-    padding: 32px 28px;
-  }
-
-  /* ── Grid ───────────────────────────────────────────────────────────────── */
-  .bsuccess__grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 32px;
-  }
-
-  /* ── Info Section ──────────────────────────────────────────────────────── */
-  .bsuccess__section-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 16px;
-  }
-  .bsuccess__section-header h3 {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #0f172a;
-    margin: 0;
-    font-family: 'Playfair Display', serif;
-  }
-  .bsuccess__hotel-name {
-    font-size: 1.15rem;
-    font-weight: 800;
-    color: #0f172a;
-    margin-bottom: 6px;
-  }
-  .bsuccess__hotel-location {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 0.88rem;
-    color: #6b7280;
-    margin-bottom: 14px;
-  }
-  .bsuccess__room-badge {
-    display: inline-block;
-    background: rgba(197, 160, 89, 0.1);
-    color: var(--primary);
-    padding: 6px 16px;
-    border-radius: 8px;
-    font-size: 0.82rem;
-    font-weight: 700;
-  }
-
-  /* ── Summary Section ───────────────────────────────────────────────────── */
-  .bsuccess__summary-section {
-    background: #f9fafb;
-    padding: 24px;
-    border-radius: 16px;
-  }
-  .bsuccess__detail-block {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .bsuccess__detail-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex: 1;
-  }
-  .bsuccess__detail-icon {
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
-    background: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--primary);
-    flex-shrink: 0;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-  }
-  .bsuccess__detail-label {
-    font-size: 0.65rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: #9ca3af;
-    margin-bottom: 1px;
-  }
-  .bsuccess__detail-value {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #0f172a;
-  }
-  .bsuccess__detail-arrow {
-    color: #d1d5db;
-    font-size: 1.2rem;
-    flex-shrink: 0;
-  }
-
-  .bsuccess__divider {
-    height: 1px;
-    background: #e5e7eb;
-    margin: 16px 0;
-  }
-
-  .bsuccess__meta-row {
-    display: flex;
-    gap: 24px;
-  }
-  .bsuccess__meta-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.88rem;
-    font-weight: 600;
-    color: #4b5563;
-  }
-  .bsuccess__meta-item svg {
-    color: #9ca3af;
-  }
-
-  .bsuccess__total-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .bsuccess__total-label {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #6b7280;
-  }
-  .bsuccess__total-value {
-    font-size: 1.35rem;
-    font-weight: 900;
-    color: #0f172a;
-  }
-
-  /* ── Alert ──────────────────────────────────────────────────────────────── */
-  .bsuccess__alert {
-    margin-top: 28px;
-    padding: 16px 20px;
-    border-radius: 14px;
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-  }
-  .bsuccess__alert svg {
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-  .bsuccess__alert p {
-    margin: 0;
-    font-size: 0.88rem;
-    line-height: 1.5;
-  }
-  .bsuccess__alert--success {
-    background: #ecfdf5;
-    border: 1px solid #a7f3d0;
-    color: #065f46;
-  }
-  .bsuccess__alert--success svg {
-    color: #059669;
-  }
-  .bsuccess__alert--warning {
-    background: #fffbeb;
-    border: 1px solid #fde68a;
-    color: #92400e;
-  }
-  .bsuccess__alert--warning svg {
-    color: #f59e0b;
-  }
-
-  /* ── Actions ───────────────────────────────────────────────────────────── */
-  .bsuccess__actions {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-  .bsuccess__btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 16px 28px;
-    border-radius: 14px;
-    font-weight: 700;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: 'Outfit', sans-serif;
-    text-decoration: none;
-    border: none;
-  }
-  .bsuccess__btn--primary {
-    background: linear-gradient(135deg, #c5a059 0%, #d4b06a 50%, #c5a059 100%);
-    background-size: 200% auto;
-    color: white;
-    box-shadow: 0 4px 16px rgba(197, 160, 89, 0.35);
-  }
-  .bsuccess__btn--primary:hover {
-    background-position: right center;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(197, 160, 89, 0.45);
-  }
-  .bsuccess__btn--secondary {
-    background: white;
-    color: #0f172a;
-    border: 1px solid #e5e7eb;
-  }
-  .bsuccess__btn--secondary:hover {
-    background: #f9fafb;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-  }
-
-  /* ── Responsive ────────────────────────────────────────────────────────── */
-  @media (max-width: 768px) {
-    .bsuccess {
-      padding: 2rem 1rem 4rem;
-    }
-    .bsuccess__heading {
-      font-size: 2rem;
-    }
-    .bsuccess__grid {
-      grid-template-columns: 1fr;
-      gap: 24px;
-    }
-    .bsuccess__id-bar {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 16px 20px;
-    }
-    .bsuccess__body {
-      padding: 24px 20px;
-    }
-    .bsuccess__detail-block {
-      flex-direction: column;
-      align-items: stretch;
-    }
-    .bsuccess__detail-arrow {
-      text-align: center;
-      transform: rotate(90deg);
-    }
-    .bsuccess__actions {
-      flex-direction: column;
-    }
-    .bsuccess__btn {
-      justify-content: center;
-      width: 100%;
-    }
-  }
-`;
 
 export default BookingSuccess;

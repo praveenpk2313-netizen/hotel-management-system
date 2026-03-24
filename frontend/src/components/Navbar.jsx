@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, Menu, X } from 'lucide-react';
+import { LogOut, Menu, X, Bell, User, Layout, History, MapPin, Sparkles, ShieldCheck, ChevronDown } from 'lucide-react';
 import NotificationBell from './NotificationBell';
 
 const Navbar = () => {
@@ -9,10 +9,18 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
+    setIsMenuOpen(false);
   };
 
   const isHome = location.pathname === '/';
@@ -30,102 +38,184 @@ const Navbar = () => {
   };
 
   return (
-    <nav style={{ 
-      background: '#ffffff', 
-      padding: '1.2rem 4%', 
-      display: 'flex', 
-      justifyContent: 'space-between', 
-      alignItems: 'center',
-      position: 'sticky',
-      top: 0,
-      zIndex: 1000,
-      boxShadow: '0 4px 12px rgba(0,0,0,0.02)',
-      backdropFilter: 'blur(10px)'
-    }}>
-      {/* Logo */}
-      <Link to="/" style={{ 
-        display: 'flex', alignItems: 'center', gap: '0.75rem',
-        fontSize: '1.8rem', fontWeight: '800', color: '#0f172a', textDecoration: 'none',
-        fontFamily: '"Playfair Display", serif', fontStyle: 'italic',
-      }}>
-        <img src="/logo.png" alt="StayNow Logo" style={{ width: '40px', height: '40px', objectFit: 'contain', borderRadius: '10px' }} />
-        StayNow
-      </Link>
+    <nav className={`fixed top-0 inset-x-0 z-[1000] transition-all duration-500 px-4 md:px-10 py-4 ${
+      scrolled ? 'bg-white/80 backdrop-blur-xl shadow-premium py-3' : 'bg-transparent py-6'
+    }`}>
+      <div className="max-w-7xl mx-auto flex justify-between items-center bg-white/10 backdrop-blur-md rounded-[2.5rem] border border-white/20 p-2 md:p-3 shadow-2xl relative overflow-hidden group">
+        
+        {/* Navigation Decoration */}
+        {scrolled && <div className="absolute inset-0 bg-white opacity-95 transition-opacity" />}
+        
+        {/* Logo Section */}
+        <Link to="/" className="flex items-center gap-4 group/logo relative z-10 pl-4 py-2">
+          <div className="w-12 h-12 bg-secondary-dark rounded-2xl flex items-center justify-center p-2 group-hover/logo:rotate-12 transition-transform shadow-lg">
+             <img src="/logo.png" className="w-[32px] h-[32px] object-contain" alt="PK UrbanStay" />
+          </div>
+          <div className="hidden sm:block">
+             <h2 className={`text-2xl font-serif font-black italic tracking-tight leading-none transition-colors ${scrolled ? 'text-secondary-dark' : 'text-white'}`}>
+                PK UrbanStay
+             </h2>
+             <p className="text-[9px] font-black text-primary uppercase tracking-[3px] mt-1">Heritage Hospitality</p>
+          </div>
+        </Link>
 
-      {/* Center Links (Desktop) */}
-      <div className="desktop-menu" style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
-        <button onClick={() => scrollToSection('home')} className="nav-btn-link">Home</button>
-        <button onClick={() => scrollToSection('hotels')} className="nav-btn-link">Hotels</button>
-        <button onClick={() => scrollToSection('deals')} className="nav-btn-link">Deals</button>
-        <button onClick={() => scrollToSection('about-us')} className="nav-btn-link">About Us</button>
-        <button onClick={() => scrollToSection('contact-us')} className="nav-btn-link">Contact Us</button>
-      </div>
-
-      {/* Right Section (Desktop) */}
-      <div className="desktop-menu" style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
-        {user ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-            <NotificationBell />
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', lineHeight: '1.2' }}>
-               <span style={{ fontWeight: '700', fontSize: '0.9rem', color: '#0f172a' }}>{user.name}</span>
-               <span style={{ fontSize: '0.7rem', color: '#c5a059', fontWeight: '800', textTransform: 'uppercase' }}>{user.role}</span>
-            </div>
-            <button onClick={handleLogout} style={{ 
-              background: '#0f172a', color: 'white', padding: '0.6rem 1.25rem', borderRadius: '50px', border: 'none', cursor: 'pointer',
-              fontSize: '0.85rem', fontWeight: '700', transition: '0.2s', display: 'flex', alignItems: 'center', gap: '0.5rem'
-            }} onMouseOver={e => e.currentTarget.style.background = '#1e293b'} onMouseOut={e => e.currentTarget.style.background = '#0f172a'}>
-              <LogOut size={16} /> Logout
+        {/* Desktop Interface: Center Links */}
+        <div className="hidden lg:flex items-center gap-10 relative z-10 px-6">
+          {['home', 'hotels', 'deals', 'about-us', 'contact-us'].map((link) => (
+            <button 
+              key={link}
+              onClick={() => scrollToSection(link)}
+              className={`text-[10px] font-black uppercase tracking-[3px] transition-all relative group py-2 ${
+                scrolled ? 'text-gray-400 hover:text-secondary-dark' : 'text-white/70 hover:text-white'
+              }`}
+            >
+              {link.replace('-', ' ')}
+              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
             </button>
-          </div>
-        ) : (
-          <>
-            <Link to="/login" style={{ textDecoration: 'none', color: '#0f172a', fontWeight: '700', fontSize: '0.9rem' }}>Login</Link>
-            <Link to="/register" style={{ 
-              background: '#c5a059', color: 'white', padding: '0.7rem 1.75rem', borderRadius: '50px', textDecoration: 'none', fontWeight: '700', fontSize: '0.9rem',
-              boxShadow: '0 4px 12px rgba(197, 160, 89, 0.2)', transition: '0.3s'
-            }} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>Sign Up</Link>
-          </>
-        )}
+          ))}
+        </div>
+
+        {/* Right Interface: Identity & Auth */}
+        <div className="flex items-center gap-4 relative z-10 pr-2">
+          {user ? (
+            <div className="flex items-center gap-6">
+              <div className="hidden md:flex items-center gap-4 px-4 py-2 bg-gray-50/10 rounded-2xl border border-white/5 group hover:bg-white/80 transition-all cursor-pointer">
+                 <NotificationBell scrollMode={scrolled} />
+                 <div className="w-px h-6 bg-white/20" />
+                 <div className="text-right flex flex-col items-end">
+                    <span className={`text-[10px] font-black uppercase tracking-widest ${scrolled ? 'text-secondary-dark' : 'text-white'}`}>{user.name}</span>
+                    <span className="text-[8px] font-bold text-primary uppercase tracking-[2px]">{user.role}</span>
+                 </div>
+                 <div className="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-sm">
+                    {user.role === 'manager' ? <Layout size={18} /> : <User size={18} />}
+                 </div>
+              </div>
+
+              {/* Action Dropdown Alternative for Small Screens */}
+              <div className="flex md:hidden items-center gap-2">
+                 <NotificationBell scrollMode={scrolled} />
+                 <button onClick={() => setIsMenuOpen(!isMenuOpen)} className={`w-12 h-12 rounded-2xl flex items-center justify-center ${scrolled ? 'bg-secondary-dark text-white' : 'bg-white text-secondary-dark shadow-xl'}`}>
+                    {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+                 </button>
+              </div>
+
+              <button 
+                onClick={handleLogout}
+                className={`hidden md:flex items-center gap-3 h-12 px-6 rounded-2xl font-black text-[10px] uppercase tracking-[2px] transition-all active:scale-95 ${
+                  scrolled ? 'bg-secondary-dark text-white hover:bg-primary shadow-lg shadow-black/10' : 'bg-white text-secondary-dark hover:bg-primary hover:text-white shadow-2xl shadow-black/20'
+                }`}
+              >
+                <LogOut size={16} /> Logout
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-4">
+              <Link to="/login" className={`text-[10px] font-black uppercase tracking-[3px] px-4 transition-all ${scrolled ? 'text-gray-400 hover:text-secondary-dark' : 'text-white/70 hover:text-white'}`}>
+                 Access
+              </Link>
+              <Link 
+                to="/register" 
+                className={`flex items-center gap-3 h-12 px-8 rounded-2xl font-black text-[10px] uppercase tracking-[3px] transition-all active:scale-95 ${
+                  scrolled ? 'bg-secondary-dark text-white hover:bg-primary shadow-lg shadow-black/10' : 'bg-primary text-white hover:bg-white hover:text-secondary-dark shadow-xl shadow-primary/30'
+                }`}
+              >
+                 Covenant <ArrowRight size={14} className="animate-pulse" />
+              </Link>
+              <button 
+                onClick={() => setIsMenuOpen(!isMenuOpen)} 
+                className={`lg:hidden w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${scrolled ? 'bg-gray-50 text-secondary-dark border border-gray-100' : 'bg-white/10 text-white border border-white/20'}`}
+              >
+                {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Mobile Toggle */}
-      <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="mobile-toggle" style={{ display: 'none', background: 'none', border: 'none' }}>
-        {isMenuOpen ? <X size={28} color="#111" /> : <Menu size={28} color="#111" />}
-      </button>
-
-      {/* Mobile Menu */}
+      {/* Global Mobile Menu Overlay */}
       {isMenuOpen && (
-        <div style={{ position: 'absolute', top: '100%', left: 0, width: '100%', background: 'white', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 15px 30px rgba(0,0,0,0.1)', animation: 'slideDown 0.3s ease-out' }}>
-          <button onClick={() => scrollToSection('home')} className="mobile-nav-btn">Home</button>
-          <button onClick={() => scrollToSection('hotels')} className="mobile-nav-btn">Hotels</button>
-          <button onClick={() => scrollToSection('deals')} className="mobile-nav-btn">Deals</button>
-          <button onClick={() => scrollToSection('about-us')} className="mobile-nav-btn">About Us</button>
-          <button onClick={() => scrollToSection('contact-us')} className="mobile-nav-btn">Contact Us</button>
-          <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1.5rem' }}>
-            {user ? (
-              <button onClick={handleLogout} className="mobile-nav-btn" style={{ color: '#ef4444' }}>Logout</button>
-            ) : (
-              <div style={{ display: 'flex', gap: '1rem' }}>
-                 <Link to="/login" onClick={() => setIsMenuOpen(false)} style={{ flex: 1, textAlign: 'center', padding: '1rem', border: '1px solid #0f172a', borderRadius: '12px', textDecoration: 'none', color: '#0f172a', fontWeight: '700' }}>Login</Link>
-                 <Link to="/register" onClick={() => setIsMenuOpen(false)} style={{ flex: 1, textAlign: 'center', padding: '1rem', background: '#0f172a', borderRadius: '12px', textDecoration: 'none', color: 'white', fontWeight: '700' }}>Sign Up</Link>
+        <div className="fixed inset-0 z-[2000] lg:hidden animate-fade-in">
+           <div className="absolute inset-0 bg-secondary-dark/95 backdrop-blur-2xl" onClick={() => setIsMenuOpen(false)} />
+           <div className="relative w-full h-full flex flex-col p-8 space-y-12">
+              <div className="flex justify-between items-center pb-10 border-b border-white/5">
+                 <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 bg-primary text-white rounded-[1.5rem] flex items-center justify-center shadow-xl shadow-primary/30">
+                       <Sparkles size={28} />
+                    </div>
+                    <div>
+                       <h2 className="text-2xl font-serif font-black italic text-white leading-none">PK UrbanStay</h2>
+                       <p className="text-[10px] font-black text-primary uppercase tracking-[3px] mt-1">Heritage Hospitality</p>
+                    </div>
+                 </div>
+                 <button onClick={() => setIsMenuOpen(false)} className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-white border border-white/10 active:scale-95 transition-all shadow-inner">
+                    <X size={28} />
+                 </button>
               </div>
-            )}
-          </div>
+
+              <div className="flex-1 flex flex-col gap-8 justify-center items-center">
+                 {['home', 'hotels', 'deals', 'about-us', 'contact-us'].map((link) => (
+                   <button 
+                     key={link}
+                     onClick={() => scrollToSection(link)}
+                     className="text-4xl font-serif font-black text-white italic hover:text-primary transition-all transform hover:scale-105 active:scale-95 flex items-center gap-4 capitalize"
+                   >
+                      {link.replace('-', ' ')} <ChevronDown size={28} className="-rotate-90 opacity-20" />
+                   </button>
+                 ))}
+              </div>
+
+              <div className="pt-10 border-t border-white/5 space-y-6">
+                 {user ? (
+                   <div className="flex flex-col gap-6">
+                      <div className="flex items-center justify-between bg-white/5 p-6 rounded-[2rem] border border-white/10">
+                         <div className="flex items-center gap-4">
+                            <div className="w-14 h-14 bg-primary text-white rounded-2xl flex items-center justify-center shadow-lg">
+                               <User size={28} />
+                            </div>
+                            <div>
+                               <p className="text-xl font-bold text-white">{user.name}</p>
+                               <p className="text-[10px] font-black text-primary uppercase tracking-[2px]">{user.role} Index</p>
+                            </div>
+                         </div>
+                         <NotificationBell scrollMode={false} />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                         <button 
+                            onClick={() => { navigate(user.role === 'manager' ? '/manager/dashboard' : '/customer/dashboard'); setIsMenuOpen(false); }}
+                            className="h-16 bg-white text-secondary-dark rounded-[1.25rem] font-black text-[10px] uppercase tracking-[3px] flex items-center justify-center gap-3 shadow-lg"
+                         >
+                            Dashboard <Layout size={18} className="text-primary" />
+                         </button>
+                         <button 
+                            onClick={handleLogout}
+                            className="h-16 bg-rose-500/10 text-rose-500 border-2 border-rose-500/20 rounded-[1.25rem] font-black text-[10px] uppercase tracking-[3px] flex items-center justify-center gap-3 shadow-lg"
+                         >
+                            Logout <LogOut size={18} />
+                         </button>
+                      </div>
+                   </div>
+                 ) : (
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Link to="/login" onClick={() => setIsMenuOpen(false)} className="h-20 bg-white/5 border-2 border-white/10 text-white rounded-[1.5rem] flex items-center justify-center gap-4 font-black uppercase text-[10px] tracking-[4px] hover:border-primary transition-all uppercase">
+                         Access Lounge <User size={20} className="text-primary" />
+                      </Link>
+                      <Link to="/register" onClick={() => setIsMenuOpen(false)} className="h-20 bg-primary text-white rounded-[1.5rem] flex items-center justify-center gap-4 font-black uppercase text-[10px] tracking-[4px] shadow-2xl shadow-primary/40 hover:scale-[1.02] transition-all uppercase">
+                         Secure Covenant <ShieldCheck size={20} />
+                      </Link>
+                   </div>
+                 )}
+              </div>
+
+              <div className="text-center pt-6">
+                 <p className="text-[9px] font-black text-gray-600 uppercase tracking-[3px] italic">© {new Date().getFullYear()} PK UrbanStay Hospitality. Universal Covenants Apply.</p>
+              </div>
+           </div>
         </div>
       )}
 
       <style>{`
-        .nav-btn-link { background: none; border: none; padding: 0; color: #64748b; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: 0.2s; font-family: inherit; }
-        .nav-btn-link:hover { color: #c5a059; }
-        
-        .mobile-nav-btn { background: none; border: none; padding: 0.5rem 0; text-align: left; color: #1e293b; font-weight: 700; font-size: 1.1rem; cursor: pointer; font-family: inherit; }
-        
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-
-        @media (max-width: 900px) {
-          .desktop-menu { display: none !important; }
-          .mobile-toggle { display: block !important; cursor: pointer; }
-        }
+        @keyframes fade-in { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
       `}</style>
     </nav>
   );

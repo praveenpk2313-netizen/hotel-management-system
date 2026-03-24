@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { 
   ArrowLeft, 
   CreditCard, 
@@ -15,7 +15,13 @@ import {
   Moon,
   BedDouble,
   Clock,
-  Sparkles
+  Sparkles,
+  Shield,
+  Zap,
+  Tag,
+  Award,
+  ArrowRight,
+  UserCheck
 } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
@@ -90,7 +96,7 @@ const PaymentPage = () => {
         key: orderData.key,
         amount: orderData.amount,
         currency: orderData.currency,
-        name: "StayNow Luxury",
+        name: "PK UrbanStay Luxury",
         description: `Stay at ${hotel.name}`,
         image: hotel.images?.[0],
         order_id: orderData.orderId,
@@ -109,7 +115,7 @@ const PaymentPage = () => {
           }
         },
         prefill: { name: user?.name, email: user?.email },
-        theme: { color: "#0f172a" },
+        theme: { color: "#C5A059" },
         modal: { ondismiss: () => setLoading(false) }
       };
 
@@ -129,250 +135,311 @@ const PaymentPage = () => {
   if (!bookingData || !hotel) return null;
 
   return (
-    <div className="checkout animate-fade">
-      <div className="checkout__container">
+    <div className="bg-background-light min-h-screen pb-20 pt-10">
+      <div className="max-w-7xl mx-auto px-4 md:px-10 space-y-12 animate-fade-in">
+        
+        {/* Navigation & Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 bg-white p-10 rounded-[3rem] border border-gray-100 shadow-premium group relative overflow-hidden">
+           {/* Decoration */}
+           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-32 -mt-32 blur-3xl" />
+           
+           <div className="space-y-4 relative z-10">
+              <button 
+                onClick={() => navigate(-1)}
+                className="flex items-center gap-3 text-gray-400 font-black text-[10px] uppercase tracking-[3px] hover:text-primary transition-colors mb-2"
+              >
+                 <ArrowLeft size={16} /> Return to Resort
+              </button>
+              <h1 className="text-4xl md:text-5xl font-serif text-secondary-dark font-black tracking-tight leading-none">
+                 Secure <span className="text-primary italic">Checkout</span>
+              </h1>
+           </div>
 
-        {/* Back Button */}
-        <button onClick={() => navigate(-1)} className="checkout__back-btn">
-          <ArrowLeft size={18} /> Back to hotel
-        </button>
-
-        {/* Page Title */}
-        <div className="checkout__header">
-          <h1 className="checkout__title">Confirm & Pay</h1>
-          <div className="checkout__secure-badge">
-            <Lock size={14} /> Secure Checkout
-          </div>
+           <div className="flex items-center gap-4 relative z-10">
+              <div className="px-6 h-14 bg-emerald-50 rounded-2xl flex items-center gap-3 text-emerald-600 font-black text-[10px] uppercase tracking-[2px] border border-emerald-100">
+                 <Lock size={16} /> Encrypted Gateway
+              </div>
+              <div className="hidden lg:flex px-6 h-14 bg-primary/10 rounded-2xl items-center gap-3 text-primary font-black text-[10px] uppercase tracking-[2px]">
+                 <ShieldCheck size={18} /> Verified Vault
+              </div>
+           </div>
         </div>
 
-        <div className="checkout__grid">
-          
-          {/* ─── LEFT: Payment Section ──────────────────────────────── */}
-          <div className="checkout__left">
-
-            {/* Step 1: Your Trip */}
-            <section className="checkout__section">
-              <h2 className="checkout__section-title">
-                <span className="checkout__step-number">1</span>
-                Your Trip
-              </h2>
-              <div className="checkout__trip-details">
-                <div className="checkout__trip-row">
-                  <div>
-                    <div className="checkout__trip-label">Dates</div>
-                    <div className="checkout__trip-value">
-                      {formatDate(bookingData.checkInDate)} — {formatDate(bookingData.checkOutDate)}
-                    </div>
-                  </div>
-                  <button className="checkout__edit-btn" onClick={() => navigate(-1)}>Edit</button>
-                </div>
-                <div className="checkout__trip-row">
-                  <div>
-                    <div className="checkout__trip-label">Guests</div>
-                    <div className="checkout__trip-value">{bookingData.numGuests} guest{bookingData.numGuests > 1 ? 's' : ''}</div>
-                  </div>
-                  <button className="checkout__edit-btn" onClick={() => navigate(-1)}>Edit</button>
-                </div>
-              </div>
-            </section>
-
-            {/* Development Notice */}
-            {MOCK_PAYMENT && (
-              <div className="checkout__dev-notice">
-                <Info size={16} />
-                <div>
-                  <strong>Test Mode Active</strong>
-                  <p>Payments are simulated. No real charges will be made.</p>
-                </div>
-              </div>
-            )}
-
-            {/* Error */}
-            {error && (
-              <div className="checkout__error">
-                <Info size={18} /> {error}
-              </div>
-            )}
-
-            {/* Step 2: Payment Method */}
-            <section className="checkout__section">
-              <h2 className="checkout__section-title">
-                <span className="checkout__step-number">2</span>
-                Payment Method
-              </h2>
-
-              <div className="checkout__methods">
-                {/* Stripe */}
-                <div 
-                  className={`checkout__method ${paymentMethod === 'stripe' ? 'active' : ''}`}
-                  onClick={() => setPaymentMethod('stripe')}
-                >
-                  <div className="checkout__method-left">
-                    <div className={`checkout__radio ${paymentMethod === 'stripe' ? 'checked' : ''}`}>
-                      {paymentMethod === 'stripe' && <div className="checkout__radio-dot"></div>}
-                    </div>
-                    <div>
-                      <div className="checkout__method-name">Credit or Debit Card</div>
-                      <div className="checkout__method-desc">Visa, Mastercard, Amex</div>
-                    </div>
-                  </div>
-                  <div className="checkout__card-icons">
-                    <img src="https://img.icons8.com/color/48/000000/visa.png" alt="Visa" />
-                    <img src="https://img.icons8.com/color/48/000000/mastercard.png" alt="MC" />
-                    <img src="https://img.icons8.com/color/48/000000/amex.png" alt="Amex" />
-                  </div>
-                </div>
-
-                {/* Razorpay */}
-                <div 
-                  className={`checkout__method ${paymentMethod === 'razorpay' ? 'active' : ''}`}
-                  onClick={() => setPaymentMethod('razorpay')}
-                >
-                  <div className="checkout__method-left">
-                    <div className={`checkout__radio ${paymentMethod === 'razorpay' ? 'checked' : ''}`}>
-                      {paymentMethod === 'razorpay' && <div className="checkout__radio-dot"></div>}
-                    </div>
-                    <div>
-                      <div className="checkout__method-name">Razorpay</div>
-                      <div className="checkout__method-desc">UPI, NetBanking, Wallets</div>
-                    </div>
-                  </div>
-                  <img src="https://razorpay.com/favicon.png" style={{ height: '24px' }} alt="Razorpay" />
-                </div>
-              </div>
-
-              {/* Payment Form */}
-              <div className="checkout__pay-form">
-                {paymentMethod === 'stripe' ? (
-                  <Elements stripe={stripePromise}>
-                    <StripeCheckoutForm 
-                      bookingData={bookingData} 
-                      stripeTxnId={stripeTxnRef.current}
-                      navigate={navigate}
-                      onSuccess={() => setSuccess(true)} 
-                      onError={setError}
-                      setLoading={setLoading}
-                      loading={loading}
-                    />
-                  </Elements>
-                ) : (
-                  <button 
-                    onClick={handleRazorpayCheckout}
-                    disabled={loading}
-                    className="checkout__confirm-btn"
-                  >
-                    {loading ? <Loader2 className="animate-spin" size={20} /> : <ShieldCheck size={20} />}
-                    {loading ? 'Processing...' : `Confirm & Pay ${formatCurrency(bookingData.totalPrice)}`}
-                  </button>
-                )}
-              </div>
-            </section>
-
-            {/* Trust Badges */}
-            <div className="checkout__trust">
-              <div className="checkout__trust-item">
-                <ShieldCheck size={18} />
-                <span>SSL Encrypted</span>
-              </div>
-              <div className="checkout__trust-divider"></div>
-              <div className="checkout__trust-item">
-                <Lock size={18} />
-                <span>PCI Compliant</span>
-              </div>
-              <div className="checkout__trust-divider"></div>
-              <div className="checkout__trust-item">
-                <CheckCircle2 size={18} />
-                <span>Money-back Guarantee</span>
-              </div>
-            </div>
-          </div>
-
-          {/* ─── RIGHT: Order Summary ──────────────────────────────── */}
-          <div className="checkout__right">
-            <div className="checkout__summary-card">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+           
+           {/* Left: Operations (Col 7) */}
+           <div className="lg:col-span-7 space-y-10">
               
-              {/* Hotel Preview */}
-              <div className="checkout__hotel-preview">
-                <img 
-                  src={hotel.images?.[0] || "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&q=80&w=300"} 
-                  alt={hotel.name}
-                  className="checkout__hotel-img"
-                />
-                <div className="checkout__hotel-info">
-                  <div className="checkout__hotel-type">{selectedRoom?.type || 'Room'}</div>
-                  <h3 className="checkout__hotel-name">{hotel.name}</h3>
-                  <div className="checkout__hotel-location">
-                    <MapPin size={14} /> {hotel.city || hotel.location}
-                  </div>
-                  {hotel.averageRating > 0 && (
-                    <div className="checkout__hotel-rating">
-                      <span className="checkout__star">★</span> {hotel.averageRating?.toFixed(1)}
-                      <span className="checkout__rating-count">({hotel.totalReviews} reviews)</span>
+              {/* Trip Audit */}
+              <section className="bg-white p-10 md:p-12 rounded-[3.5rem] border border-gray-50 shadow-premium space-y-10 group">
+                 <div className="flex justify-between items-center pb-6 border-b border-gray-50">
+                    <h2 className="text-2xl font-serif text-secondary-dark font-black flex items-center gap-3">
+                       <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary text-sm font-black">01</div>
+                       Your Itinerary
+                    </h2>
+                    <button onClick={() => navigate(-1)} className="text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-primary transition-colors">Adjust Scope</button>
+                 </div>
+
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div className="space-y-6">
+                       <div className="flex items-center gap-4 group/item">
+                          <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-primary border border-gray-200 group-hover/item:bg-primary group-hover/item:text-white transition-all">
+                             <Calendar size={20} />
+                          </div>
+                          <div>
+                             <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Temporal Window</p>
+                             <p className="text-sm font-bold text-secondary-dark uppercase tracking-tight">{formatDate(bookingData.checkInDate)} — {formatDate(bookingData.checkOutDate)}</p>
+                          </div>
+                       </div>
+                       <div className="flex items-center gap-4 group/item">
+                          <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-primary border border-gray-200 group-hover/item:bg-primary group-hover/item:text-white transition-all">
+                             <UserCheck size={20} />
+                          </div>
+                          <div>
+                             <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Guest Commitment</p>
+                             <p className="text-sm font-bold text-secondary-dark uppercase tracking-tight">{bookingData.numGuests} Verified Guest{bookingData.numGuests > 1 ? 's' : ''}</p>
+                          </div>
+                       </div>
                     </div>
-                  )}
+
+                    <div className="bg-gray-50 p-8 rounded-[2.5rem] border border-gray-100 flex flex-col justify-center space-y-3 relative overflow-hidden">
+                       <div className="absolute top-0 right-0 p-4 opacity-5">
+                          <Moon size={100} />
+                       </div>
+                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Duration Audit</p>
+                       <p className="text-3xl font-black text-secondary-dark italic font-serif leading-none">
+                          {nights} <span className="text-primary italic opacity-80">Nights</span>
+                       </p>
+                       <div className="flex items-center gap-2 text-[10px] font-bold text-emerald-500 uppercase tracking-widest">
+                          <CheckCircle2 size={12} /> Flexible Policy Applied
+                       </div>
+                    </div>
+                 </div>
+              </section>
+
+              {/* Dev Notice */}
+              {MOCK_PAYMENT && (
+                <div className="bg-amber-50 p-8 rounded-[2.5rem] border border-amber-100 flex items-center gap-6 animate-slide-up group">
+                   <div className="w-14 h-14 bg-white rounded-3xl flex items-center justify-center text-amber-500 shadow-sm border border-amber-100 group-hover:rotate-12 transition-transform">
+                      <Zap size={28} className="animate-pulse" />
+                   </div>
+                   <div className="space-y-1">
+                      <h4 className="text-xs font-black text-amber-800 uppercase tracking-widest">Protocol Intelligence: Simulation Active</h4>
+                      <p className="text-sm text-amber-600 font-medium">This transaction cycle is a simulation. No financial settlement is required for heritage verification.</p>
+                   </div>
                 </div>
+              )}
+
+              {/* Step 2: Protocol Selection */}
+              <section className="bg-white p-10 md:p-12 rounded-[3.5rem] border border-gray-50 shadow-premium space-y-10 overflow-hidden">
+                 <div className="flex justify-between items-center pb-6 border-b border-gray-50">
+                    <h2 className="text-2xl font-serif text-secondary-dark font-black flex items-center gap-3">
+                       <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary text-sm font-black">02</div>
+                       Settlement Protocol
+                    </h2>
+                    <div className="flex items-center gap-2 px-3 py-1 bg-gray-50 rounded-full text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                       <Shield size={12} /> PCI Level 1
+                    </div>
+                 </div>
+
+                 {error && (
+                   <div className="p-6 bg-rose-50 border border-rose-100 rounded-[2rem] flex items-center gap-4 text-rose-700 text-sm font-bold animate-shake">
+                      <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-rose-500 shadow-sm"><Info size={20} /></div>
+                      {error}
+                   </div>
+                 )}
+
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Stripe Choice */}
+                    <button 
+                      onClick={() => setPaymentMethod('stripe')}
+                      className={`p-10 rounded-[2.5rem] border-2 transition-all duration-500 text-left space-y-4 relative group ${
+                        paymentMethod === 'stripe' 
+                        ? 'border-primary bg-primary/5 shadow-xl shadow-primary/10' 
+                        : 'border-gray-100 bg-white hover:border-gray-300'
+                      }`}
+                    >
+                       <div className="flex justify-between items-start">
+                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border transition-all ${
+                            paymentMethod === 'stripe' ? 'bg-primary text-white border-primary shadow-lg shadow-primary/30' : 'bg-gray-50 text-gray-300 border-gray-200'
+                          }`}>
+                             <CreditCard size={24} />
+                          </div>
+                          {paymentMethod === 'stripe' && <CheckCircle2 size={24} className="text-primary animate-scale-in" />}
+                       </div>
+                       <div>
+                          <h4 className={`text-lg font-bold transition-colors ${paymentMethod === 'stripe' ? 'text-secondary-dark' : 'text-gray-400'}`}>Global Card</h4>
+                          <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">VISA / MASTERCARD / AMEX</p>
+                       </div>
+                       <div className="flex gap-2 group-hover:opacity-100 opacity-50 transition-opacity">
+                          <img src="https://img.icons8.com/color/48/000000/visa.png" className="h-6 object-contain" alt="Visa" />
+                          <img src="https://img.icons8.com/color/48/000000/mastercard.png" className="h-6 object-contain" alt="MC" />
+                       </div>
+                    </button>
+
+                    {/* Razorpay Choice */}
+                    <button 
+                      onClick={() => setPaymentMethod('razorpay')}
+                      className={`p-10 rounded-[2.5rem] border-2 transition-all duration-500 text-left space-y-4 relative group ${
+                        paymentMethod === 'razorpay' 
+                        ? 'border-primary bg-primary/5 shadow-xl shadow-primary/10' 
+                        : 'border-gray-100 bg-white hover:border-gray-300'
+                      }`}
+                    >
+                       <div className="flex justify-between items-start">
+                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border transition-all ${
+                            paymentMethod === 'razorpay' ? 'bg-primary text-white border-primary shadow-lg shadow-primary/30' : 'bg-gray-50 text-gray-300 border-gray-200'
+                          }`}>
+                             <Zap size={24} />
+                          </div>
+                          {paymentMethod === 'razorpay' && <CheckCircle2 size={24} className="text-primary animate-scale-in" />}
+                       </div>
+                       <div>
+                          <h4 className={`text-lg font-bold transition-colors ${paymentMethod === 'razorpay' ? 'text-secondary-dark' : 'text-gray-400'}`}>Instant Multi-Rail</h4>
+                          <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">UPI / NETBANKING / WALLET</p>
+                       </div>
+                       <div className="flex gap-2 group-hover:opacity-100 opacity-50 transition-opacity items-center">
+                          <img src="https://razorpay.com/favicon.png" className="h-6 object-contain" alt="Razorpay" />
+                          <span className="text-[9px] font-black text-secondary-dark/40 uppercase tracking-widest">RAZORPAY SECURE</span>
+                       </div>
+                    </button>
+                 </div>
+
+                 <div className="pt-10 border-t border-gray-50">
+                    {paymentMethod === 'stripe' ? (
+                      <Elements stripe={stripePromise}>
+                        <StripeCheckoutForm 
+                          bookingData={bookingData} 
+                          stripeTxnId={stripeTxnRef.current}
+                          navigate={navigate}
+                          onSuccess={() => setSuccess(true)} 
+                          onError={setError}
+                          setLoading={setLoading}
+                          loading={loading}
+                        />
+                      </Elements>
+                    ) : (
+                      <div className="space-y-8">
+                         <div className="bg-gray-50 p-6 rounded-2xl border border-dashed border-gray-200 text-center">
+                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-relaxed">Razorpay initiates a multi-rail sequence for instant validation.</p>
+                         </div>
+                         <button 
+                           onClick={handleRazorpayCheckout}
+                           disabled={loading}
+                           className="w-full h-18 bg-secondary-dark text-white rounded-[1.5rem] font-black text-xs uppercase tracking-[3px] shadow-2xl shadow-secondary/20 hover:bg-primary transition-all flex items-center justify-center gap-4 group active:scale-[0.98]"
+                         >
+                            {loading ? <Loader2 className="animate-spin text-primary" size={24} /> : <ShieldCheck size={24} className="text-primary group-hover:text-white transition-colors" />}
+                            {loading ? 'Sychronizing...' : `Finalize ${formatCurrency(bookingData.totalPrice)}`}
+                         </button>
+                      </div>
+                    )}
+                 </div>
+              </section>
+
+              {/* Trust Section */}
+              <div className="flex flex-wrap items-center justify-center gap-12 py-10 opacity-30 group grayscale hover:grayscale-0 transition-all duration-700">
+                 <div className="flex items-center gap-3">
+                    <ShieldCheck size={24} />
+                    <span className="text-[10px] font-black uppercase tracking-[3px]">SSL Encrypted</span>
+                 </div>
+                 <div className="w-px h-6 bg-gray-300 hidden md:block" />
+                 <div className="flex items-center gap-3">
+                    <Lock size={24} />
+                    <span className="text-[10px] font-black uppercase tracking-[3px]">Financial Covenant</span>
+                 </div>
+                 <div className="w-px h-6 bg-gray-300 hidden md:block" />
+                 <div className="flex items-center gap-3">
+                    <CheckCircle2 size={24} />
+                    <span className="text-[10px] font-black uppercase tracking-[3px]">Guarantee Applied</span>
+                 </div>
               </div>
+           </div>
 
-              <div className="checkout__summary-divider"></div>
+           {/* Right: Summary Hub (Col 5) */}
+           <div className="lg:col-span-5 relative lg:sticky lg:top-10 space-y-10">
+              <div className="bg-secondary-dark rounded-[4rem] shadow-premium-dark overflow-hidden group">
+                 
+                 {/* Visual Media */}
+                 <div className="relative h-72 overflow-hidden">
+                    <img 
+                      src={hotel.images?.[0] || "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=1200"} 
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[4s]" 
+                      alt="Hotel" 
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-secondary-dark via-secondary-dark/10 to-transparent" />
+                    <div className="absolute top-8 left-8">
+                       <div className="px-4 py-1.5 bg-primary/20 backdrop-blur-xl border border-white/20 rounded-full text-primary font-black text-[9px] uppercase tracking-[3px] flex items-center gap-2">
+                          <Award size={12} /> Heritage Elite
+                       </div>
+                    </div>
+                 </div>
 
-              {/* Stay Details */}
-              <div className="checkout__stay-details">
-                <div className="checkout__stay-row">
-                  <div className="checkout__stay-icon"><Calendar size={16} /></div>
-                  <div>
-                    <div className="checkout__stay-label">Check-in</div>
-                    <div className="checkout__stay-value">{formatDate(bookingData.checkInDate)}</div>
-                  </div>
-                </div>
-                <div className="checkout__stay-arrow">
-                  <ChevronRight size={16} />
-                  <span className="checkout__stay-nights">{nights} night{nights > 1 ? 's' : ''}</span>
-                </div>
-                <div className="checkout__stay-row">
-                  <div className="checkout__stay-icon"><Calendar size={16} /></div>
-                  <div>
-                    <div className="checkout__stay-label">Check-out</div>
-                    <div className="checkout__stay-value">{formatDate(bookingData.checkOutDate)}</div>
-                  </div>
-                </div>
+                 {/* Intellectual Info */}
+                 <div className="p-10 md:p-14 space-y-10 text-white relative z-10">
+                    <div className="space-y-3">
+                       <h3 className="text-3xl font-serif font-black tracking-tight leading-none truncate group-hover:text-primary transition-all">
+                          {hotel.name}
+                       </h3>
+                       <div className="flex items-center gap-3 text-xs text-gray-500 font-bold uppercase tracking-widest">
+                          <MapPin size={16} className="text-primary" /> {hotel.location || hotel.city}
+                       </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-2 border-y border-white/5 py-10">
+                       <div className="flex justify-between items-center group/line">
+                          <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest group-hover/line:text-primary transition-colors">Suite Specification</p>
+                          <p className="text-sm font-bold tracking-tight">{selectedRoom?.type || 'Luxury Suite'}</p>
+                       </div>
+                       <div className="flex justify-between items-center group/line">
+                          <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest group-hover/line:text-primary transition-colors">Global Rate / Night</p>
+                          <p className="text-sm font-bold tracking-tight">{formatCurrency(selectedRoom?.price)}</p>
+                       </div>
+                       <div className="flex justify-between items-center group/line">
+                          <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest group-hover/line:text-primary transition-colors">Temporal Span</p>
+                          <p className="text-sm font-bold tracking-tight italic text-primary font-serif">{nights} Nights</p>
+                       </div>
+                    </div>
+
+                    <div className="space-y-6">
+                       <div className="flex justify-between items-end">
+                          <div className="space-y-1">
+                             <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Total Investment</p>
+                             <p className="text-[9px] font-bold text-emerald-500 uppercase tracking-[2px]">Taxes & Fees Applied</p>
+                          </div>
+                          <p className="text-5xl font-black text-primary font-serif italic tracking-tighter leading-none">
+                             {formatCurrency(bookingData.totalPrice)}
+                          </p>
+                       </div>
+                       
+                       <div className="bg-white/5 border border-white/10 p-6 rounded-[2rem] flex items-center gap-4 group/support">
+                          <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-primary border border-white/10 group-hover/support:rotate-12 transition-transform">
+                             <Sparkles size={24} />
+                          </div>
+                          <div>
+                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Elite Covenant</p>
+                             <p className="text-xs font-medium text-white/60">Includes priority concierge response.</p>
+                          </div>
+                       </div>
+                    </div>
+                 </div>
               </div>
+           </div>
 
-              <div className="checkout__summary-divider"></div>
-
-              {/* Guests */}
-              <div className="checkout__guest-info">
-                <Users size={16} className="checkout__guest-icon" />
-                <span>{bookingData.numGuests} Guest{bookingData.numGuests > 1 ? 's' : ''}</span>
-              </div>
-
-              <div className="checkout__summary-divider"></div>
-
-              {/* Price Details */}
-              <h4 className="checkout__price-title">Price Details</h4>
-              <div className="checkout__price-rows">
-                <div className="checkout__price-row">
-                  <span>{formatCurrency(selectedRoom?.price)} × {nights} night{nights > 1 ? 's' : ''}</span>
-                  <span>{formatCurrency((selectedRoom?.price || 0) * nights)}</span>
-                </div>
-                <div className="checkout__price-row checkout__price-row--green">
-                  <span>Taxes & Fees</span>
-                  <span>Included</span>
-                </div>
-              </div>
-
-              <div className="checkout__summary-divider checkout__summary-divider--thick"></div>
-
-              {/* Total */}
-              <div className="checkout__total">
-                <span>Total (USD)</span>
-                <span className="checkout__total-amount">{formatCurrency(bookingData.totalPrice)}</span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
-      
-      <style>{checkoutStyles}</style>
+
+      <style>{`
+        @keyframes scale-in { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .animate-scale-in { animation: scale-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fade-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fade-in 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes slide-up { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-slide-up { animation: slide-up 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes slide-right { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+        .animate-slide-right { animation: slide-right 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
+        .animate-shake { animation: shake 0.4s ease-in-out; }
+      `}</style>
     </div>
   );
 };
@@ -406,40 +473,42 @@ const StripeCheckoutForm = ({ bookingData, stripeTxnId, navigate, onSuccess, onE
       const result = await stripe.confirmCardPayment(intentData.clientSecret, {
         payment_method: {
           card: elements.getElement(CardElement),
-          billing_details: { name: bookingData?.userName || 'Valued Guest' },
+          billing_details: { name: bookingData?.userName || 'Elite Guest' },
         }
       });
 
       if (result.error) {
-        onError(result.error.message);
-        setLoading(false);
+         onError(result.error.message);
+         setLoading(false);
       } else if (result.paymentIntent.status === 'succeeded') {
-        const { data: finalBooking } = await confirmBookingAfterPayment({
-          ...bookingData,
-          paymentMethod: 'Stripe',
-          transactionId: result.paymentIntent.id
-        });
-        navigate('/booking-success', { state: { booking: finalBooking } });
+         const { data: finalBooking } = await confirmBookingAfterPayment({
+           ...bookingData,
+           paymentMethod: 'Stripe',
+           transactionId: result.paymentIntent.id
+         });
+         navigate('/booking-success', { state: { booking: finalBooking } });
       }
     } catch (err) {
-      onError(err.response?.data?.message || 'Transaction failed. Please try again.');
+      onError(err.response?.data?.message || 'Protocol synchronization failure. Please audit and retry.');
       setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="checkout__stripe-card">
-        <label className="checkout__stripe-label">Card Information</label>
-        <div className="checkout__stripe-element">
+    <form onSubmit={handleSubmit} className="space-y-10">
+      <div className="space-y-4">
+        <label className="text-[10px] font-black text-secondary-dark uppercase tracking-[3px] ml-1">Card Intelligence</label>
+        <div className="bg-gray-50 p-6 rounded-[2rem] border-2 border-gray-100 focus-within:border-primary focus-within:bg-white transition-all shadow-sm">
           <CardElement options={{
             style: {
               base: {
                 fontSize: '16px',
                 fontFamily: "'Outfit', sans-serif",
-                color: '#0f172a',
-                '::placeholder': { color: '#9ca3af' },
+                color: '#0F172A',
+                letterSpacing: '0.025em',
+                '::placeholder': { color: '#94A3B8' },
               },
+              invalid: { color: '#ef4444' }
             },
           }} />
         </div>
@@ -448,599 +517,13 @@ const StripeCheckoutForm = ({ bookingData, stripeTxnId, navigate, onSuccess, onE
       <button 
         type="submit" 
         disabled={!stripe || loading}
-        className="checkout__confirm-btn"
+        className="w-full h-18 bg-secondary-dark text-white rounded-[1.5rem] font-black text-xs uppercase tracking-[3px] shadow-2xl shadow-secondary/20 hover:bg-primary transition-all flex items-center justify-center gap-4 group active:scale-[0.98]"
       >
-        {loading ? <Loader2 className="animate-spin" size={20} /> : <Lock size={20} />}
-        {loading ? 'Processing...' : `Confirm & Pay ${formatCurrency(bookingData.totalPrice)}`}
+        {loading ? <Loader2 className="animate-spin text-primary" size={24} /> : <Lock size={24} className="text-primary group-hover:text-white transition-colors" />}
+        {loading ? 'Validating...' : `Secure Finalize ${formatCurrency(bookingData.totalPrice)}`}
       </button>
     </form>
   );
 };
-
-const checkoutStyles = `
-  /* ── Page Layout ───────────────────────────────────────────────────────── */
-  .checkout {
-    background: #f7f7f7;
-    min-height: 100vh;
-    padding: 0 0 5rem;
-  }
-  .checkout__container {
-    max-width: 1120px;
-    margin: 0 auto;
-    padding: 2rem 1.5rem;
-  }
-
-  /* ── Back Button ───────────────────────────────────────────────────────── */
-  .checkout__back-btn {
-    background: none;
-    border: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: #0f172a;
-    font-weight: 600;
-    font-size: 0.9rem;
-    cursor: pointer;
-    padding: 8px 0;
-    margin-bottom: 1.5rem;
-    font-family: 'Outfit', sans-serif;
-    transition: color 0.2s;
-  }
-  .checkout__back-btn:hover {
-    color: var(--primary);
-  }
-
-  /* ── Header ────────────────────────────────────────────────────────────── */
-  .checkout__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 2rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid #e5e7eb;
-  }
-  .checkout__title {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #0f172a;
-    margin: 0;
-    font-family: 'Playfair Display', serif;
-  }
-  .checkout__secure-badge {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: #059669;
-    background: #ecfdf5;
-    padding: 6px 14px;
-    border-radius: 20px;
-    border: 1px solid #a7f3d0;
-  }
-
-  /* ── Grid ───────────────────────────────────────────────────────────────── */
-  .checkout__grid {
-    display: grid;
-    grid-template-columns: 1fr 420px;
-    gap: 3rem;
-    align-items: start;
-  }
-
-  /* ── Left Column ───────────────────────────────────────────────────────── */
-  .checkout__section {
-    background: white;
-    border-radius: 16px;
-    border: 1px solid #e5e7eb;
-    padding: 28px;
-    margin-bottom: 20px;
-  }
-  .checkout__section-title {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #0f172a;
-    margin: 0 0 24px 0;
-    font-family: 'Playfair Display', serif;
-  }
-  .checkout__step-number {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: #0f172a;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.85rem;
-    font-weight: 700;
-    font-family: 'Outfit', sans-serif;
-    flex-shrink: 0;
-  }
-
-  /* ── Trip Details ──────────────────────────────────────────────────────── */
-  .checkout__trip-details {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-  .checkout__trip-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 0;
-    border-bottom: 1px solid #f3f4f6;
-  }
-  .checkout__trip-row:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-  }
-  .checkout__trip-label {
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: #0f172a;
-    margin-bottom: 2px;
-  }
-  .checkout__trip-value {
-    font-size: 0.88rem;
-    color: #6b7280;
-  }
-  .checkout__edit-btn {
-    background: none;
-    border: none;
-    color: #0f172a;
-    font-weight: 700;
-    font-size: 0.88rem;
-    text-decoration: underline;
-    cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-family: 'Outfit', sans-serif;
-    transition: all 0.15s;
-  }
-  .checkout__edit-btn:hover {
-    background: #f3f4f6;
-  }
-
-  /* ── Dev Notice ────────────────────────────────────────────────────────── */
-  .checkout__dev-notice {
-    background: #fffbeb;
-    border: 1px solid #fde68a;
-    border-radius: 12px;
-    padding: 14px 18px;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    font-size: 0.85rem;
-    color: #92400e;
-  }
-  .checkout__dev-notice strong {
-    display: block;
-    margin-bottom: 2px;
-    font-size: 0.88rem;
-  }
-  .checkout__dev-notice p {
-    margin: 0;
-    line-height: 1.4;
-  }
-  .checkout__dev-notice svg {
-    margin-top: 2px;
-    flex-shrink: 0;
-  }
-
-  /* ── Error ──────────────────────────────────────────────────────────────── */
-  .checkout__error {
-    background: #fef2f2;
-    border: 1px solid #fecaca;
-    color: #dc2626;
-    padding: 14px 18px;
-    border-radius: 12px;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 0.88rem;
-    font-weight: 500;
-  }
-
-  /* ── Payment Methods ───────────────────────────────────────────────────── */
-  .checkout__methods {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 24px;
-  }
-  .checkout__method {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 18px 20px;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 14px;
-    cursor: pointer;
-    transition: all 0.2s;
-    background: white;
-  }
-  .checkout__method:hover {
-    border-color: #d1d5db;
-  }
-  .checkout__method.active {
-    border-color: #0f172a;
-    background: #fafafa;
-    box-shadow: 0 0 0 1px #0f172a;
-  }
-  .checkout__method-left {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-  .checkout__radio {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    border: 2px solid #d1d5db;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: border-color 0.15s;
-    flex-shrink: 0;
-  }
-  .checkout__radio.checked {
-    border-color: #0f172a;
-  }
-  .checkout__radio-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: #0f172a;
-  }
-  .checkout__method-name {
-    font-weight: 700;
-    font-size: 0.95rem;
-    color: #0f172a;
-    margin-bottom: 1px;
-  }
-  .checkout__method-desc {
-    font-size: 0.82rem;
-    color: #9ca3af;
-  }
-  .checkout__card-icons {
-    display: flex;
-    gap: 6px;
-  }
-  .checkout__card-icons img {
-    height: 22px;
-  }
-
-  /* ── Stripe Card ───────────────────────────────────────────────────────── */
-  .checkout__stripe-card {
-    margin-bottom: 20px;
-  }
-  .checkout__stripe-label {
-    display: block;
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #374151;
-    margin-bottom: 10px;
-  }
-  .checkout__stripe-element {
-    padding: 16px;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 12px;
-    background: #fafafa;
-    transition: border-color 0.2s;
-  }
-  .checkout__stripe-element:focus-within {
-    border-color: #0f172a;
-    background: white;
-  }
-
-  /* ── Confirm Button ────────────────────────────────────────────────────── */
-  .checkout__confirm-btn {
-    width: 100%;
-    padding: 18px 24px;
-    background: linear-gradient(135deg, #c5a059 0%, #d4b06a 50%, #c5a059 100%);
-    background-size: 200% auto;
-    color: white;
-    border: none;
-    border-radius: 14px;
-    font-size: 1.1rem;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 16px rgba(197, 160, 89, 0.35);
-    font-family: 'Outfit', sans-serif;
-    letter-spacing: 0.01em;
-  }
-  .checkout__confirm-btn:hover:not(:disabled) {
-    background-position: right center;
-    transform: translateY(-1px);
-    box-shadow: 0 6px 24px rgba(197, 160, 89, 0.45);
-  }
-  .checkout__confirm-btn:active:not(:disabled) {
-    transform: translateY(0);
-  }
-  .checkout__confirm-btn:disabled {
-    opacity: 0.65;
-    cursor: not-allowed;
-  }
-
-  /* ── Trust Badges ──────────────────────────────────────────────────────── */
-  .checkout__trust {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    padding: 20px 0;
-    margin-top: 8px;
-  }
-  .checkout__trust-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: #9ca3af;
-  }
-  .checkout__trust-item svg {
-    color: #d1d5db;
-  }
-  .checkout__trust-divider {
-    width: 1px;
-    height: 16px;
-    background: #e5e7eb;
-  }
-
-  /* ── Right Column: Summary Card ────────────────────────────────────────── */
-  .checkout__summary-card {
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 16px;
-    padding: 24px;
-    position: sticky;
-    top: 2rem;
-  }
-
-  /* ── Hotel Preview ─────────────────────────────────────────────────────── */
-  .checkout__hotel-preview {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 4px;
-  }
-  .checkout__hotel-img {
-    width: 130px;
-    height: 110px;
-    object-fit: cover;
-    border-radius: 12px;
-    flex-shrink: 0;
-  }
-  .checkout__hotel-info {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-width: 0;
-  }
-  .checkout__hotel-type {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--primary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 4px;
-  }
-  .checkout__hotel-name {
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: #0f172a;
-    margin: 0 0 6px 0;
-    line-height: 1.3;
-    font-family: 'Playfair Display', serif;
-  }
-  .checkout__hotel-location {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 0.82rem;
-    color: #6b7280;
-    margin-bottom: 6px;
-  }
-  .checkout__hotel-rating {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: #0f172a;
-  }
-  .checkout__star {
-    color: var(--primary);
-  }
-  .checkout__rating-count {
-    color: #9ca3af;
-    font-weight: 400;
-  }
-
-  /* ── Dividers ──────────────────────────────────────────────────────────── */
-  .checkout__summary-divider {
-    height: 1px;
-    background: #f3f4f6;
-    margin: 20px 0;
-  }
-  .checkout__summary-divider--thick {
-    background: #e5e7eb;
-  }
-
-  /* ── Stay Details ──────────────────────────────────────────────────────── */
-  .checkout__stay-details {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .checkout__stay-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex: 1;
-  }
-  .checkout__stay-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    background: #f3f4f6;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    color: #6b7280;
-  }
-  .checkout__stay-label {
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: #9ca3af;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    margin-bottom: 1px;
-  }
-  .checkout__stay-value {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #0f172a;
-  }
-  .checkout__stay-arrow {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-    color: #d1d5db;
-    flex-shrink: 0;
-  }
-  .checkout__stay-nights {
-    font-size: 0.65rem;
-    font-weight: 700;
-    color: #9ca3af;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-
-  /* ── Guest Info ────────────────────────────────────────────────────────── */
-  .checkout__guest-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: #374151;
-  }
-  .checkout__guest-icon {
-    color: #6b7280;
-  }
-
-  /* ── Price Details ─────────────────────────────────────────────────────── */
-  .checkout__price-title {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #0f172a;
-    margin: 0 0 16px 0;
-    font-family: 'Playfair Display', serif;
-  }
-  .checkout__price-rows {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  .checkout__price-row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.9rem;
-    color: #4b5563;
-  }
-  .checkout__price-row span:first-child {
-    text-decoration: underline;
-    cursor: help;
-  }
-  .checkout__price-row--green {
-    color: #059669;
-  }
-  .checkout__price-row--green span:first-child {
-    text-decoration: none;
-  }
-
-  /* ── Total ──────────────────────────────────────────────────────────────── */
-  .checkout__total {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: #0f172a;
-  }
-  .checkout__total-amount {
-    font-size: 1.3rem;
-    font-weight: 800;
-  }
-
-  /* ── Responsive ────────────────────────────────────────────────────────── */
-  @media (max-width: 1024px) {
-    .checkout__grid {
-      grid-template-columns: 1fr !important;
-    }
-    .checkout__right {
-      order: -1;
-    }
-    .checkout__summary-card {
-      position: static;
-    }
-  }
-  @media (max-width: 640px) {
-    .checkout__container {
-      padding: 1rem;
-    }
-    .checkout__title {
-      font-size: 1.5rem;
-    }
-    .checkout__section {
-      padding: 20px 18px;
-      border-radius: 14px;
-    }
-    .checkout__hotel-preview {
-      flex-direction: column;
-    }
-    .checkout__hotel-img {
-      width: 100%;
-      height: 160px;
-    }
-    .checkout__stay-details {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 12px;
-    }
-    .checkout__stay-arrow {
-      flex-direction: row;
-      gap: 8px;
-    }
-    .checkout__trust {
-      flex-direction: column;
-      gap: 12px;
-    }
-    .checkout__trust-divider {
-      display: none;
-    }
-    .checkout__header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 10px;
-    }
-    .checkout__secure-badge {
-      align-self: flex-start;
-    }
-  }
-`;
 
 export default PaymentPage;

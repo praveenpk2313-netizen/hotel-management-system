@@ -8,7 +8,12 @@ import {
   Calendar, 
   DollarSign, 
   ArrowUpRight, 
-  Loader2 
+  Loader2,
+  Users,
+  Briefcase,
+  ArrowRight,
+  ChevronRight,
+  ExternalLink
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -18,8 +23,8 @@ import {
   CartesianGrid, 
   Tooltip, 
   ResponsiveContainer, 
-  LineChart, 
-  Line 
+  AreaChart, 
+  Area 
 } from 'recharts';
 import { formatCurrency, formatDate } from '../../utils/helpers';
 
@@ -34,145 +39,222 @@ const ManagerDashboard = () => {
   }, [dispatch]);
 
   const statCards = [
-    { title: 'Total Revenue', value: stats ? formatCurrency(stats.totalRevenue) : '$0', icon: <DollarSign />, color: '#10b981', bg: '#d1fae5' },
-    { title: 'Total Hotels', value: stats?.totalHotels || 0, icon: <Hotel />, color: '#6366f1', bg: '#e0e7ff' },
-    { title: 'Total Rooms', value: stats?.totalRooms || 0, icon: <TrendingUp />, color: '#f59e0b', bg: '#fef3c7' },
-    { title: 'Total Bookings', value: stats?.totalBookings || 0, icon: <Calendar />, color: '#ec4899', bg: '#fce7f3' },
+    { title: 'Gross Revenue', value: stats ? formatCurrency(stats.totalRevenue) : '$0', icon: DollarSign, trend: '+12.5%', color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
+    { title: 'Elite Properties', value: stats?.totalHotels || 0, icon: Hotel, trend: 'Managed', color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100' },
+    { title: 'Total Inventory', value: stats?.totalRooms || 0, icon: Briefcase, trend: 'Rooms', color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-100' },
+    { title: 'Confirmed Stays', value: stats?.totalBookings || 0, icon: Calendar, trend: 'Reservations', color: 'text-rose-600', bg: 'bg-rose-50', border: 'border-rose-100' },
   ];
 
   if (loading) return (
-    <div style={{ display: 'flex', justifyContent: 'center', padding: '10rem' }}>
-      <Loader2 className="animate-spin" size={40} color="var(--primary)" />
+    <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+      <div className="relative">
+         <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+         <div className="absolute inset-0 flex items-center justify-center">
+            <Hotel size={24} className="text-primary animate-pulse" />
+         </div>
+      </div>
+      <p className="text-sm font-bold text-gray-400 uppercase tracking-widest animate-pulse">Synchronizing Data...</p>
     </div>
   );
 
   if (error && !stats) return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '8rem 2rem', gap: '1.5rem' }}>
-      <div style={{ fontSize: '3rem' }}>⚠️</div>
-      <h2 style={{ margin: 0, color: '#1e293b' }}>Could not load dashboard</h2>
-      <p style={{ color: '#64748b', margin: 0 }}>{error}</p>
+    <div className="flex flex-col items-center justify-center py-20 px-6 text-center animate-fade-in">
+      <div className="w-20 h-20 bg-red-50 rounded-3xl flex items-center justify-center text-red-500 mb-6">
+         <TrendingUp size={40} className="rotate-180" />
+      </div>
+      <h2 className="text-2xl font-serif text-secondary-dark font-bold mb-2">Systems Interrupted</h2>
+      <p className="text-gray-500 max-w-sm mb-8">{error}</p>
       <button
         onClick={() => { dispatch(getManagerStats()); dispatch(getManagerAnalytics()); }}
-        style={{ background: '#c5a059', color: 'white', border: 'none', padding: '0.75rem 2rem', borderRadius: '10px', fontWeight: '700', cursor: 'pointer', fontSize: '0.95rem' }}
+        className="btn-gold"
       >
-        Retry
+        Re-establish Connection
       </button>
     </div>
   );
 
   return (
-    <div className="animate-fade">
-      <div style={{ marginBottom: '2.5rem' }}>
-        <h1 className="luxury-font" style={{ fontSize: '2.2rem', margin: '0 0 0.5rem 0' }}>Welcome back, {user?.name || 'Manager'}</h1>
-        <p style={{ color: '#64748b' }}>Here's what's happening with your properties today.</p>
-      </div>
-
+    <div className="space-y-10 animate-fade-in">
+      
       {/* Stats Grid */}
-      <div className="dashboard-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', marginBottom: '2.5rem' }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
         {statCards.map((card, idx) => (
-          <div key={idx} className="stat-card glass-panel" style={{ padding: '1.5rem', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '1.25rem', border: '1px solid #f1f5f9' }}>
-            <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: card.bg, color: card.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              {card.icon}
-            </div>
-            <div>
-              <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b', fontWeight: '500' }}>{card.title}</p>
-              <h3 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '800', color: '#1e293b' }}>{card.value}</h3>
+          <div key={idx} className="group relative bg-white rounded-3xl p-6 md:p-8 border border-gray-100 shadow-sm hover:shadow-premium transition-all duration-500 overflow-hidden">
+            <div className={`absolute top-0 right-0 w-32 h-32 ${card.bg} rounded-full -mr-16 -mt-16 opacity-40 group-hover:scale-110 transition-transform duration-700`} />
+            
+            <div className="relative z-10 space-y-6">
+              <div className={`w-14 h-14 ${card.bg} ${card.color} rounded-2xl flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-500`}>
+                <card.icon size={28} />
+              </div>
+              
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                   <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest">{card.title}</p>
+                   <span className="text-[10px] font-black text-primary uppercase bg-primary/10 px-2 py-0.5 rounded-full">{card.trend}</span>
+                </div>
+                <h3 className="text-3xl font-serif text-secondary-dark font-black tracking-tight group-hover:text-primary transition-colors">{card.value}</h3>
+              </div>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="responsive-grid-2-1" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem', marginBottom: '2.5rem' }}>
-        {/* Analytics Chart */}
-        <div className="glass-panel" style={{ padding: '2rem', borderRadius: '24px', border: '1px solid #f1f5f9', overflow: 'hidden' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
-            <h3 style={{ margin: 0 }}>Revenue Analytics</h3>
-            <select style={{ padding: '0.5rem', borderRadius: '8px', border: '1px solid #e2e8f0', outline: 'none' }}>
-              <option>Last 6 Months</option>
-              <option>Last Year</option>
-            </select>
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        {/* Revenue Analytics */}
+        <div className="xl:col-span-2 bg-white rounded-[2.5rem] p-8 md:p-10 border border-gray-100 shadow-sm">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
+            <div>
+              <h3 className="text-2xl font-serif text-secondary-dark font-bold">Revenue Performance</h3>
+              <p className="text-sm text-gray-400 font-medium">Monthly growth across your portfolio.</p>
+            </div>
+            <div className="flex gap-2 p-1 bg-gray-50 rounded-xl">
+               <button className="px-4 py-2 text-xs font-black uppercase text-primary bg-white shadow-sm rounded-lg tracking-wider">Revenue</button>
+               <button className="px-4 py-2 text-xs font-black uppercase text-gray-400 hover:text-secondary tracking-wider transition-colors">Bookings</button>
+            </div>
           </div>
-          <div style={{ height: '300px', width: '100%' }}>
-            <ResponsiveContainer>
-              <BarChart data={analytics}>
+          
+          <div className="h-[350px] w-full mt-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={analytics}>
+                <defs>
+                  <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#c5a059" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#c5a059" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="_id" tickFormatter={(m) => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][m-1]} axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
-                <Tooltip 
-                  cursor={{fill: '#f8fafc'}}
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                <XAxis 
+                  dataKey="_id" 
+                  tickFormatter={(m) => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][m-1]} 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{fill: '#94a3b8', fontSize: 11, fontWeight: 700}} 
+                  dy={15} 
                 />
-                <Bar dataKey="revenue" fill="#c5a059" radius={[4, 4, 0, 0]} />
-              </BarChart>
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{fill: '#94a3b8', fontSize: 11, fontWeight: 700}} 
+                />
+                <Tooltip 
+                  cursor={{stroke: '#c5a059', strokeWidth: 2}}
+                  contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 20px 40px -10px rgba(0,0,0,0.15)', padding: '15px' }}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="revenue" 
+                  stroke="#c5a059" 
+                  strokeWidth={4} 
+                  fillOpacity={1} 
+                  fill="url(#colorRevenue)" 
+                  animationDuration={1500}
+                />
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Booking Trends */}
-        <div className="glass-panel" style={{ padding: '2rem', borderRadius: '24px', border: '1px solid #f1f5f9' }}>
-          <h3 style={{ margin: '0 0 2rem 0' }}>Booking Trends</h3>
-          <div style={{ height: '300px', width: '100%' }}>
-            <ResponsiveContainer>
-              <LineChart data={analytics}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="_id" hide />
-                <Tooltip />
-                <Line type="monotone" dataKey="bookings" stroke="#6366f1" strokeWidth={3} dot={{r: 4, fill: '#6366f1'}} activeDot={{r: 6}} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+        {/* Global Stats / Quick Info */}
+        <div className="bg-secondary-dark rounded-[2.5rem] p-10 text-white relative overflow-hidden flex flex-col justify-between">
+           <div className="absolute top-0 right-0 w-64 h-64 bg-primary rounded-full blur-[120px] opacity-20 -mr-32 -mt-32" />
+           
+           <div className="relative z-10 space-y-8">
+              <div className="space-y-2">
+                 <h3 className="text-2xl font-serif text-white font-bold leading-tight">Property <br /><span className="text-primary italic">Distribution</span></h3>
+                 <p className="text-gray-400 text-sm font-medium">Your current occupancy health.</p>
+              </div>
+
+              <div className="space-y-6">
+                 {[
+                   { label: 'Room Occupancy', value: '82%', width: 'w-[82%]', color: 'bg-primary' },
+                   { label: 'Staffing Capacity', value: '94%', width: 'w-[94%]', color: 'bg-emerald-500' },
+                   { label: 'Customer Satisfaction', value: '4.8/5', width: 'w-[96%]', color: 'bg-blue-500' }
+                 ].map((stat, i) => (
+                   <div key={i} className="space-y-2">
+                      <div className="flex justify-between text-xs font-bold uppercase tracking-widest overflow-hidden">
+                         <span className="opacity-60">{stat.label}</span>
+                         <span className="text-primary">{stat.value}</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                         <div className={`${stat.width} h-full ${stat.color} rounded-full animate-pulse transition-all duration-1000`} />
+                      </div>
+                   </div>
+                 ))}
+              </div>
+           </div>
+
+           <div className="relative z-10 pt-10">
+              <button className="w-full h-14 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 flex items-center justify-center gap-3 font-bold hover:bg-white/20 transition-all group">
+                 Open Full Analytics <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+              </button>
+           </div>
         </div>
       </div>
 
-      {/* Recent Bookings Table */}
-      <div className="glass-panel" style={{ padding: '2rem', borderRadius: '24px', border: '1px solid #f1f5f9' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-          <h3 style={{ margin: 0 }}>Recent Reservations</h3>
-          <button style={{ color: 'var(--primary)', fontWeight: '700', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            View All <ArrowUpRight size={18} />
+      {/* Recent Reservations Table */}
+      <div className="bg-white rounded-[2.5rem] overflow-hidden border border-gray-100 shadow-sm">
+        <div className="p-8 md:p-10 border-b border-gray-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h3 className="text-2xl font-serif text-secondary-dark font-bold">Recent Reservations</h3>
+            <p className="text-sm text-gray-400 font-medium">Verify and manage latest guest activity.</p>
+          </div>
+          <button className="flex items-center gap-2 text-primary font-black uppercase text-xs tracking-[2px] hover:translate-x-1 transition-transform group">
+             Explore All <ArrowRight size={16} />
           </button>
         </div>
         
-        <div style={{ overflowX: 'auto' }}>
+        <div className="overflow-x-auto">
           {(!stats?.recentBookings || stats.recentBookings.length === 0) ? (
-            <div style={{ padding: '3rem', textAlign: 'center', color: '#94a3b8' }}>
-              <p style={{ margin: 0, fontSize: '0.95rem' }}>No recent reservations yet.</p>
+            <div className="py-20 flex flex-col items-center justify-center text-gray-300">
+               <Calendar size={60} strokeWidth={1} className="mb-4 opacity-30" />
+               <p className="font-bold text-sm tracking-widest uppercase">No pending reservations</p>
             </div>
           ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <table className="w-full text-left">
             <thead>
-              <tr style={{ borderBottom: '1px solid #f1f5f9', textAlign: 'left' }}>
-                <th style={{ padding: '1rem', color: '#64748b', fontWeight: '600', fontSize: '0.85rem' }}>CUSTOMER</th>
-                <th style={{ padding: '1rem', color: '#64748b', fontWeight: '600', fontSize: '0.85rem' }}>HOTEL</th>
-                <th style={{ padding: '1rem', color: '#64748b', fontWeight: '600', fontSize: '0.85rem' }}>DATES</th>
-                <th style={{ padding: '1rem', color: '#64748b', fontWeight: '600', fontSize: '0.85rem' }}>AMOUNT</th>
-                <th style={{ padding: '1rem', color: '#64748b', fontWeight: '600', fontSize: '0.85rem' }}>STATUS</th>
+              <tr className="bg-gray-50/50">
+                <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Guest Identity</th>
+                <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Property Location</th>
+                <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Stay Period</th>
+                <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Revenue</th>
+                <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Status</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-gray-50">
               {stats.recentBookings.map((booking) => (
-                <tr key={booking._id} style={{ borderBottom: '1px solid #f8fafc' }}>
-                  <td style={{ padding: '1.25rem 1rem' }}>
-                    <p style={{ margin: 0, fontWeight: '700', fontSize: '0.9rem' }}>{booking.userId?.name}</p>
-                    <p style={{ margin: 0, fontSize: '0.75rem', color: '#94a3b8' }}>{booking.userId?.email}</p>
+                <tr key={booking._id} className="hover:bg-gray-50/30 transition-colors group">
+                  <td className="px-8 py-7">
+                    <div className="flex items-center gap-4">
+                       <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-sm font-black text-primary border-2 border-white">
+                          {booking.userId?.name?.charAt(0)}
+                       </div>
+                       <div>
+                          <p className="font-black text-secondary-dark text-sm leading-none mb-1">{booking.userId?.name}</p>
+                          <p className="text-xs text-gray-400 font-medium">{booking.userId?.email}</p>
+                       </div>
+                    </div>
                   </td>
-                  <td style={{ padding: '1.25rem 1rem', fontSize: '0.9rem', color: '#475569' }}>{booking.hotelId?.name}</td>
-                  <td style={{ padding: '1.25rem 1rem', fontSize: '0.85rem', color: '#475569' }}>
-                    {formatDate(booking.checkInDate)} - {formatDate(booking.checkOutDate)}
+                  <td className="px-8 py-7">
+                    <div className="flex items-center gap-2 text-secondary-dark font-bold text-sm">
+                       <Hotel size={16} className="text-primary opacity-60" />
+                       {booking.hotelId?.name}
+                    </div>
                   </td>
-                  <td style={{ padding: '1.25rem 1rem', fontWeight: '700', color: '#10b981' }}>{formatCurrency(booking.totalPrice)}</td>
-                  <td style={{ padding: '1.25rem 1rem' }}>
-                    <span style={{ 
-                      padding: '4px 12px', 
-                      borderRadius: '20px', 
-                      fontSize: '0.7rem', 
-                      fontWeight: '800', 
-                      textTransform: 'uppercase',
-                      background: booking.status === 'confirmed' ? '#dcfce7' : '#fef9c3',
-                      color: booking.status === 'confirmed' ? '#15803d' : '#854d0e'
-                    }}>
-                      {booking.status}
-                    </span>
+                  <td className="px-8 py-7">
+                    <div className="text-xs font-black text-secondary-dark tracking-tighter">
+                       {formatDate(booking.checkInDate)} — {formatDate(booking.checkOutDate)}
+                    </div>
+                  </td>
+                  <td className="px-8 py-7 text-center">
+                    <span className="text-emerald-600 font-black text-sm">{formatCurrency(booking.totalPrice)}</span>
+                  </td>
+                  <td className="px-8 py-7 text-right">
+                    <div className="inline-flex items-center gap-1.5 pl-3 pr-4 py-1.5 rounded-full border shadow-sm">
+                       <div className={`w-2 h-2 rounded-full ${booking.status === 'confirmed' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+                       <span className={`text-[10px] font-black uppercase tracking-wider ${booking.status === 'confirmed' ? 'text-emerald-700' : 'text-amber-700'}`}>
+                          {booking.status}
+                       </span>
+                    </div>
                   </td>
                 </tr>
               ))}

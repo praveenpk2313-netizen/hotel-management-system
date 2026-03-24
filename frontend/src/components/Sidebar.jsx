@@ -9,12 +9,16 @@ import {
   BarChart3, 
   Settings, 
   LogOut,
-  Hotel
+  Hotel,
+  ShieldCheck,
+  ChevronRight,
+  Menu,
+  X
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-const Sidebar = ({ isOpen, activeSection, onSectionChange }) => {
+const Sidebar = ({ isOpen, activeSection, onSectionChange, onClose }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -24,7 +28,7 @@ const Sidebar = ({ isOpen, activeSection, onSectionChange }) => {
     if (role === 'admin') {
       navigate('/admin');
     } else {
-      navigate('/manager');
+      navigate('/manager/login');
     }
   };
 
@@ -45,84 +49,93 @@ const Sidebar = ({ isOpen, activeSection, onSectionChange }) => {
   const menuItems = user?.role === 'admin' ? adminItems : managerItems;
 
   return (
-    <aside className={`dashboard-sidebar ${isOpen ? 'open' : ''}`}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2.5rem', padding: '0.5rem' }}>
-        <Hotel size={32} color="var(--primary)" />
-        <h2 className="luxury-font" style={{ fontSize: '1.5rem', letterSpacing: '1px' }}>Horizon</h2>
-      </div>
+    <>
+      {/* Mobile Overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-secondary-dark/60 backdrop-blur-sm z-[100] lg:hidden animate-fade-in"
+          onClick={onClose}
+        />
+      )}
 
-      <nav style={{ flex: 1 }}>
-        {menuItems.map((item) => (
-          <button 
-            key={item.id}
-            onClick={() => onSectionChange(item.id)}
-            className={`nav-link ${activeSection === item.id ? 'active' : ''}`}
-            style={{ 
-              background: 'none', 
-              border: 'none', 
-              width: '100%', 
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '1rem',
-              padding: '0.875rem 1.25rem',
-              borderRadius: '12px',
-              color: activeSection === item.id ? 'white' : '#94a3b8',
-              backgroundColor: activeSection === item.id ? 'var(--primary)' : 'transparent',
-              marginBottom: '0.5rem',
-              transition: 'all 0.2s ease'
-            }}
-          >
-            <item.icon size={20} />
-            <span style={{ fontWeight: '600' }}>{item.title}</span>
+      {/* Sidebar */}
+      <aside className={`
+        fixed inset-y-0 left-0 z-[110] w-[280px] bg-secondary-dark text-white p-6 flex flex-col transition-all duration-300 ease-in-out
+        ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
+        {/* Brand */}
+        <div className="flex items-center justify-between mb-10 px-2 lg:px-4">
+          <div className="flex items-center gap-3">
+             <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
+                <span className="text-white font-serif text-xl font-bold">P</span>
+             </div>
+             <div>
+                <span className="block text-white font-serif text-lg tracking-wider uppercase leading-none">PK Urban</span>
+                <span className="text-[10px] text-primary font-bold uppercase tracking-widest leading-none">Stay Portal</span>
+             </div>
+          </div>
+          <button onClick={onClose} className="lg:hidden text-gray-400 hover:text-white transition-colors">
+            <X size={24} />
           </button>
-        ))}
-      </nav>
-
-      <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1.5rem', marginTop: '1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem', padding: '0.5rem' }}>
-          <div style={{ 
-            width: '40px', 
-            height: '40px', 
-            borderRadius: '12px', 
-            background: 'var(--primary)', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            fontWeight: '600',
-            fontSize: '1.1rem',
-            color: 'white'
-          }}>
-            {user?.name?.charAt(0) || 'M'}
-          </div>
-          <div style={{ overflow: 'hidden' }}>
-            <p style={{ fontWeight: '600', fontSize: '0.9rem', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'white' }}>{user?.name || 'Manager'}</p>
-            <p style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'capitalize' }}>{user?.role}</p>
-          </div>
         </div>
 
-        <button 
-          onClick={handleLogout}
-          className="nav-link logout-btn" 
-          style={{ 
-            width: '100%', 
-            background: 'none', 
-            border: 'none', 
-            color: '#fca5a5',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '1rem',
-            padding: '0.875rem 1.25rem',
-            borderRadius: '12px',
-            transition: 'all 0.2s ease'
-          }}
-        >
-          <LogOut size={20} />
-          <span style={{ fontWeight: '600' }}>Logout</span>
-        </button>
-      </div>
-    </aside>
+        {/* Navigation */}
+        <nav className="flex-1 space-y-1">
+          <div className="text-[10px] font-black text-gray-500 uppercase tracking-[2px] mb-4 ml-4">
+             Management Menu
+          </div>
+          {menuItems.map((item) => (
+            <button 
+              key={item.id}
+              onClick={() => {
+                onSectionChange(item.id);
+                if (window.innerWidth < 1024) onClose();
+              }}
+              className={`
+                w-full group flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all duration-200
+                ${activeSection === item.id 
+                  ? 'bg-primary text-white shadow-lg shadow-primary/20' 
+                  : 'text-gray-400 hover:bg-white/5 hover:text-white'}
+              `}
+            >
+              <div className="flex items-center gap-3.5">
+                <item.icon size={20} className={activeSection === item.id ? 'text-white' : 'text-gray-500 group-hover:text-primary transition-colors'} />
+                <span className="font-semibold text-sm tracking-tight">{item.title}</span>
+              </div>
+              {activeSection === item.id && <ChevronRight size={16} className="animate-pulse" />}
+            </button>
+          ))}
+        </nav>
+
+        {/* Footer Profile & Logout */}
+        <div className="mt-auto pt-8 border-t border-white/10 space-y-6">
+          <div className="flex items-center gap-3 px-2">
+            <div className="relative group">
+               <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-white font-black text-xl shadow-lg border-2 border-white/10 overflow-hidden transform group-hover:scale-105 transition-transform">
+                  {user?.name?.charAt(0) || 'M'}
+               </div>
+               <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-secondary-dark rounded-full shadow-sm" />
+            </div>
+            <div className="flex-1 overflow-hidden">
+               <h4 className="text-sm font-bold text-white truncate">{user?.name || 'Manager'}</h4>
+               <div className="flex items-center gap-1.5 opacity-60 text-[11px] uppercase tracking-wider font-black text-primary">
+                  <ShieldCheck size={12} /> {user?.role || 'Partner'}
+               </div>
+            </div>
+          </div>
+
+          <button 
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl text-red-400 font-bold hover:bg-red-500/10 transition-all border border-transparent hover:border-red-500/20 active:scale-95 group"
+          >
+            <div className="w-8 h-8 rounded-xl bg-red-400/10 flex items-center justify-center group-hover:bg-red-400 group-hover:text-white transition-colors">
+               <LogOut size={18} />
+            </div>
+            <span className="text-sm">Sign Out Portal</span>
+          </button>
+        </div>
+      </aside>
+    </>
   );
 };
 

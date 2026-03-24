@@ -12,7 +12,13 @@ import {
   AlertCircle,
   Save,
   ArrowLeft,
-  Check
+  Check,
+  Building2,
+  MapPin,
+  Sparkles,
+  Camera,
+  ChevronRight,
+  Info
 } from 'lucide-react';
 
 const AMENITIES_LIST = [
@@ -77,11 +83,11 @@ const AddHotel = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (form.images.length === 0) {
-      setError('Please upload at least one hotel image.');
+      setError('Please upload at least one hotel image for the collection.');
       return;
     }
     if (form.amenities.length === 0) {
-      setError('Please select at least one amenity.');
+      setError('Please select at least one amenity to highlight your property.');
       return;
     }
 
@@ -92,163 +98,180 @@ const AddHotel = () => {
       await createManagerHotel(form);
       navigate('/manager/hotels');
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create hotel');
+      setError(err.response?.data?.message || 'Property registration failed. Please verify credentials.');
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div className="animate-fade" style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 1rem' }}>
+    <div className="animate-fade-in max-w-5xl mx-auto pb-20">
+      {/* Back Button */}
       <button 
         onClick={() => navigate('/manager/hotels')}
-        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'none', border: 'none', color: '#64748b', fontWeight: '600', cursor: 'pointer', marginBottom: '2rem' }}
+        className="group flex items-center gap-2 text-primary font-black uppercase text-xs tracking-[2px] mb-10 hover:-translate-x-1 transition-transform"
       >
-        <ArrowLeft size={18} /> Back to My Hotels
+        <ArrowLeft size={16} /> Portfolio Collection
       </button>
 
-      <div className="glass-panel" style={{ borderRadius: '32px', padding: '3.5rem', border: '1px solid #f1f5f9', background: 'white', boxShadow: '0 10px 40px rgba(0,0,0,0.03)' }}>
-        <div style={{ marginBottom: '3rem' }}>
-          <h1 className="luxury-font" style={{ fontSize: '2.8rem', margin: '0 0 0.75rem 0', color: '#0f172a' }}>Add New Hotel</h1>
-          <p style={{ color: '#64748b', fontSize: '1.1rem' }}>Define the soul of your property. Provide accurate details to attract sophisticated travelers.</p>
+      {/* Main Container */}
+      <div className="bg-white rounded-[3rem] border border-gray-100 shadow-premium overflow-hidden">
+        
+        {/* Header Section */}
+        <div className="p-10 md:p-16 border-b border-gray-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 bg-gray-50/50">
+          <div className="space-y-3">
+             <div className="flex items-center gap-2 text-primary font-black text-xs uppercase tracking-[3px]">
+                <Sparkles size={16} className="animate-pulse" /> Global Standard Registration
+             </div>
+             <h1 className="text-4xl md:text-5xl font-serif text-secondary-dark font-black tracking-tight leading-none">
+                Expand Your <br />
+                <span className="text-primary italic">Heritage</span>
+             </h1>
+             <p className="text-gray-400 font-medium max-w-md leading-relaxed">
+                Provide precise details to register your property within the PK UrbanStay luxury elite collection.
+             </p>
+          </div>
+          <div className="w-24 h-24 bg-white rounded-3xl shadow-sm border border-gray-100 flex items-center justify-center text-primary transform rotate-6">
+             <Building2 size={40} />
+          </div>
         </div>
 
-        {error && (
-          <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c', padding: '1.25rem', borderRadius: '16px', marginBottom: '2.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <AlertCircle size={20} /> {error}
-          </div>
-        )}
+        {/* Content Body */}
+        <div className="p-10 md:p-16">
+          {error && (
+            <div className="p-6 bg-rose-50 border border-rose-100 rounded-[2rem] flex items-center gap-4 text-rose-600 text-sm font-bold mb-12 animate-shake">
+               <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-rose-500 shadow-sm">
+                  <AlertCircle size={20} />
+               </div>
+               {error}
+            </div>
+          )}
 
-        <form onSubmit={handleSubmit}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-            <div className="form-group-custom">
-              <label className="label-custom">Hotel Name</label>
-              <input required type="text" value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="input-custom" placeholder="e.g. Royal Grand Palace" />
-            </div>
-            <div className="form-group-custom">
-              <label className="label-custom">Location / Area</label>
-              <input required type="text" value={form.location} onChange={e => setForm({...form, location: e.target.value})} className="input-custom" placeholder="e.g. Marine Drive" />
-            </div>
-            <div className="form-group-custom">
-              <label className="label-custom">City</label>
-              <input required type="text" value={form.city} onChange={e => setForm({...form, city: e.target.value})} className="input-custom" placeholder="e.g. Mumbai" />
-            </div>
-            <div className="form-group-custom">
-              <label className="label-custom">Full Address</label>
-              <input required type="text" value={form.address} onChange={e => setForm({...form, address: e.target.value})} className="input-custom" placeholder="Complete postal address" />
-            </div>
-          </div>
+          <form onSubmit={handleSubmit} className="space-y-16">
+            
+            {/* Section 1: Core Details */}
+            <div className="space-y-10">
+               <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-secondary-dark text-white flex items-center justify-center font-black text-xs">01</div>
+                  <h3 className="text-xl font-bold text-secondary-dark font-serif uppercase tracking-wider">Identity & Location</h3>
+               </div>
+               
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+                  <div className="space-y-2 group">
+                     <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1 group-focus-within:text-primary transition-colors">Property Moniker</label>
+                     <input required type="text" value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="input-premium" placeholder="Ex: PK Urban Ritz" />
+                  </div>
+                  <div className="space-y-2 group">
+                     <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1 group-focus-within:text-primary transition-colors">Strategic Area</label>
+                     <input required type="text" value={form.location} onChange={e => setForm({...form, location: e.target.value})} className="input-premium" placeholder="Ex: Downtown Plaza" />
+                  </div>
+                  <div className="space-y-2 group">
+                     <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1 group-focus-within:text-primary transition-colors">Metropolitan City</label>
+                     <input required type="text" value={form.city} onChange={e => setForm({...form, city: e.target.value})} className="input-premium" placeholder="Ex: London" />
+                  </div>
+                  <div className="space-y-2 group">
+                     <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1 group-focus-within:text-primary transition-colors">Verified Registry Address</label>
+                     <input required type="text" value={form.address} onChange={e => setForm({...form, address: e.target.value})} className="input-premium" placeholder="Full street address" />
+                  </div>
+               </div>
 
-          <div style={{ marginTop: '2.5rem' }}>
-            <label className="label-custom">Property Description</label>
-            <textarea required rows="5" value={form.description} onChange={e => setForm({...form, description: e.target.value})} className="input-custom" style={{ resize: 'none', height: '150px' }} placeholder="Describe the ambiance, the view, and the unique experiences awaiting your guests..."></textarea>
-          </div>
+               <div className="space-y-2 group">
+                  <div className="flex justify-between items-center ml-1">
+                     <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest group-focus-within:text-primary transition-colors">Property Narrative</label>
+                     <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Min 50 chars</span>
+                  </div>
+                  <textarea required rows={5} value={form.description} onChange={e => setForm({...form, description: e.target.value})} className="input-premium py-6 min-h-[160px]" placeholder="Explain the heritage and unique atmosphere of this property..."></textarea>
+               </div>
+            </div>
 
-          <div style={{ marginTop: '3rem' }}>
-            <label className="label-custom" style={{ marginBottom: '1.5rem', display: 'block' }}>Key Amenities & Services</label>
-            <div className="amenities-grid-custom">
-              {AMENITIES_LIST.map((item) => (
-                <div 
-                  key={item.name}
-                  onClick={() => toggleAmenity(item.name)}
-                  style={{
-                    padding: '1.25rem',
-                    borderRadius: '16px',
-                    border: `2px solid ${form.amenities.includes(item.name) ? 'var(--primary)' : '#f1f5f9'}`,
-                    background: form.amenities.includes(item.name) ? 'rgba(197, 160, 89, 0.05)' : '#f8fafc',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '1rem',
-                    transition: '0.2s',
-                    position: 'relative'
-                  }}
-                  onMouseEnter={e => !form.amenities.includes(item.name) && (e.currentTarget.style.borderColor = '#e2e8f0')}
-                  onMouseLeave={e => !form.amenities.includes(item.name) && (e.currentTarget.style.borderColor = '#f1f5f9')}
-                >
-                  <span style={{ fontSize: '1.5rem' }}>{item.icon}</span>
-                  <span style={{ fontSize: '0.9rem', fontWeight: '600', color: form.amenities.includes(item.name) ? '#1e293b' : '#64748b' }}>{item.name}</span>
-                  {form.amenities.includes(item.name) && (
-                    <div style={{ position: 'absolute', top: '-8px', right: '-8px', background: 'var(--primary)', color: 'white', borderRadius: '50%', width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Check size={14} strokeWidth={4} />
+            {/* Section 2: Amenities */}
+            <div className="space-y-10">
+               <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-secondary-dark text-white flex items-center justify-center font-black text-xs">02</div>
+                  <h3 className="text-xl font-bold text-secondary-dark font-serif uppercase tracking-wider">Features & Amenities</h3>
+               </div>
+               
+               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                  {AMENITIES_LIST.map((item) => (
+                    <button 
+                      key={item.id}
+                      type="button"
+                      onClick={() => toggleAmenity(item.name)}
+                      className={`p-5 rounded-3xl border transition-all text-left flex flex-col gap-4 group relative overflow-hidden ${form.amenities.includes(item.name) ? 'border-primary bg-primary/5 shadow-premium' : 'border-gray-100 bg-gray-50/50 hover:bg-white hover:border-gray-200'}`}
+                    >
+                       <span className="text-3xl group-hover:scale-110 transition-transform inline-block">{item.icon}</span>
+                       <span className={`text-[10px] font-black uppercase tracking-wider leading-tight ${form.amenities.includes(item.name) ? 'text-secondary-dark' : 'text-gray-400'}`}>{item.name}</span>
+                       {form.amenities.includes(item.name) && (
+                         <div className="absolute top-3 right-3 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                            <Check size={14} strokeWidth={4} />
+                         </div>
+                       )}
+                    </button>
+                  ))}
+               </div>
+            </div>
+
+            {/* Section 3: Visual Identity */}
+            <div className="space-y-10">
+               <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-secondary-dark text-white flex items-center justify-center font-black text-xs">03</div>
+                  <h3 className="text-xl font-bold text-secondary-dark font-serif uppercase tracking-wider">Visual Heritage (Gallery)</h3>
+               </div>
+               
+               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                  {form.images.map((img, i) => (
+                    <div key={i} className="group relative aspect-square rounded-[2rem] overflow-hidden border-4 border-white shadow-premium">
+                       <img src={img} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="Preview" />
+                       <button 
+                         type="button" 
+                         onClick={() => setForm({...form, images: form.images.filter((_, idx) => idx !== i)})} 
+                         className="absolute top-4 right-4 w-9 h-9 bg-black/60 backdrop-blur-md rounded-xl text-white opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center hover:bg-rose-500 shadow-lg"
+                       >
+                          <X size={16} />
+                       </button>
                     </div>
-                  )}
-                </div>
-              ))}
+                  ))}
+                  <label className="aspect-square border-4 border-dashed border-gray-100 rounded-[2rem] flex flex-col items-center justify-center gap-3 text-gray-300 cursor-pointer hover:border-primary/30 hover:bg-primary/5 hover:text-primary transition-all group shadow-sm hover:shadow-premium">
+                     <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
+                        <Camera size={28} />
+                     </div>
+                     <span className="text-[10px] font-black uppercase tracking-widest">Add Legacy Photo</span>
+                     <input type="file" multiple hidden onChange={handleImageUpload} />
+                  </label>
+               </div>
             </div>
-          </div>
 
-          <div style={{ marginTop: '3.5rem' }}>
-            <label className="label-custom" style={{ marginBottom: '1.5rem', display: 'block' }}>Property Gallery</label>
-            <div className="image-grid-custom" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '1.5rem' }}>
-              {form.images.map((img, i) => (
-                <div key={i} style={{ position: 'relative', height: '140px', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 10px 15px rgba(0,0,0,0.05)' }}>
-                  <img src={img} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  <button type="button" onClick={() => setForm({...form, images: form.images.filter((_, idx) => idx !== i)})} style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(239, 68, 68, 0.9)', border: 'none', color: 'white', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><X size={16} /></button>
-                </div>
-              ))}
-              <label style={{ height: '140px', border: '2px dashed #cbd5e1', borderRadius: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#94a3b8', background: '#f8fafc', transition: '0.3s' }} className="image-upload-btn">
-                <ImageIcon size={32} />
-                <span style={{ fontSize: '0.9rem', marginTop: '0.5rem', fontWeight: '700' }}>Add Photo</span>
-                <input type="file" multiple hidden onChange={handleImageUpload} />
-              </label>
+            {/* Submit Block */}
+            <div className="pt-16 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-8">
+               <div className="flex items-center gap-3 text-gray-400">
+                  <Info size={20} className="text-primary" />
+                  <p className="text-sm font-medium">Verified properties receive priority indexing.</p>
+               </div>
+               
+               <button 
+                 type="submit" 
+                 disabled={submitting} 
+                 className="w-full md:w-[320px] h-16 bg-secondary-dark text-white font-bold rounded-2xl shadow-xl shadow-secondary-dark/20 hover:shadow-secondary-dark/40 active:scale-95 transition-all flex items-center justify-center gap-3 uppercase tracking-widest text-xs group relative overflow-hidden"
+               >
+                 <div className="absolute inset-0 bg-primary opacity-0 group-hover:opacity-10 transition-opacity" />
+                 {submitting ? (
+                   <Loader2 className="animate-spin" size={20} />
+                 ) : (
+                   <>
+                      Submit for Global Audit <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform text-primary" />
+                   </>
+                 )}
+               </button>
             </div>
-          </div>
-
-          <div style={{ marginTop: '4rem', borderTop: '1px solid #f1f5f9', paddingTop: '3rem', display: 'flex', justifyContent: 'flex-end' }}>
-            <button 
-              type="submit" 
-              disabled={submitting} 
-              style={{ 
-                width: '300px', 
-                height: '60px',
-                background: '#0f172a',
-                color: 'white',
-                borderRadius: '16px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '1rem',
-                fontSize: '1.1rem',
-                fontWeight: '700',
-                border: 'none',
-                cursor: submitting ? 'not-allowed' : 'pointer',
-                boxShadow: '0 10px 25px rgba(15, 23, 42, 0.25)',
-                transition: '0.3s'
-              }}
-              onMouseEnter={e => !submitting && (e.currentTarget.style.transform = 'translateY(-2px)')}
-              onMouseLeave={e => !submitting && (e.currentTarget.style.transform = 'translateY(0)')}
-            >
-              {submitting ? <Loader2 className="animate-spin" size={24} /> : <Save size={24} />}
-              {submitting ? 'Creating Property...' : 'Submit for Approval'}
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
-
+      
       <style>{`
-        .form-group-custom { display: flex; flexDirection: column; gap: 0.75rem; }
-        .label-custom { font-weight: 700; font-size: 0.95rem; color: #1e293b; margin-bottom: 0.5rem; display: block; }
-        .input-custom { padding: 1.1rem 1.4rem; border: 1.5px solid #e2e8f0; border-radius: 16px; outline: none; transition: 0.3s; font-size: 1rem; width: 100%; box-sizing: border-box; }
-        .input-custom:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.1); }
-        .image-upload-btn:hover { border-color: var(--primary); background: #fdfcfb; color: var(--primary); }
-        .amenities-grid-custom { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; }
-
-        @media (max-width: 900px) {
-          .glass-panel { padding: 2rem !important; }
-          .luxury-font { font-size: 2.2rem !important; }
-        }
-
-        @media (max-width: 640px) {
-          .glass-panel { padding: 1.5rem !important; border-radius: 20px !important; }
-          .input-custom { padding: 0.9rem 1.1rem !important; }
-          .amenities-grid-custom { grid-template-columns: 1fr 1fr !important; }
-        }
-
-        @media (max-width: 480px) {
-          .amenities-grid-custom { grid-template-columns: 1fr !important; }
-          .luxury-font { font-size: 1.8rem !important; }
-        }
+        @keyframes fade-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
+        .animate-shake { animation: shake 0.4s ease-in-out; }
       `}</style>
     </div>
   );

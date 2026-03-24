@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-do
 import { useAuth } from '../context/AuthContext';
 import { useDispatch } from 'react-redux';
 import { loginStart, loginFailure } from '../redux/slices/authSlice';
-import { AlertCircle, Eye, EyeOff, Mail, Lock, Loader2 } from 'lucide-react';
+import { AlertCircle, Eye, EyeOff, Mail, Lock, Loader2, ArrowRight, CheckCircle2 } from 'lucide-react';
 import api, { API_BASE_URL, getApiErrorMessage } from '../services/api';
 
 const Login = () => {
@@ -82,185 +82,158 @@ const Login = () => {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: '#f8fafc',
-      padding: '2rem'
-    }}>
-      <div style={{
-        display: 'flex',
-        width: '100%',
-        maxWidth: '1050px',
-        minHeight: '650px',
-        background: 'white',
-        borderRadius: '32px',
-        overflow: 'hidden',
-        boxShadow: '0 25px 60px rgba(0,0,0,0.08)',
-        border: '1px solid #f1f5f9'
-      }}>
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 md:p-8 font-sans">
+      <div className="w-full max-w-6xl flex flex-col md:flex-row bg-white rounded-[2.5rem] overflow-hidden shadow-premium border border-gray-100 min-h-[700px]">
         
-        {/* Visual Panel - Relevant Luxury Image */}
-        <div style={{
-          flex: 1,
-          position: 'relative',
-          display: window.innerWidth < 900 ? 'none' : 'block'
-        }}>
-          <img 
-            src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=1200" 
-            alt="Luxury Interior" 
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-          />
-          <div style={{ 
-            position: 'absolute', 
-            inset: 0, 
-            background: 'linear-gradient(rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.7))',
-            padding: '4rem',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-end'
-          }}>
-             <h2 style={{ color: 'white', fontSize: '3rem', fontWeight: '400', fontFamily: '"Playfair Display", serif', marginBottom: '1rem', lineHeight: '1.2' }}>Discover Perfection<br />In Every Stay.</h2>
-             <p style={{ color: 'white', opacity: 0.8, fontSize: '1rem', fontWeight: '300', lineHeight: '1.7', maxWidth: '350px' }}>Your global portal for extraordinary accommodations and world-class hospitality.</p>
+        {/* Left: Illustrative / Branding Section */}
+        <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-secondary-dark p-12 flex-col justify-between">
+          {/* Background Image with Overlay */}
+          <div className="absolute inset-0 z-0">
+            <img 
+              src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=2000" 
+              className="w-full h-full object-cover opacity-40 mix-blend-overlay scale-110" 
+              alt="Luxury Hotel"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-secondary-dark via-secondary-dark/40 to-transparent" />
+          </div>
+
+          {/* Top Brand */}
+          <div className="relative z-10 flex items-center gap-3">
+             <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
+                <span className="text-white font-serif text-xl font-bold">P</span>
+             </div>
+             <span className="text-white font-serif text-2xl tracking-wider uppercase">PK UrbanStay</span>
+          </div>
+
+          {/* Bottom Content */}
+          <div className="relative z-10 space-y-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-white text-sm">
+               <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+               Experience the Pinnacle of Luxury
+            </div>
+            <h2 className="text-5xl xl:text-6xl text-white font-serif leading-tight">
+               Your Gateway <br />
+               To Global <span className="text-primary italic">Comfort</span>.
+            </h2>
+            <p className="text-gray-400 text-lg max-w-md leading-relaxed">
+               Access high-end stays and personalized hospitality through our exclusive management portal.
+            </p>
+
+            <div className="grid grid-cols-2 gap-8 pt-8 border-t border-white/10">
+               <div className="space-y-1">
+                  <div className="text-primary font-bold text-2xl">500+</div>
+                  <div className="text-gray-500 text-sm uppercase tracking-widest">Properties</div>
+               </div>
+               <div className="space-y-1">
+                  <div className="text-primary font-bold text-2xl">24/7</div>
+                  <div className="text-gray-500 text-sm uppercase tracking-widest">Support</div>
+               </div>
+            </div>
           </div>
         </div>
 
-        {/* Clean Form Panel */}
-        <div style={{
-          flex: 0.9,
-          padding: '4rem 3.5rem',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          background: 'white'
-        }}>
-          {/* Header */}
-          <div style={{ marginBottom: '3.5rem' }}>
-             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
-                <img src="/logo.png" style={{ width: '36px', height: '36px' }} alt="StayNow Logo" />
-                <span style={{ fontSize: '1.25rem', fontWeight: '800', color: '#0f172a', fontFamily: '"Playfair Display", serif' }}>StayNow</span>
+        {/* Right: Login Form Section */}
+        <div className="flex-1 p-8 md:p-16 lg:p-20 flex flex-col justify-center bg-white">
+          {/* Mobile Brand Show */}
+          <div className="lg:hidden flex items-center gap-3 mb-12">
+             <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
+                <span className="text-white font-serif text-xl font-bold">P</span>
              </div>
-             <h1 style={{ fontSize: '2.5rem', fontWeight: '700', color: '#0f172a', marginBottom: '0.75rem' }}>Welcome Back</h1>
-             <p style={{ color: '#94a3b8', fontSize: '1rem', fontWeight: '500' }}>Enter your credential details to log in.</p>
+             <span className="text-secondary-dark font-serif text-2xl tracking-wider uppercase">PK UrbanStay</span>
           </div>
 
-          {error && (
-            <div style={{ display:'flex', alignItems:'center', gap:'0.75rem', background:'#fff1f2', color:'#e11d48', padding:'1rem 1.25rem', borderRadius:'16px', marginBottom:'2rem', fontSize:'0.9rem', fontWeight: '600' }}>
-               <AlertCircle size={20} /> {error}
+          <div className="max-w-md w-full mx-auto space-y-10">
+            <div className="space-y-3">
+              <h1 className="text-4xl font-serif text-secondary-dark font-bold">Welcome Back</h1>
+              <p className="text-gray-500 font-medium">Please enter your account details to sign in.</p>
             </div>
-          )}
 
-          {/* Regular Login */}
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-             <div className="input-field">
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '800', color: '#0f172a', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.6rem' }}>Email Address</label>
-                <div style={{ position: 'relative' }}>
-                   <input type="email" placeholder="john@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required className="clean-input" />
-                   <Mail className="field-icon" size={18} />
+            {error && (
+              <div className="flex items-center gap-3 bg-red-50 border border-red-100 text-red-600 p-5 rounded-2xl animate-fade-in">
+                 <AlertCircle className="shrink-0" size={20} />
+                 <p className="text-sm font-semibold">{error}</p>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-[11px] font-black text-secondary-dark uppercase tracking-[1.5px] ml-1">Email Address</label>
+                <div className="relative group">
+                   <input 
+                    type="email" 
+                    placeholder="name@example.com" 
+                    value={email} 
+                    onChange={(e) => setEmail(e.target.value)} 
+                    required 
+                    className="w-full h-16 pl-12 pr-6 bg-gray-50 border-2 border-transparent rounded-2xl text-secondary-dark font-medium 
+                               focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none"
+                   />
+                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors" size={20} />
                 </div>
-             </div>
-             
-             <div className="input-field">
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
-                   <label style={{ fontSize: '0.8rem', fontWeight: '800', color: '#0f172a', textTransform: 'uppercase', letterSpacing: '1px' }}>Password</label>
-                   <Link to="/forgot-password" style={{ fontSize: '0.8rem', color: '#c5a059', fontWeight: '800', textDecoration: 'none' }}>Forgot?</Link>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex justify-between items-end ml-1">
+                   <label className="text-[11px] font-black text-secondary-dark uppercase tracking-[1.5px]">Password</label>
+                   <Link to="/forgot-password" size={18} className="text-xs text-primary font-bold hover:underline">Forgot?</Link>
                 </div>
-                <div style={{ position: 'relative' }}>
-                   <input type={showPwd ? 'text' : 'password'} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required className="clean-input" />
-                   <Lock className="field-icon" size={18} />
-                   <button type="button" onClick={() => setShowPwd(!showPwd)} style={{ position: 'absolute', right: '1.25rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
-                      {showPwd ? <EyeOff size={18} /> : <Eye size={18} />}
+                <div className="relative group">
+                   <input 
+                    type={showPwd ? 'text' : 'password'} 
+                    placeholder="••••••••" 
+                    value={password} 
+                    onChange={(e) => setPassword(e.target.value)} 
+                    required 
+                    className="w-full h-16 pl-12 pr-12 bg-gray-50 border-2 border-transparent rounded-2xl text-secondary-dark font-medium 
+                               focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none"
+                   />
+                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors" size={20} />
+                   <button 
+                    type="button" 
+                    onClick={() => setShowPwd(!showPwd)} 
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-secondary-dark transition-colors p-1"
+                   >
+                      {showPwd ? <EyeOff size={20} /> : <Eye size={20} />}
                    </button>
                 </div>
-             </div>
+              </div>
 
-             <button type="submit" disabled={loading} className="clean-submit" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem' }}>
-                {loading ? <><Loader2 size={20} className="spin-icon" /> Authenticating...</> : 'Sign In To Account'}
-             </button>
-          </form>
+              <button 
+                type="submit" 
+                disabled={loading} 
+                className="w-full h-16 bg-gradient-to-r from-secondary-light to-secondary-dark text-white font-bold rounded-2xl 
+                           shadow-2xl shadow-secondary/20 flex items-center justify-center gap-3 active:scale-[0.98] transition-all 
+                           hover:shadow-secondary/40 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed group"
+              >
+                {loading ? (
+                  <><Loader2 size={24} className="animate-spin" /> Authenticating...</>
+                ) : (
+                  <>Sign In To Account <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" /></>
+                )}
+              </button>
+            </form>
 
-          {/* Google Sign In ONLY */}
-          <button onClick={() => openOAuthPopup('google')} className="social-pill-btn" style={{ width: '100%', marginTop: '1rem' }}>
-             <svg width="20" height="20" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-             Continue with Google
-          </button>
+            <div className="relative flex items-center py-4">
+              <div className="flex-grow border-t border-gray-100"></div>
+              <span className="flex-shrink mx-4 text-gray-400 text-xs font-bold uppercase tracking-widest">Or login with</span>
+              <div className="flex-grow border-t border-gray-100"></div>
+            </div>
 
-          <p style={{ textAlign: 'center', marginTop: '3rem', color: '#94a3b8', fontSize: '0.95rem' }}>
-             New to StayNow? <Link to="/register" style={{ color: '#0f172a', fontWeight: '800', textDecoration: 'none', marginLeft: '0.4rem' }}>Create Account</Link>
-          </p>
+            <button 
+              onClick={() => openOAuthPopup('google')} 
+              className="w-full h-16 bg-white border-2 border-gray-50 rounded-2xl flex items-center justify-center gap-3 
+                         font-bold text-secondary-dark hover:bg-gray-50 hover:border-gray-200 transition-all active:scale-[0.98]"
+            >
+               <svg width="24" height="24" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+               Google Account
+            </button>
+
+            <p className="text-center pt-6 text-gray-500 font-medium">
+               New to the platform? <Link to="/register" className="text-secondary-dark font-black hover:text-primary transition-colors">Create Free Account</Link>
+            </p>
+          </div>
         </div>
-
       </div>
-
-      <style>{`
-        .clean-input {
-          width: 100%;
-          height: 56px;
-          padding: 0 1rem 0 3.2rem;
-          border-radius: 12px;
-          border: 1.5px solid #f1f5f9;
-          background: #fdfdfd;
-          font-size: 1rem;
-          outline: none;
-          transition: 0.3s;
-          box-sizing: border-box;
-          color: #0f172a;
-          font-weight: 500;
-        }
-        .clean-input:focus {
-          border-color: #c5a059;
-          background: white;
-          box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.1);
-        }
-        .field-icon {
-          position: absolute;
-          left: 1rem;
-          top: 50%;
-          transform: translateY(-50%);
-          color: #94a3b8;
-          transition: 0.3s;
-        }
-        .clean-input:focus ~ .field-icon { color: #c5a059; }
-        
-        .clean-submit {
-          height: 60px;
-          background: #0f172a;
-          color: white;
-          border-radius: 12px;
-          border: none;
-          font-weight: 800;
-          font-size: 1.05rem;
-          cursor: pointer;
-          transition: 0.3s;
-          box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
-        }
-        .clean-submit:hover:not(:disabled) {
-          transform: translateY(-2px);
-          box-shadow: 0 15px 30px rgba(15, 23, 42, 0.25);
-          background: #1e293b;
-        }
-        .social-pill-btn {
-          flex: 1;
-          height: 54px;
-          border-radius: 12px;
-          border: 1.5px solid #f1f5f9;
-          background: white;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.75rem;
-          font-weight: 700;
-          color: #1e293b;
-          cursor: pointer;
-          transition: 0.3s;
-        }
-        .social-pill-btn:hover {
-          background: #f8fafc;
-          border-color: #cbd5e1;
-        }
-      `}</style>
     </div>
   );
 };

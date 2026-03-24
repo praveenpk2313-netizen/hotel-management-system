@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import HotelCard from '../components/HotelCard';
 import { fetchHotels } from '../services/api';
 import { 
@@ -12,7 +12,17 @@ import {
   X, 
   Star,
   ChevronRight,
-  Loader2
+  Loader2,
+  Calendar,
+  Zap,
+  Tag,
+  ArrowRight,
+  Sparkles,
+  Award,
+  Filter,
+  ArrowUpDown,
+  CheckCircle2,
+  Clock
 } from 'lucide-react';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
@@ -60,18 +70,16 @@ const HotelListPage = () => {
       setHotels(data);
       setError('');
     } catch (err) {
-      console.error('Failed to fetch hotels:', err);
-      setError('Could not load hotels. Please try again later.');
+      setError('Directory retrieval failed.');
     } finally {
       setLoading(false);
     }
   }, [filters.location, filters.minPrice, filters.maxPrice, filters.rating, filters.amenities]);
 
-  // Debounce API calls for location and price
   useEffect(() => {
     const timer = setTimeout(() => {
       loadHotels();
-    }, 500);
+    }, 400);
     return () => clearTimeout(timer);
   }, [loadHotels]);
 
@@ -97,238 +105,229 @@ const HotelListPage = () => {
   };
 
   return (
-    <div style={{ background: '#f8fafc', minHeight: '100vh', padding: '2rem 1rem' }}>
-      <div className="container" style={{ maxWidth: '1400px' }}>
+    <div className="bg-background-light min-h-screen pb-24 pt-6 px-4 md:px-0">
+      <div className="max-w-7xl mx-auto space-y-12 animate-fade-in">
         
-        {/* Header Section */}
-        <div style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1.5rem' }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--primary)', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px' }}>
-              <ChevronRight size={16} /> Explore
-            </div>
-            <h1 className="luxury-font luxury-font-lg" style={{ fontSize: '2.5rem', color: '#0f172a', margin: 0 }}>Discover Luxury Stays</h1>
-            <p style={{ color: '#64748b', marginTop: '0.5rem' }}>Indulge in unparalleled comfort across the world's most premium destinations.</p>
-          </div>
-          
-          <button 
-            onClick={() => setShowMobileFilters(true)}
-            style={{ 
-              display: 'none', 
-              background: 'white', 
-              padding: '0.6rem 1.2rem', 
-              borderRadius: '10px', 
-              border: '1px solid #e2e8f0',
-              fontWeight: '600',
-              gap: '0.5rem',
-              alignItems: 'center'
-            }}
-            className="mobile-filter-btn"
-          >
-            <SlidersHorizontal size={18} /> Filters
-          </button>
+        {/* Header Terminal */}
+        <div className="bg-white p-10 md:p-14 rounded-[3.5rem] border border-gray-100 shadow-premium relative overflow-hidden group">
+           <div className="absolute top-0 right-0 w-80 h-80 bg-primary/5 rounded-full -mr-40 -mt-40 blur-3xl" />
+           
+           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-10 relative z-10">
+              <div className="space-y-4">
+                 <div className="flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full text-primary font-black text-[10px] uppercase tracking-[3px]">
+                    <Sparkles size={14} className="animate-pulse" /> Global Collection Index
+                 </div>
+                 <h1 className="text-4xl md:text-5xl lg:text-7xl font-serif text-secondary-dark font-black tracking-tight leading-none">
+                    Discover <span className="text-primary italic">Luxury</span>
+                 </h1>
+                 <p className="text-gray-400 font-medium text-lg max-w-xl">
+                    Audited properties across the most prestigious global coordinates. Refined for your perspective.
+                 </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-4">
+                 <button 
+                  onClick={() => setShowMobileFilters(true)}
+                  className="lg:hidden h-14 px-8 bg-white border-2 border-gray-100 rounded-2xl flex items-center gap-3 font-black text-[10px] uppercase tracking-[3px] text-secondary-dark hover:border-primary transition-all shadow-sm"
+                 >
+                    <SlidersHorizontal size={18} /> Modify Scope
+                 </button>
+                 <div className="hidden lg:flex items-center gap-6 px-8 py-4 bg-gray-50 rounded-[2rem] border border-gray-100">
+                    <div className="flex flex-col">
+                       <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Active Results</span>
+                       <span className="text-xl font-black text-secondary-dark">{hotels.length} <span className="text-primary font-serif italic text-lg opacity-80">PROPERTIES</span></span>
+                    </div>
+                    <div className="w-px h-8 bg-gray-200" />
+                    <div className="flex items-center gap-2">
+                       <Shield size={18} className="text-emerald-500" />
+                       <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">VERIFIED ARCHIVES</span>
+                    </div>
+                 </div>
+              </div>
+           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '2rem', position: 'relative' }}>
+        <div className="flex flex-col lg:flex-row gap-12 relative items-start">
           
-          {/* Sidebar Filters */}
-          <aside className={`filter-sidebar ${showMobileFilters ? 'mobile-open' : ''}`} style={{
-            width: '320px',
-            flexShrink: 0,
-            background: 'white',
-            borderRadius: '24px',
-            padding: '2rem',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.03)',
-            height: 'fit-content',
-            position: 'sticky',
-            top: '100px',
-            zIndex: 10
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: '700', margin: 0 }}>Filters</h3>
-              <button onClick={clearFilters} style={{ background: 'none', color: 'var(--primary)', fontWeight: '600', fontSize: '0.85rem' }}>Reset All</button>
-              <button onClick={() => setShowMobileFilters(false)} className="mobile-close-btn" style={{ display: 'none' }}><X /></button>
-            </div>
+          {/* Sidebar Filters - Desktop (Col 4) */}
+          <aside className="hidden lg:block w-96 space-y-10 sticky top-10">
+             
+             {/* Filter Section: Global Logic */}
+             <div className="bg-white p-10 rounded-[3rem] border border-gray-100 shadow-premium space-y-12">
+                <div className="flex justify-between items-center pb-6 border-b border-gray-50">
+                   <h3 className="text-xl font-serif font-black text-secondary-dark">Scope Logic</h3>
+                   <button onClick={clearFilters} className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline">Reset All</button>
+                </div>
 
-            {/* Location Search */}
-            <div style={{ marginBottom: '2rem' }}>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', color: '#64748b', marginBottom: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Location</label>
-              <div style={{ position: 'relative' }}>
-                <MapPin size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
-                <input 
-                  type="text" 
-                  placeholder="Where are you going?"
-                  value={filters.location}
-                  onChange={(e) => setFilters({...filters, location: e.target.value})}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem 1rem 0.75rem 2.5rem',
-                    borderRadius: '12px',
-                    border: '1.5px solid #e2e8f0',
-                    outline: 'none',
-                    fontSize: '0.95rem'
-                  }}
-                />
-              </div>
-            </div>
+                {/* Criteria: Location */}
+                <div className="space-y-4 group">
+                   <label className="text-[10px] font-black text-gray-400 uppercase tracking-[3px] ml-1 flex items-center gap-2 group-focus-within:text-primary transition-colors">
+                      <MapPin size={12} /> Target Coordinate
+                   </label>
+                   <input 
+                     type="text" 
+                     placeholder="Enter city or district..."
+                     value={filters.location}
+                     onChange={(e) => setFilters({...filters, location: e.target.value})}
+                     className="input-premium h-14 px-6 text-sm"
+                   />
+                </div>
 
-            {/* Price Range */}
-            <div style={{ marginBottom: '2rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <label style={{ fontSize: '0.85rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Price Range</label>
-                <span style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--primary)' }}>
-                  Max: {formatCurrency(filters.maxPrice)}
-                </span>
-              </div>
-              <input 
-                type="range" 
-                min="0" 
-                max="5000" 
-                step="50"
-                value={filters.maxPrice}
-                onChange={(e) => setFilters({...filters, maxPrice: e.target.value})}
-                style={{ width: '100%', accentColor: 'var(--primary)' }}
-              />
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', color: '#94a3b8', fontSize: '0.75rem' }}>
-                <span>$0</span>
-                <span>$5,000+</span>
-              </div>
-            </div>
+                {/* Criteria: Investment Cap */}
+                <div className="space-y-6">
+                   <div className="flex justify-between items-center px-1">
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-[3px]">Investment Cap</label>
+                      <span className="text-sm font-black text-primary italic font-serif tracking-tight">{formatCurrency(filters.maxPrice)}</span>
+                   </div>
+                   <div className="px-2">
+                      <input 
+                        type="range" min="0" max="5000" step="50"
+                        value={filters.maxPrice}
+                        onChange={(e) => setFilters({...filters, maxPrice: e.target.value})}
+                        className="w-full accent-primary h-2 bg-gray-100 rounded-full appearance-none cursor-pointer"
+                      />
+                      <div className="flex justify-between mt-4 text-[9px] font-black text-gray-300 uppercase tracking-widest">
+                         <span>$0 BASE</span>
+                         <span>$5K ELITE</span>
+                      </div>
+                   </div>
+                </div>
 
-            {/* Date Range */}
-            <div style={{ marginBottom: '2rem' }}>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', color: '#64748b', marginBottom: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Dates</label>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <DatePicker
-                  selected={filters.startDate}
-                  onChange={(date) => setFilters({...filters, startDate: date})}
-                  placeholderText="Check-in Date"
-                  className="datepicker-input"
-                  minDate={new Date()}
-                />
-                <DatePicker
-                  selected={filters.endDate}
-                  onChange={(date) => setFilters({...filters, endDate: date})}
-                  placeholderText="Check-out Date"
-                  className="datepicker-input"
-                  minDate={filters.startDate || new Date()}
-                />
-              </div>
-            </div>
+                {/* Criteria: Provisions */}
+                <div className="space-y-6">
+                   <label className="text-[10px] font-black text-gray-400 uppercase tracking-[3px] ml-1">Elite Provisions</label>
+                   <div className="grid grid-cols-1 gap-2">
+                      {AMENITIES_OPTIONS.map(amenity => (
+                        <button 
+                          key={amenity.id}
+                          onClick={() => handleAmenityToggle(amenity.id)}
+                          className={`h-12 px-6 rounded-2xl flex items-center justify-between group transition-all duration-300 border ${
+                            filters.amenities.includes(amenity.id) 
+                            ? 'bg-secondary-dark border-secondary-dark text-white shadow-lg shadow-secondary/20' 
+                            : 'bg-white border-gray-100 text-gray-400 hover:border-primary hover:text-primary'
+                          }`}
+                        >
+                           <div className="flex items-center gap-3">
+                              <amenity.icon size={16} className={filters.amenities.includes(amenity.id) ? 'text-primary' : 'text-gray-300 group-hover:text-primary'} />
+                              <span className="text-[10px] font-black uppercase tracking-widest">{amenity.name}</span>
+                           </div>
+                           {filters.amenities.includes(amenity.id) && <CheckCircle2 size={16} className="text-primary" />}
+                        </button>
+                      ))}
+                   </div>
+                </div>
 
-            {/* Amenities */}
-            <div style={{ marginBottom: '2rem' }}>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', color: '#64748b', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Amenities</label>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                {AMENITIES_OPTIONS.map(amenity => (
-                  <label key={amenity.id} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', transition: '0.2s' }}>
-                    <div 
-                      onClick={() => handleAmenityToggle(amenity.id)}
-                      style={{
-                        width: '20px',
-                        height: '20px',
-                        borderRadius: '6px',
-                        border: '2px solid',
-                        borderColor: filters.amenities.includes(amenity.id) ? 'var(--primary)' : '#cbd5e1',
-                        background: filters.amenities.includes(amenity.id) ? 'var(--primary)' : 'transparent',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        transition: '0.2s'
-                      }}
-                    >
-                      {filters.amenities.includes(amenity.id) && <X size={14} color="white" />}
-                    </div>
-                    <span style={{ fontSize: '0.95rem', color: filters.amenities.includes(amenity.id) ? '#0f172a' : '#64748b', fontWeight: filters.amenities.includes(amenity.id) ? '600' : '400' }}>
-                      {amenity.name}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
+                {/* Criteria: Sentiment Index */}
+                <div className="space-y-6">
+                   <label className="text-[10px] font-black text-gray-400 uppercase tracking-[3px] ml-1">Sentiment Index</label>
+                   <div className="flex gap-2">
+                      {[3, 4, 5].map(star => (
+                        <button
+                          key={star}
+                          onClick={() => setFilters({...filters, rating: filters.rating === star ? 0 : star})}
+                          className={`flex-1 h-12 rounded-xl flex items-center justify-center gap-1 transition-all border ${
+                            filters.rating === star 
+                            ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' 
+                            : 'bg-white border-gray-100 text-gray-400 hover:border-primary hover:text-primary'
+                          }`}
+                        >
+                           <span className="text-xs font-black">{star}+</span>
+                           <Star size={12} fill={filters.rating === star ? 'white' : 'transparent'} />
+                        </button>
+                      ))}
+                   </div>
+                </div>
+             </div>
 
-            {/* Rating Filter */}
-            <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', color: '#64748b', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Minimum Rating</label>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                {[3, 4, 5].map(star => (
-                  <button
-                    key={star}
-                    onClick={() => setFilters({...filters, rating: filters.rating === star ? 0 : star})}
-                    style={{
-                      flex: 1,
-                      padding: '0.6rem',
-                      borderRadius: '10px',
-                      border: '1.5px solid',
-                      borderColor: filters.rating === star ? 'var(--primary)' : '#e2e8f0',
-                      background: filters.rating === star ? 'rgba(197, 160, 89, 0.1)' : 'white',
-                      color: filters.rating === star ? 'var(--primary)' : '#64748b',
-                      fontWeight: '700',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '0.3rem'
-                    }}
-                  >
-                    {star}+ <Star size={14} fill={filters.rating === star ? 'var(--primary)' : 'none'} />
-                  </button>
-                ))}
-              </div>
-            </div>
+             {/* Support Card */}
+             <div className="bg-secondary-dark p-10 rounded-[3rem] text-white space-y-8 shadow-premium-dark relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-colors" />
+                <div className="relative z-10 space-y-4 text-center">
+                   <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center text-primary mx-auto border border-white/5">
+                      <Clock size={24} />
+                   </div>
+                   <h4 className="text-lg font-serif font-black tracking-tight">Need Assistance?</h4>
+                   <p className="text-[10px] font-medium text-gray-400 uppercase tracking-widest leading-relaxed">Our global concierges are on standby for your custom itinerary.</p>
+                   <button className="w-full h-12 bg-white/5 border border-white/10 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-white hover:text-secondary-dark transition-all">Support Terminal</button>
+                </div>
+             </div>
           </aside>
 
-          {/* Hotel Grid */}
-          <main style={{ flexGrow: 1 }}>
+          {/* Hotel Grid - (Col 8) */}
+          <main className="flex-1 space-y-10">
             
-            {/* Search Summary */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', background: 'white', padding: '1rem 1.5rem', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
-              <div style={{ fontWeight: '600', color: '#0f172a' }}>
-                {loading ? 'Searching...' : `${hotels.length} hotels found`}
-                {filters.location && <span style={{ color: '#94a3b8', fontWeight: '400' }}> in {filters.location}</span>}
-              </div>
-              
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Sort by:</span>
-                <select style={{ border: 'none', background: 'none', fontWeight: '600', color: 'var(--primary)', outline: 'none', cursor: 'pointer' }}>
-                  <option>Recommended</option>
-                  <option>Price: Low to High</option>
-                  <option>Price: High to Low</option>
-                  <option>Top Rated</option>
-                </select>
-              </div>
+            {/* Sorting & Stats Summary */}
+            <div className="bg-white p-6 md:p-8 rounded-[2.5rem] border border-gray-50 shadow-sm flex flex-col md:flex-row justify-between items-center gap-8">
+               <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
+                     {loading ? <Loader2 size={24} className="animate-spin" /> : <Search size={24} />}
+                  </div>
+                  <div>
+                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Active Search Manifest</p>
+                     <h3 className="text-lg font-bold text-secondary-dark flex items-center gap-2">
+                        {hotels.length} <span className="text-primary italic font-serif">Properties Matching</span>
+                        {filters.location && <span className="text-gray-300 font-normal">in {filters.location}</span>}
+                     </h3>
+                  </div>
+               </div>
+               
+               <div className="flex items-center gap-6">
+                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest lg:mb-0 mb-2">Sequence Logic</span>
+                  <div className="relative h-12 px-6 bg-gray-50 rounded-xl border border-gray-100 flex items-center gap-3 group cursor-pointer hover:border-primary transition-all">
+                     <ArrowUpDown size={14} className="text-primary" />
+                     <select className="bg-transparent border-none appearance-none font-black text-[10px] uppercase tracking-widest outline-none cursor-pointer text-secondary-dark pr-6">
+                        <option>Curated Recommend</option>
+                        <option>Inversion: High to Low</option>
+                        <option>Ascension: Low to High</option>
+                        <option>Sentiment Tier</option>
+                     </select>
+                     <ChevronRight size={14} className="absolute right-4 rotate-90 text-gray-300" />
+                  </div>
+               </div>
             </div>
 
+            {/* Main Result Area */}
             {loading && hotels.length === 0 ? (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} className="skeleton" style={{ height: '420px', borderRadius: '16px', background: 'white' }}></div>
+                  <div key={i} className="bg-white h-[500px] rounded-[3.5rem] animate-pulse border border-gray-100 flex flex-col p-6 space-y-6">
+                     <div className="flex-1 bg-gray-50 rounded-[2.5rem]" />
+                     <div className="h-6 w-3/4 bg-gray-50 rounded-full mx-6" />
+                     <div className="h-4 w-1/2 bg-gray-50 rounded-full mx-6 pb-6" />
+                  </div>
                 ))}
               </div>
             ) : error ? (
-              <div style={{ textAlign: 'center', padding: '5rem 0', background: 'white', borderRadius: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
-                <X size={48} color="var(--error)" style={{ marginBottom: '1rem' }} />
-                <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{error}</h3>
-                <button onClick={loadHotels} className="btn-primary" style={{ marginTop: '1rem' }}>Try Again</button>
+              <div className="py-24 text-center bg-white rounded-[4rem] border-2 border-dashed border-rose-100 space-y-8">
+                 <div className="w-20 h-20 bg-rose-50 rounded-[2.5rem] flex items-center justify-center text-rose-500 mx-auto shadow-sm">
+                    <X size={40} />
+                 </div>
+                 <div className="space-y-2">
+                    <h3 className="text-2xl font-serif text-secondary-dark font-black tracking-tight">{error}</h3>
+                    <p className="text-gray-400 font-medium">Unable to synchronize with the global property database. Please retry the audit.</p>
+                 </div>
+                 <button onClick={loadHotels} className="btn-gold px-10">Retry Sync</button>
               </div>
             ) : hotels.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '5rem 2rem', background: 'white', borderRadius: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
-                <div style={{ 
-                  width: '80px', height: '80px', background: '#f1f5f9', borderRadius: '50%', 
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' 
-                }}>
-                  <Search size={32} color="#94a3b8" />
-                </div>
-                <h3 className="luxury-font" style={{ fontSize: '1.8rem', marginBottom: '1rem' }}>No Hotels Found</h3>
-                <p style={{ color: '#64748b', maxWidth: '400px', margin: '0 auto 2rem' }}>
-                  We couldn't find any properties matching your current filters. Try adjusting your search or resetting filters.
-                </p>
-                <button onClick={clearFilters} className="btn-primary">View All Hotels</button>
+              <div className="py-24 text-center bg-white rounded-[4rem] border border-gray-100 space-y-10 shadow-sm">
+                 <div className="relative w-32 h-32 mx-auto">
+                    <div className="absolute inset-0 bg-primary/10 rounded-full animate-ping opacity-20" />
+                    <div className="relative flex items-center justify-center w-full h-full bg-gray-50 rounded-full border border-gray-100">
+                       <Search size={48} className="text-gray-200" />
+                    </div>
+                 </div>
+                 <div className="space-y-4">
+                    <h3 className="text-4xl font-serif text-secondary-dark font-black tracking-tight">Scope Not Found</h3>
+                    <p className="text-gray-400 font-medium max-w-sm mx-auto leading-relaxed italic">
+                       The specified coordinates do not echo with any current heritage properties. Adjust your logic or view the full ledger.
+                    </p>
+                 </div>
+                 <button onClick={clearFilters} className="btn-gold px-12 h-16 inline-flex items-center gap-3 shadow-xl">
+                    Full Portfolio Access <ArrowRight size={20} />
+                 </button>
               </div>
             ) : (
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', 
-                gap: '2rem' 
-              }}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-12 animate-slide-up">
                 {hotels.map(hotel => (
                   <HotelCard key={hotel._id} hotel={hotel} />
                 ))}
@@ -336,64 +335,144 @@ const HotelListPage = () => {
             )}
             
             {loading && hotels.length > 0 && (
-              <div style={{ 
-                position: 'fixed', bottom: '3rem', left: '50%', transform: 'translateX(-50%)',
-                background: 'white', padding: '0.75rem 1.5rem', borderRadius: '30px',
-                boxShadow: '0 10px 30px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: '0.75rem',
-                zIndex: 100
-              }}>
-                <Loader2 size={18} className="animate-spin" style={{ color: 'var(--primary)' }} />
-                <span style={{ fontWeight: '600', fontSize: '0.9rem' }}>Updating results...</span>
+              <div className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-secondary-dark px-8 h-14 rounded-2xl flex items-center gap-4 text-white font-black text-[10px] uppercase tracking-[3px] shadow-2xl shadow-secondary/40 animate-slide-up z-[100] border border-white/10 backdrop-blur-md">
+                 <Loader2 size={16} className="animate-spin text-primary" />
+                 Synchronizing Ledger...
               </div>
             )}
           </main>
         </div>
       </div>
 
+      {/* Mobile Filters Modal */}
+      {showMobileFilters && (
+        <div className="fixed inset-0 z-[200] flex flex-col bg-white animate-fade-in lg:hidden">
+           {/* Modal Header */}
+           <div className="p-8 border-b border-gray-50 flex justify-between items-center bg-secondary-dark text-white">
+              <div className="space-y-1">
+                 <h2 className="text-2xl font-serif font-black tracking-tight flex items-center gap-3">
+                    <Filter size={24} className="text-primary" /> Audit Scope
+                 </h2>
+                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Global Criteria Terminal</p>
+              </div>
+              <button 
+                onClick={() => setShowMobileFilters(false)}
+                className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center text-white border border-white/10 active:scale-95 transition-all"
+              >
+                 <X size={24} />
+              </button>
+           </div>
+
+           {/* Modal Content - Scrollable */}
+           <div className="flex-1 overflow-y-auto p-8 space-y-12 pb-32">
+              <div className="space-y-6">
+                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-[4px] ml-1 flex items-center gap-2">
+                    <MapPin size={12} className="text-primary" /> Coordinate Point
+                 </label>
+                 <input 
+                   type="text" 
+                   placeholder="TARGET CITY..."
+                   value={filters.location}
+                   onChange={(e) => setFilters({...filters, location: e.target.value})}
+                   className="input-premium h-16 px-8 text-md font-bold text-secondary-dark uppercase tracking-widest"
+                 />
+              </div>
+
+              <div className="space-y-8">
+                 <div className="flex justify-between items-center px-1">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-[4px]">Rate Covenants</label>
+                    <span className="text-lg font-black text-primary italic font-serif tracking-tight">{formatCurrency(filters.maxPrice)}</span>
+                 </div>
+                 <div className="px-2">
+                    <input 
+                      type="range" min="0" max="5000" step="50"
+                      value={filters.maxPrice}
+                      onChange={(e) => setFilters({...filters, maxPrice: e.target.value})}
+                      className="w-full accent-primary h-2 bg-gray-100 rounded-full appearance-none cursor-pointer"
+                    />
+                 </div>
+              </div>
+
+              <div className="space-y-6">
+                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-[4px] ml-1">Elite Requirements</label>
+                 <div className="grid grid-cols-1 gap-3">
+                    {AMENITIES_OPTIONS.map(amenity => (
+                      <button 
+                        key={amenity.id}
+                        onClick={() => handleAmenityToggle(amenity.id)}
+                        className={`h-16 px-8 rounded-2xl flex items-center justify-between transition-all border-2 ${
+                          filters.amenities.includes(amenity.id) 
+                          ? 'bg-secondary-dark border-secondary-dark text-white' 
+                          : 'bg-white border-gray-100 text-gray-400'
+                        }`}
+                      >
+                         <div className="flex items-center gap-4">
+                            <amenity.icon size={20} className={filters.amenities.includes(amenity.id) ? 'text-primary' : 'text-gray-300'} />
+                            <span className="text-xs font-black uppercase tracking-widest">{amenity.name}</span>
+                         </div>
+                         {filters.amenities.includes(amenity.id) && <CheckCircle2 size={20} className="text-primary flex-shrink-0" />}
+                      </button>
+                    ))}
+                 </div>
+              </div>
+
+              <div className="space-y-6 pb-10">
+                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-[4px] ml-1">Audit Score Level</label>
+                 <div className="flex gap-4">
+                    {[3, 4, 5].map(star => (
+                      <button
+                        key={star}
+                        onClick={() => setFilters({...filters, rating: filters.rating === star ? 0 : star})}
+                        className={`flex-1 h-16 rounded-2xl flex items-center justify-center gap-2 transition-all border-2 ${
+                          filters.rating === star 
+                          ? 'bg-primary border-primary text-white shadow-xl shadow-primary/20' 
+                          : 'bg-white border-gray-100 text-gray-400'
+                        }`}
+                      >
+                         <span className="text-sm font-black italic font-serif">{star}+</span>
+                         <Star size={16} fill={filters.rating === star ? 'white' : 'transparent'} />
+                      </button>
+                    ))}
+                 </div>
+              </div>
+           </div>
+
+           {/* Modal Footer */}
+           <div className="p-8 border-t border-gray-50 flex gap-4 bg-white shadow-[0_-10px_30px_rgba(0,0,0,0.05)] sticky bottom-0">
+              <button 
+                onClick={clearFilters}
+                className="flex-1 h-16 bg-gray-50 text-gray-400 font-black text-[10px] uppercase tracking-widest rounded-2xl"
+              >
+                 Reset
+              </button>
+              <button 
+                onClick={() => setShowMobileFilters(false)}
+                className="flex-[2] h-16 bg-secondary-dark text-white font-black text-[10px] uppercase tracking-widest rounded-2xl shadow-xl shadow-secondary/20 flex items-center justify-center gap-3"
+              >
+                 Apply Criteria <ArrowRight size={18} className="text-primary" />
+              </button>
+           </div>
+        </div>
+      )}
+
       <style>{`
-        .datepicker-input {
-          width: 100%;
-          padding: 0.75rem 1rem;
-          border-radius: 12px;
-          border: 1.5px solid #e2e8f0;
+        @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes slide-up { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-slide-up { animation: slide-up 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .input-premium {
+          background: #ffffff;
+          border: 2px solid #f1f5f9;
+          border-radius: 1.25rem;
           outline: none;
-          font-size: 0.95rem;
-          cursor: pointer;
+          transition: all 0.3s ease;
+          font-weight: 700;
+          color: #0f172a;
         }
-        .datepicker-input:focus {
-          border-color: var(--primary);
-        }
-        .animate-spin {
-          animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        .skeleton {
-          background: linear-gradient(90deg, #f0f0f0 25%, #f8f8f8 50%, #f0f0f0 75%);
-          background-size: 200% 100%;
-          animation: loading 1.5s infinite;
-        }
-        @keyframes loading {
-          0% { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
-        @media (max-width: 1024px) {
-          .filter-sidebar {
-            display: none;
-          }
-          .filter-sidebar.mobile-open {
-            display: block;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            width: 100%; height: 100%;
-            border-radius: 0;
-            overflow-y: auto;
-            margin: 0;
-          }
-          .mobile-filter-btn { display: flex !important; }
-          .mobile-close-btn { display: block !important; }
+        .input-premium:focus {
+          border-color: #C5A059;
+          box-shadow: 0 10px 25px -10px rgba(197, 160, 89, 0.2);
+          transform: translateY(-2px);
         }
       `}</style>
     </div>

@@ -11,16 +11,23 @@ import {
   Loader2, 
   Edit2, 
   MessageSquare,
-  Star,
+  Star as StarIcon,
   Send,
   X,
   CreditCard,
-  Trash2
+  Trash2,
+  ArrowRight,
+  ShieldCheck,
+  Zap,
+  Tag,
+  MessageCircle,
+  History,
+  Info
 } from 'lucide-react';
 import { formatCurrency, formatDate } from '../utils/helpers';
 import { fetchUserBookings, cancelBooking, modifyBooking, createRazorpayOrder, verifyRazorpayPayment, fetchReviewByBookingId } from '../services/api';
 import { submitReview, editReview, removeReview, resetReviewStatus } from '../redux/slices/reviewSlice';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import DatePicker from 'react-datepicker';
 import StarRating from '../components/StarRating';
@@ -53,31 +60,23 @@ const BookingHistory = () => {
       setSuccess(location.state.successMessage);
       window.history.replaceState({}, document.title);
     }
-    if (location.state?.highlightBooking && bookings.length > 0) {
-      const target = bookings.find(b => b._id === location.state.highlightBooking);
-      if (target) {
-        handleReviewClick(target);
-        // Clear the state
-        window.history.replaceState({}, document.title);
-      }
-    }
-  }, [location, bookings]);
+  }, [location]);
 
-  const loadBookings = async () => {
+  const loadBookings = useCallback(async () => {
     setLoading(true);
     try {
       const { data } = await fetchUserBookings();
       setBookings(data.bookings || []);
     } catch (err) {
-      setError('Failed to load your bookings. Please try again.');
+      setError('Failed to retrieve your travel archive.');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadBookings();
-  }, []);
+  }, [loadBookings]);
 
   useEffect(() => {
     if (reviewSuccess) {
@@ -85,18 +84,18 @@ const BookingHistory = () => {
       setReviewingBooking(null);
       setReviewForm({ id: null, rating: 5, comment: '' });
       dispatch(resetReviewStatus());
-      loadBookings(); // Refresh to update isReviewed flag
+      loadBookings();
     }
-  }, [reviewSuccess, dispatch]);
+  }, [reviewSuccess, dispatch, loadBookings, reviewingBooking?.isReviewed]);
 
   const handleCancel = async (id) => {
-    if (!window.confirm('Are you sure you want to cancel this booking? This action cannot be undone.')) return;
+    if (!window.confirm('Are you sure you want to terminate this reservation?')) return;
     try {
       await cancelBooking(id);
-      setSuccess('Booking cancelled successfully.');
+      setSuccess('Reservation terminated successfully.');
       loadBookings();
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to cancel booking.');
+      setError(err.response?.data?.message || 'Termination failed.');
     }
   };
 
@@ -116,7 +115,7 @@ const BookingHistory = () => {
     try {
       const diffTime = Math.abs(modifyingDates.end - modifyingDates.start);
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      const newTotal = diffDays * (modifyingBooking.roomId?.price || 0);
+      const newTotal = (diffDays || 1) * (modifyingBooking.roomId?.price || 0);
 
       await modifyBooking(modifyingBooking._id, {
         checkInDate: modifyingDates.start,
@@ -125,11 +124,11 @@ const BookingHistory = () => {
         numGuests: modifyingDates.guests
       });
 
-      setSuccess('Booking updated successfully.');
+      setSuccess('Itinerary modified successfully.');
       setModifyingBooking(null);
       loadBookings();
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to update booking.');
+      setError(err.response?.data?.message || 'Modification failed.');
     } finally {
       setSubmittingMod(false);
     }
@@ -162,14 +161,14 @@ const BookingHistory = () => {
   };
 
   const handleDeleteReview = async () => {
-    if (!window.confirm('Are you sure you want to delete your review?')) return;
+    if (!window.confirm('Delete this review forever?')) return;
     dispatch(removeReview(reviewForm.id));
   };
 
   const handleReviewClick = async (booking) => {
     setError('');
+    setReviewingBooking(booking);
     if (booking.isReviewed) {
-      setReviewingBooking(booking);
       try {
         const { data } = await fetchReviewByBookingId(booking._id);
         setReviewForm({ id: data._id, rating: data.rating, comment: data.comment });
@@ -177,244 +176,349 @@ const BookingHistory = () => {
         setReviewForm({ id: null, rating: 5, comment: '' });
       }
     } else {
-      setReviewingBooking(booking);
       setReviewForm({ id: null, rating: 5, comment: '' });
     }
   };
 
-  const isReviewable = (booking) => {
-    return booking.status === 'confirmed';
-  };
-
-  if (loading && bookings.length === 0) {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: '1rem' }}>
-        <Loader2 size={40} className="animate-spin" color="var(--primary)" />
-        <p style={{ color: 'var(--text-muted)' }}>Fetching your reservations...</p>
-      </div>
-    );
-  }
+  if (loading && bookings.length === 0) return (
+    <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+      <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+      <p className="text-xs font-black text-gray-400 uppercase tracking-widest animate-pulse">Retrieving Archive...</p>
+    </div>
+  );
 
   return (
-    <div className="animate-fade" style={{ padding: '4rem 0', background: '#fdfcfb', minHeight: '100vh' }}>
-      <div className="container" style={{ maxWidth: '1000px' }}>
-        <div style={{ marginBottom: '3rem' }}>
-          <h1 className="luxury-font" style={{ fontSize: '3rem', color: '#0f172a', marginBottom: '0.5rem' }}>My Journeys</h1>
-          <p style={{ color: '#64748b', fontSize: '1.1rem' }}>Manage your stays and share your experiences.</p>
+    <div className="bg-background-light min-h-screen pb-20 pt-10 px-4 md:px-0">
+      <div className="max-w-6xl mx-auto space-y-12 animate-fade-in">
+        
+        {/* Header Section */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8 bg-white p-10 md:p-12 rounded-[3.5rem] border border-gray-100 shadow-premium relative overflow-hidden group">
+           {/* Decoration */}
+           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-primary/10 transition-colors duration-1000" />
+           
+           <div className="space-y-4 relative z-10">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full text-primary font-black text-[10px] uppercase tracking-[3px]">
+                 <History size={14} /> Global Travel Ledger
+              </div>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-secondary-dark font-black tracking-tight leading-[1.1]">
+                 My <span className="text-primary italic">Journeys</span>
+              </h1>
+              <p className="text-gray-400 font-medium text-lg max-w-lg leading-relaxed">
+                 A curated retrospective of your elite experiences with the PK UrbanStay collection.
+              </p>
+           </div>
+           
+           <div className="flex items-center gap-6 relative z-10 pb-2">
+              <div className="text-right">
+                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Active Status</p>
+                 <p className="text-xl font-bold text-secondary-dark">{bookings.filter(b => b.status === 'confirmed').length} Confirmed</p>
+              </div>
+              <div className="w-px h-12 bg-gray-100" />
+              <div className="text-right">
+                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Stay Value</p>
+                 <p className="text-xl font-bold text-primary italic font-serif tracking-tight">VIP Ledger</p>
+              </div>
+           </div>
         </div>
 
-        {success && (
-          <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', color: '#15803d', padding: '1rem', borderRadius: '16px', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <CheckCircle size={20} /> {success}
-          </div>
-        )}
+        {/* Notifications */}
+        <div className="space-y-4">
+           {success && (
+             <div className="p-5 bg-emerald-50 border border-emerald-100 rounded-[2rem] flex items-center gap-4 text-emerald-700 text-sm font-bold animate-slide-up">
+                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-emerald-500 shadow-sm"><CheckCircle size={20} /></div>
+                {success}
+             </div>
+           )}
+           {error && (
+             <div className="p-5 bg-rose-50 border border-rose-100 rounded-[2rem] flex items-center gap-4 text-rose-700 text-sm font-bold animate-shake">
+                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-rose-500 shadow-sm"><AlertTriangle size={20} /></div>
+                {error}
+             </div>
+           )}
+        </div>
 
-        {error && (
-          <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c', padding: '1rem', borderRadius: '16px', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <AlertTriangle size={20} /> {error}
-          </div>
-        )}
-
+        {/* Bookings Collection */}
         {bookings.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '5rem 2rem', background: 'white', borderRadius: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
-            <Calendar size={32} color="#94a3b8" />
-            <h3 className="luxury-font" style={{ fontSize: '1.8rem', margin: '1rem 0' }}>No Bookings Yet</h3>
-            <a href="/hotels" className="btn-primary" style={{ padding: '1rem 2rem', textDecoration: 'none' }}>Explore Hotels</a>
+          <div className="py-32 flex flex-col items-center justify-center text-center bg-white rounded-[4rem] border border-gray-100 shadow-sm">
+             <div className="w-24 h-24 bg-gray-50 rounded-[2.5rem] flex items-center justify-center text-gray-200 mb-8 border border-gray-50">
+                <Calendar size={48} />
+             </div>
+             <h3 className="text-2xl font-serif text-secondary-dark font-black">No Reservations Found</h3>
+             <p className="text-gray-400 font-medium mt-2 mb-10 max-w-sm mx-auto leading-relaxed">Your travel archive is currently clear. Begin your next luxury chapter today.</p>
+             <Link to="/hotels" className="btn-gold flex items-center gap-3">
+                Discover Properties <ArrowRight size={20} className="text-white/80" />
+             </Link>
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-            {bookings.map(booking => (
-              <div key={booking._id} className="glass-panel" style={{ 
-                padding: '2rem', 
-                borderRadius: '24px', 
-                display: 'grid',
-                gridTemplateColumns: '180px 1fr auto',
-                gap: '2.5rem', 
-                alignItems: 'center',
-                boxShadow: '0 10px 30px rgba(0,0,0,0.04)',
-                background: 'white',
-                opacity: booking.status === 'cancelled' ? 0.7 : 1
-              }}>
-                <img 
-                  src={booking.hotelId?.images?.[0] || "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&q=80&w=300"} 
-                  style={{ width: '180px', height: '140px', borderRadius: '16px', objectFit: 'cover' }}
-                />
-                
-                <div>
-                  <h3 className="luxury-font" style={{ fontSize: '1.5rem', margin: '0 0 0.4rem 0' }}>{booking.hotelId?.name}</h3>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-                     <div style={{ 
-                        padding: '4px 12px', 
-                        borderRadius: '30px', 
-                        fontSize: '0.75rem', 
-                        fontWeight: '800',
-                        textTransform: 'uppercase',
-                        backgroundColor: booking.status === 'confirmed' ? '#dcfce7' : booking.status === 'cancelled' ? '#fee2e2' : '#fef9c3',
-                        color: booking.status === 'confirmed' ? '#166534' : booking.status === 'cancelled' ? '#991b1b' : '#854d0e'
-                      }}>
-                        {booking.status}
-                      </div>
-                      {isReviewable(booking) && (
-                        <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <CheckCircle size={14} /> Completed Stay
-                        </span>
-                      )}
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem' }}>
-                    <div style={{ color: '#64748b', fontSize: '0.9rem' }}>{formatDate(booking.checkInDate)} — {formatDate(booking.checkOutDate)}</div>
-                    <div style={{ fontWeight: '700', textAlign: 'right' }}>{formatCurrency(booking.totalPrice)}</div>
-                  </div>
-                </div>
+          <div className="grid grid-cols-1 gap-8">
+            {bookings.map((booking, idx) => (
+              <div key={booking._id} style={{ animationDelay: `${idx * 100}ms` }} className="animate-slide-up bg-white p-8 md:p-12 rounded-[3.5rem] border border-gray-100 shadow-premium hover:shadow-2xl transition-all duration-700 overflow-hidden relative group">
+                 
+                 {/* Card Decoration */}
+                 <div className="absolute inset-y-0 right-0 w-1 bg-gradient-to-b from-primary/5 via-primary to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+                 
+                 <div className="relative z-10 flex flex-col lg:flex-row gap-12 items-center">
+                    
+                    {/* Visual Media */}
+                    <div className="w-full lg:w-72 aspect-[4/3] rounded-[2.5rem] overflow-hidden shadow-premium relative flex-shrink-0 group/img">
+                       <img 
+                         src={booking.hotelId?.images?.[0] || "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&q=80&w=400"} 
+                         className="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-[3s]"
+                         alt={booking.hotelId?.name}
+                       />
+                       <div className="absolute inset-0 bg-secondary-dark/20 group-hover/img:bg-transparent transition-colors duration-700" />
+                       <div className="absolute bottom-6 left-6 right-6">
+                          <div className={`px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-[2px] backdrop-blur-md shadow-lg flex items-center justify-center gap-2 border border-white/20 ${
+                            booking.status === 'confirmed' ? 'bg-emerald-500/80 text-white' : 
+                            booking.status === 'cancelled' ? 'bg-rose-500/80 text-white' : 
+                            'bg-amber-500/80 text-white'
+                          }`}>
+                             <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                             {booking.status}
+                          </div>
+                       </div>
+                    </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', minWidth: '150px' }}>
-                  {isReviewable(booking) ? (
-                    <button 
-                      onClick={() => handleReviewClick(booking)}
-                      style={{ 
-                        padding: '0.75rem 1rem', 
-                        borderRadius: '12px', 
-                        background: booking.isReviewed ? '#f8fafc' : '#0f172a', 
-                        color: booking.isReviewed ? '#475569' : 'white', 
-                        border: booking.isReviewed ? '1px solid #e2e8f0' : 'none', 
-                        fontWeight: '700', 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'center', 
-                        gap: '0.5rem', 
-                        fontSize: '0.85rem',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      {booking.isReviewed ? <Edit2 size={16} color="#0ea5e9" /> : <Star size={16} color="#f59e0b" />}
-                      {booking.isReviewed ? 'Edit Review' : 'Rate Your Stay'}
-                    </button>
-                  ) : booking.status !== 'cancelled' && booking.paymentStatus !== 'paid' ? (
-                    <button onClick={() => handlePayment(booking)} style={{ padding: '0.75rem 1rem', borderRadius: '12px', background: 'var(--primary)', color: 'white', border: 'none', fontWeight: '700', fontSize: '0.85rem' }}>
-                       Pay Now
-                    </button>
-                  ) : null}
-                  
-                  {booking.status !== 'cancelled' && !isReviewable(booking) && (
-                    <button onClick={() => handleModifyClick(booking)} style={{ padding: '0.6rem', borderRadius: '10px', background: '#f8fafc', border: '1px solid #e2e8f0', color: '#475569', fontSize: '0.8rem', fontWeight: '700' }}>
-                       Modify Trip
-                    </button>
-                  )}
-                  
-                  <button onClick={() => navigate(`/hotel/${booking.hotelId?._id}`)} style={{ padding: '0.6rem', borderRadius: '10px', background: 'white', border: '1px solid #e2e8f0', color: '#94a3b8', fontSize: '0.8rem', fontWeight: '700' }}>
-                    View Resort
-                  </button>
-                </div>
+                    {/* Intellectual Data */}
+                    <div className="flex-1 space-y-8 min-w-0">
+                       <div className="space-y-3">
+                          <p className="text-[11px] font-black text-primary uppercase tracking-[3px] flex items-center gap-2">
+                             <Tag size={12} className="opacity-50" /> ID: {booking._id.slice(-8)}
+                          </p>
+                          <h2 className="text-3xl md:text-4xl font-serif text-secondary-dark font-black tracking-tight truncate group-hover:text-primary transition-colors">
+                             {booking.hotelId?.name}
+                          </h2>
+                          <p className="text-gray-400 font-bold text-sm flex items-center gap-2 uppercase tracking-widest">
+                             <MapPin size={16} className="text-primary" /> {booking.hotelId?.location || 'Elite Location'}
+                          </p>
+                       </div>
+
+                       <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 py-8 border-y border-gray-50">
+                          <div className="space-y-1">
+                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Temporal Entry</p>
+                             <p className="text-sm font-bold text-secondary-dark uppercase tracking-tight">{formatDate(booking.checkInDate)}</p>
+                          </div>
+                          <div className="space-y-1">
+                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Temporal Exit</p>
+                             <p className="text-sm font-bold text-secondary-dark uppercase tracking-tight">{formatDate(booking.checkOutDate)}</p>
+                          </div>
+                          <div className="space-y-1">
+                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Suite Class</p>
+                             <p className="text-sm font-bold text-secondary-dark truncate">{booking.roomId?.type || 'Luxury Suite'}</p>
+                          </div>
+                          <div className="space-y-1">
+                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Investment</p>
+                             <p className="text-xl font-black text-primary">{formatCurrency(booking.totalPrice)}</p>
+                          </div>
+                       </div>
+                    </div>
+
+                    {/* Operations Controls */}
+                    <div className="w-full lg:w-60 flex flex-col gap-3">
+                       {booking.status === 'confirmed' ? (
+                         <button 
+                           onClick={() => handleReviewClick(booking)}
+                           className={`h-14 rounded-2xl font-black text-xs uppercase tracking-[2px] shadow-sm flex items-center justify-center gap-3 transition-all active:scale-95 border ${
+                             booking.isReviewed 
+                             ? 'bg-gray-50 border-gray-100 text-gray-400 hover:bg-white hover:text-primary hover:border-primary' 
+                             : 'bg-secondary-dark text-white hover:bg-primary shadow-secondary/20 hover:shadow-primary/30'
+                           }`}
+                         >
+                            {booking.isReviewed ? (
+                              <><Edit2 size={16} /> Edit Intelligence</>
+                            ) : (
+                              <><StarIcon size={16} className="text-primary group-hover:text-white" /> Share Experience</>
+                            )}
+                         </button>
+                       ) : booking.status !== 'cancelled' && booking.paymentStatus !== 'paid' ? (
+                         <button 
+                           onClick={() => handlePayment(booking)}
+                           className="h-14 bg-primary text-white rounded-2xl font-black text-xs uppercase tracking-[2px] shadow-lg shadow-primary/30 flex items-center justify-center gap-3 hover:bg-primary-dark hover:-translate-y-1 transition-all active:scale-95"
+                         >
+                            <CreditCard size={18} /> Finalize Payment
+                         </button>
+                       ) : null}
+
+                       <div className="grid grid-cols-2 gap-3">
+                          {booking.status !== 'cancelled' && !['confirmed', 'completed'].includes(booking.status) && (
+                            <button 
+                              onClick={() => handleModifyClick(booking)}
+                              className="h-14 bg-white text-secondary-dark border-2 border-gray-100 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:border-secondary-dark transition-all flex items-center justify-center gap-2"
+                            >
+                               <Clock size={16} /> Modify
+                            </button>
+                          )}
+                          <button 
+                            onClick={() => navigate(`/hotel/${booking.hotelId?._id}`)}
+                            className="h-14 bg-white text-secondary-dark border-2 border-gray-100 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:border-secondary-dark transition-all flex items-center justify-center gap-2 lg:col-span-2"
+                          >
+                             <Zap size={16} className="text-primary" /> View Resort
+                          </button>
+                          {booking.status === 'pending' && (
+                            <button 
+                              onClick={() => handleCancel(booking._id)}
+                              className="h-14 bg-rose-50 text-rose-600 border border-rose-100 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-rose-600 hover:text-white transition-all flex items-center justify-center gap-2 col-span-2"
+                            >
+                               <XCircle size={16} /> Terminate Stay
+                            </button>
+                          )}
+                       </div>
+                    </div>
+
+                 </div>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      {/* Review Modal */}
+      {/* Review Modal - Redesigned */}
       {reviewingBooking && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 3000 }}>
-          <div className="animate-fade" style={{ background: 'white', padding: '3rem', borderRadius: '32px', width: '90%', maxWidth: '500px' }}>
-            <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-              <div style={{ width: '64px', height: '64px', background: '#f8fafc', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', border: '1px solid #e2e8f0' }}>
-                 <MessageSquare size={32} color="var(--primary)" />
-              </div>
-              <h2 className="luxury-font" style={{ fontSize: '2rem', margin: '0 0 0.5rem 0' }}>{reviewingBooking.isReviewed ? 'Update Your Review' : 'Share Experience'}</h2>
-              <p style={{ color: '#64748b' }}>How was your stay at {reviewingBooking.hotelId?.name}?</p>
-            </div>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 sm:p-10">
+           <div className="absolute inset-0 bg-secondary-dark/60 backdrop-blur-xl animate-fade-in" onClick={() => setReviewingBooking(null)} />
+           <div className="relative w-full max-w-xl bg-white rounded-[3.5rem] shadow-premium-dark overflow-hidden animate-slide-up">
+              
+              <div className="p-10 md:p-12 space-y-10">
+                 <div className="text-center space-y-4">
+                    <div className="w-20 h-20 bg-primary/10 rounded-[2.5rem] flex items-center justify-center text-primary mx-auto border-4 border-white shadow-premium">
+                       <MessageCircle size={40} className="animate-pulse" />
+                    </div>
+                    <h2 className="text-3xl font-serif text-secondary-dark font-black truncate px-4 capitalize">
+                       {reviewingBooking.isReviewed ? 'Refine Review' : 'Stay Intelligence'}
+                    </h2>
+                    <p className="text-gray-400 font-medium px-8 leading-relaxed">How would you describe your experience at the <span className="text-secondary-dark font-bold underline decoration-primary/30">{reviewingBooking.hotelId?.name}</span>?</p>
+                 </div>
 
-            <form onSubmit={handleReviewSubmit}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                <label style={{ fontWeight: '800', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px', color: '#94a3b8' }}>Select Rating</label>
-                <StarRating size={36} rating={reviewForm.rating} onChange={r => setReviewForm({...reviewForm, rating: r})} />
-              </div>
+                 <form onSubmit={handleReviewSubmit} className="space-y-10">
+                    <div className="flex flex-col items-center gap-4">
+                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Sentiment Score</p>
+                       <StarRating size={44} rating={reviewForm.rating} onChange={r => setReviewForm({...reviewForm, rating: r})} />
+                    </div>
 
-              <div style={{ marginBottom: '2rem' }}>
-                <label style={{ display: 'block', fontWeight: '700', fontSize: '0.9rem', marginBottom: '0.75rem', color: '#1e293b' }}>Your Thoughts</label>
-                <textarea 
-                  required
-                  rows="5"
-                  value={reviewForm.comment}
-                  onChange={e => setReviewForm({...reviewForm, comment: e.target.value})}
-                  placeholder="Describe your stay, service, and atmosphere..."
-                  style={{ width: '100%', padding: '1.25rem', borderRadius: '18px', border: '1.5px solid #e2e8f0', outline: 'none', resize: 'none', fontSize: '1rem', transition: '0.2s' }}
-                  onFocus={e => e.target.style.borderColor = 'var(--primary)'}
-                  onBlur={e => e.target.style.borderColor = '#e2e8f0'}
-                ></textarea>
-              </div>
+                    <div className="space-y-2 group">
+                       <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1 group-focus-within:text-primary transition-colors">Experience Narration</label>
+                       <textarea 
+                         required
+                         rows="5"
+                         value={reviewForm.comment}
+                         onChange={e => setReviewForm({...reviewForm, comment: e.target.value})}
+                         placeholder="Describe service, atmosphere, and amenities..."
+                         className="input-premium py-6 min-h-[160px]"
+                       />
+                    </div>
 
-              {reviewError && <p style={{ color: '#ef4444', fontSize: '0.9rem', textAlign: 'center', marginBottom: '1.5rem' }}>{reviewError}</p>}
+                    {reviewError && (
+                      <div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl text-rose-600 text-[10px] font-black uppercase tracking-widest text-center">
+                         {reviewError}
+                      </div>
+                    )}
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                  <button type="button" onClick={() => setReviewingBooking(null)} style={{ flex: 1, padding: '1.25rem', borderRadius: '16px', background: '#f1f5f9', color: '#475569', border: 'none', fontWeight: '700', cursor: 'pointer' }}>Close</button>
-                  <button 
-                    type="submit" 
-                    disabled={reviewLoading}
-                    style={{ flex: 2, padding: '1.25rem', borderRadius: '16px', background: '#0ea5e9', color: 'white', border: 'none', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', cursor: 'pointer', boxShadow: '0 4px 12px rgba(14, 165, 233, 0.3)' }}
-                  >
-                    {reviewLoading ? <Loader2 className="animate-spin" size={20} /> : <><Send size={18} /> {reviewingBooking.isReviewed ? 'Update Review' : 'Submit Review'}</>}
-                  </button>
-                </div>
-                
-                {reviewingBooking.isReviewed && (
-                  <button 
-                    type="button" 
-                    onClick={handleDeleteReview}
-                    style={{ background: 'none', border: 'none', color: '#ef4444', fontWeight: '700', fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', cursor: 'pointer', padding: '0.5rem' }}
-                  >
-                    <Trash2 size={16} /> Delete My Review
-                  </button>
-                )}
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Modify Modal */}
-      {modifyingBooking && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000 }}>
-           <div style={{ background: 'white', padding: '2.5rem', borderRadius: '32px', width: '90%', maxWidth: '450px' }}>
-              <h3 className="luxury-font" style={{ fontSize: '1.8rem', marginBottom: '1.5rem' }}>Modify Your Stay</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#64748b', marginBottom: '0.5rem' }}>GUESTS</label>
-                  <input 
-                    type="number" min="1" max="10" 
-                    value={modifyingDates.guests} 
-                    onChange={e => setModifyingDates({...modifyingDates, guests: e.target.value})}
-                    style={{ width: '100%', padding: '0.8rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}
-                  />
-                </div>
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                   <div style={{ flex: 1 }}>
-                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#64748b' }}>CHECK-IN</label>
-                     <DatePicker selected={modifyingDates.start} onChange={d => setModifyingDates({...modifyingDates, start: d})} className="booking-datepicker" />
-                   </div>
-                   <div style={{ flex: 1 }}>
-                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#64748b' }}>CHECK-OUT</label>
-                     <DatePicker selected={modifyingDates.end} onChange={d => setModifyingDates({...modifyingDates, end: d})} className="booking-datepicker" />
-                   </div>
-                </div>
-              </div>
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '2.5rem' }}>
-                <button onClick={() => setModifyingBooking(null)} style={{ flex: 1, padding: '1rem', borderRadius: '12px', background: '#f1f5f9', border: 'none', fontWeight: '700' }}>Cancel</button>
-                <button onClick={handleModifySubmit} disabled={submittingMod} style={{ flex: 2, padding: '1rem', borderRadius: '12px', background: 'var(--primary)', color: 'white', border: 'none', fontWeight: '700' }}>
-                  {submittingMod ? <Loader2 size={20} className="animate-spin" /> : 'Confirm Changes'}
-                </button>
+                    <div className="flex flex-col gap-4">
+                       <button 
+                         type="submit" 
+                         disabled={reviewLoading}
+                         className="w-full h-16 bg-secondary-dark text-white font-black rounded-2xl shadow-xl shadow-secondary/20 hover:bg-primary hover:shadow-primary/30 transition-all flex items-center justify-center gap-3 uppercase tracking-widest text-xs"
+                       >
+                          {reviewLoading ? <Loader2 className="animate-spin" /> : <><Send size={18} className="text-primary" /> {reviewingBooking.isReviewed ? 'Update Intelligence' : 'Archive Experience'}</>}
+                       </button>
+                       
+                       <div className="flex items-center gap-4">
+                          <button type="button" onClick={() => setReviewingBooking(null)} className="flex-1 h-14 bg-gray-50 text-gray-400 font-black rounded-2xl hover:bg-gray-100 transition-colors uppercase tracking-widest text-[10px]">Cancel</button>
+                          {reviewingBooking.isReviewed && (
+                            <button type="button" onClick={handleDeleteReview} className="flex-1 h-14 bg-rose-50 text-rose-500 font-black rounded-2xl hover:bg-rose-500 hover:text-white transition-all uppercase tracking-widest text-[10px] flex items-center justify-center gap-2">
+                               <Trash2 size={16} /> Delete
+                            </button>
+                          )}
+                       </div>
+                    </div>
+                 </form>
               </div>
            </div>
         </div>
       )}
 
-      <style>{`
-        .glass-panel { transition: 0.3s; }
-        .glass-panel:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.06) !important; }
-        .booking-datepicker { width: 100%; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 0.8rem; outline: none; font-weight: 700; color: #1e293b; cursor: pointer; margin-top: 0.5rem; }
-        .booking-datepicker:focus { border-color: var(--primary); }
-      `}</style>
+      {/* Modify Modal - Redesigned */}
+      {modifyingBooking && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 sm:p-10">
+           <div className="absolute inset-0 bg-secondary-dark/60 backdrop-blur-xl animate-fade-in" onClick={() => setModifyingBooking(null)} />
+           <div className="relative w-full max-w-lg bg-white rounded-[3.5rem] shadow-premium-dark overflow-hidden animate-slide-up">
+              
+              <div className="p-10 md:p-12 space-y-10">
+                 <div className="text-center space-y-4">
+                    <div className="w-20 h-20 bg-primary/10 rounded-[2.5rem] flex items-center justify-center text-primary mx-auto border-4 border-white shadow-premium">
+                       <Clock size={40} className="animate-pulse" />
+                    </div>
+                    <h2 className="text-3xl font-serif text-secondary-dark font-black">Adjust Itinerary</h2>
+                    <p className="text-gray-400 font-medium leading-relaxed">Update stay duration for your experience at <br /> <span className="text-secondary-dark font-bold">{modifyingBooking.hotelId?.name}</span></p>
+                 </div>
+
+                 <form className="space-y-8">
+                    <div className="space-y-2 group">
+                       <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1 group-focus-within:text-primary transition-colors">Guest Commitment</label>
+                       <div className="relative">
+                          <UserCheck className="absolute left-5 top-1/2 -translate-y-1/2 text-primary" size={18} />
+                          <input 
+                            type="number" min="1" max="10" 
+                            value={modifyingDates.guests} 
+                            onChange={e => setModifyingDates({...modifyingDates, guests: e.target.value})}
+                            className="input-premium pl-14"
+                          />
+                       </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-6">
+                       <div className="space-y-2">
+                          <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1">Arrival</label>
+                          <DatePicker 
+                            selected={modifyingDates.start} 
+                            onChange={d => setModifyingDates({...modifyingDates, start: d})} 
+                            className="w-full h-14 px-6 bg-gray-50 border-2 border-transparent rounded-2xl text-sm font-bold focus:bg-white focus:border-primary/20 transition-all outline-none cursor-pointer text-center"
+                          />
+                       </div>
+                       <div className="space-y-2">
+                          <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1">Departure</label>
+                          <DatePicker 
+                            selected={modifyingDates.end} 
+                            onChange={d => setModifyingDates({...modifyingDates, end: d})} 
+                            className="w-full h-14 px-6 bg-gray-50 border-2 border-transparent rounded-2xl text-sm font-bold focus:bg-white focus:border-primary/20 transition-all outline-none cursor-pointer text-center"
+                          />
+                       </div>
+                    </div>
+
+                    <div className="p-6 bg-gray-50 rounded-[2rem] border border-gray-100 flex items-center justify-between">
+                       <div className="flex items-center gap-3">
+                          <Info size={20} className="text-primary" />
+                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Pricing Strategy</p>
+                       </div>
+                       <p className="text-lg font-black text-secondary-dark">Dynamic Audit</p>
+                    </div>
+
+                    <div className="flex flex-col gap-4">
+                       <button 
+                         type="button"
+                         onClick={handleModifySubmit} 
+                         disabled={submittingMod}
+                         className="w-full h-16 bg-secondary-dark text-white font-black rounded-2xl shadow-xl shadow-secondary/20 hover:bg-primary transition-all flex items-center justify-center gap-3 uppercase tracking-widest text-xs"
+                       >
+                          {submittingMod ? <Loader2 className="animate-spin" /> : <><ShieldCheck size={18} className="text-primary" /> Confirm Logic</>}
+                       </button>
+                       <button type="button" onClick={() => setModifyingBooking(null)} className="w-full h-14 text-gray-400 font-black uppercase tracking-widest text-[10px]">Abandon Changes</button>
+                    </div>
+                 </form>
+              </div>
+           </div>
+        </div>
+      )}
+
     </div>
   );
 };
+
+// Simple UserCheck icon since it's not imported
+const UserCheck = ({ size, className }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/>
+  </svg>
+);
 
 export default BookingHistory;

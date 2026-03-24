@@ -1,34 +1,39 @@
-import React from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { 
-  LayoutDashboard, 
-  Hotel, 
-  BedDouble, 
-  CalendarCheck, 
-  BarChart3, 
-  MessageSquare, 
-  LogOut, 
-  User, 
-  Bell, 
   Search,
-  X,
   Menu,
-  Plus,
+  Bell,
+  User,
   Loader2,
-  MapPin
+  MapPin,
+  CheckCircle2,
+  ChevronDown
 } from 'lucide-react';
+import Sidebar from '../../components/Sidebar';
 import NotificationBell from '../../components/NotificationBell';
 import { useAuth } from '../../context/AuthContext';
 import { fetchSuggestions } from '../../services/api';
 
 const ManagerLayout = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const [isSidebarOpen, setSidebarOpen] = React.useState(true);
-  const [searchTerm, setSearchTerm] = React.useState('');
-  const [suggestions, setSuggestions] = React.useState([]);
-  const [showSuggestions, setShowSuggestions] = React.useState(false);
-  const [loadingSuggestions, setLoadingSuggestions] = React.useState(false);
+  const location = useLocation();
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+
+  // Sync active section from URL
+  const [activeSection, setActiveSection] = useState('hotels');
+  
+  useEffect(() => {
+    const path = location.pathname.split('/').pop();
+    if (path && path !== 'manager') {
+      setActiveSection(path);
+    }
+  }, [location]);
 
   const handleSearchChange = async (e) => {
     const val = e.target.value;
@@ -54,181 +59,140 @@ const ManagerLayout = () => {
   const handleSuggestionClick = (text) => {
     setSearchTerm(text);
     setShowSuggestions(false);
-    // Optionally navigate to hotels list with this filter
     navigate(`/manager/hotels?city=${text}`);
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
+  const handleSectionChange = (sectionId) => {
+    setActiveSection(sectionId);
+    navigate(`/manager/${sectionId}`);
   };
 
-  const navItems = [
-    { name: 'Dashboard', path: '/manager/dashboard', icon: <LayoutDashboard size={20} /> },
-    { name: 'My Hotels', path: '/manager/hotels', icon: <Hotel size={20} /> },
-    { name: 'Add New Hotel', path: '/manager/add-hotel', icon: <Plus size={20} /> },
-    { name: 'Bookings', path: '/manager/bookings', icon: <CalendarCheck size={20} /> },
-    { name: 'Analytics', path: '/manager/analytics', icon: <BarChart3 size={20} /> },
-    { name: 'Reviews', path: '/manager/reviews', icon: <MessageSquare size={20} /> },
-  ];
-
   return (
-    <div className="manager-dashboard" style={{ display: 'flex', minHeight: '100vh', background: '#f8fafc' }}>
-      {/* Sidebar */}
-      <aside className={`responsive-sidebar ${!isSidebarOpen ? 'closed-mobile' : ''}`} style={{ 
-        width: isSidebarOpen ? '280px' : '80px', 
-        background: '#1e293b', 
-        color: 'white', 
-        transition: '0.3s', 
-        display: 'flex', 
-        flexDirection: 'column',
-        position: 'sticky',
-        top: 0,
-        height: '100vh',
-        zIndex: 100
-      }}>
-        <div style={{ padding: '2rem 1.5rem', display: 'flex', alignItems: 'center', justifyContent: isSidebarOpen ? 'space-between' : 'center' }}>
-          {isSidebarOpen && <h2 className="luxury-font" style={{ fontSize: '1.25rem', margin: 0, color: '#c5a059' }}>StayNow Manager</h2>}
-          <button 
-            onClick={() => setSidebarOpen(!isSidebarOpen)}
-            style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
-          >
-            {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-        </div>
+    <div className="flex min-h-screen bg-background font-sans">
+      {/* Sidebar Component */}
+      <Sidebar 
+        isOpen={isSidebarOpen} 
+        activeSection={activeSection} 
+        onSectionChange={handleSectionChange}
+        onClose={() => setSidebarOpen(false)}
+      />
 
-        <nav style={{ flexGrow: 1, padding: '1rem 0' }}>
-          {navItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '1rem',
-                padding: '1rem 1.5rem',
-                color: '#94a3b8',
-                textDecoration: 'none',
-                transition: '0.2s',
-                justifyContent: isSidebarOpen ? 'flex-start' : 'center'
-              }}
-            >
-              <span style={{ color: 'inherit' }}>{item.icon}</span>
-              {isSidebarOpen && <span>{item.name}</span>}
-            </NavLink>
-          ))}
-        </nav>
-
-        <div style={{ padding: '2rem 1.5rem', borderTop: '1px solid #334155' }}>
-          <button 
-            onClick={handleLogout}
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '1rem', 
-              color: '#ef4444', 
-              background: 'none', 
-              border: 'none', 
-              cursor: 'pointer',
-              width: '100%',
-              padding: '0.5rem 0',
-              justifyContent: isSidebarOpen ? 'flex-start' : 'center'
-            }}
-          >
-            <LogOut size={20} />
-            {isSidebarOpen && <span style={{ fontWeight: '600' }}>Logout</span>}
-          </button>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-        {/* Topbar */}
-        <header className="responsive-header" style={{ 
-          height: '80px', 
-          background: 'white', 
-          borderBottom: '1px solid #e2e8f0', 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'space-between', 
-          padding: '0 2rem',
-          position: 'sticky',
-          top: 0,
-          zIndex: 90
-        }}>
+      {/* Main Content Area */}
+      <main className="flex-1 flex flex-col min-w-0 transition-all duration-300 lg:ml-0">
+        
+        {/* Top Header */}
+        <header className="h-20 lg:h-24 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-6 md:px-10 sticky top-0 z-[90]">
           
-          {/* Mobile Toggle inside Header */}
-          <button 
-            className="mobile-header-toggle"
-            onClick={() => setSidebarOpen(!isSidebarOpen)}
-            style={{ display: 'none', background: 'none', border: 'none', color: '#1e293b', cursor: 'pointer', marginRight: '1rem' }}
-          >
-            <Menu size={24} />
-          </button>
+          {/* Left: Search & Mobile Toggle */}
+          <div className="flex items-center gap-6 flex-1 max-w-2xl">
+            <button 
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden p-2.5 bg-gray-50 rounded-xl text-secondary hover:bg-gray-100 transition-colors"
+            >
+              <Menu size={24} />
+            </button>
 
-          <div className="responsive-header-search" style={{ display: 'flex', alignItems: 'center', background: '#f1f5f9', padding: '0.5rem 1rem', borderRadius: '10px', width: '300px', position: 'relative' }}>
-            <Search size={18} color="#94a3b8" />
-            <input 
-              type="text" 
-              placeholder="Search things..." 
-              value={searchTerm}
-              onChange={handleSearchChange}
-              onFocus={() => { if (searchTerm && suggestions.length > 0) setShowSuggestions(true); }}
-              onBlur={() => setTimeout(() => setShowSuggestions(false), 300)}
-              style={{ background: 'none', border: 'none', paddingLeft: '0.75rem', outline: 'none', width: '100%' }} 
-            />
-            {loadingSuggestions && <Loader2 size={16} className="animate-spin" color="var(--primary)" />}
+            <div className="hidden md:flex relative flex-1 group">
+               <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors">
+                  <Search size={20} />
+               </div>
+               <input 
+                 type="text" 
+                 placeholder="Search guest, booking, or city..." 
+                 value={searchTerm}
+                 onChange={handleSearchChange}
+                 className="w-full h-12 pl-12 pr-12 bg-gray-50 border-2 border-transparent rounded-[14px] text-sm font-medium focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 transition-all outline-none"
+               />
+               {loadingSuggestions && (
+                 <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                    <Loader2 size={16} className="animate-spin text-primary" />
+                 </div>
+               )}
 
-            {showSuggestions && (suggestions.length > 0 || loadingSuggestions) && (
-              <div style={{
-                position: 'absolute', top: '110%', left: 0, width: '100%',
-                minWidth: '350px',
-                background: 'white', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)',
-                borderRadius: '12px', padding: '0.5rem 0', zIndex: 2000,
-                border: '1px solid #e2e8f0'
-              }}>
-                {loadingSuggestions ? (
-                   <div style={{ padding: '0.75rem 1.25rem', color: '#64748b', fontSize: '0.85rem' }}>Searching...</div>
-                ) : suggestions.map((text, idx) => (
-                  <div 
-                    key={idx} onClick={() => handleSuggestionClick(text)}
-                    style={{ padding: '0.75rem 1.25rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#1e293b', fontSize: '0.9rem' }}
-                    onMouseOver={(e) => e.currentTarget.style.background = '#f8fafc'}
-                    onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
-                  >
-                    <MapPin size={14} color="#94a3b8" />
-                    {text}
-                  </div>
-                ))}
-              </div>
-            )}
+               {/* Suggestions Dropdown */}
+               {showSuggestions && (suggestions.length > 0) && (
+                 <div className="absolute top-[120%] left-0 w-full bg-white rounded-2xl shadow-premium border border-gray-100 py-2 z-[100] animate-fade-in">
+                    {suggestions.map((text, idx) => (
+                      <button 
+                        key={idx} 
+                        onClick={() => handleSuggestionClick(text)}
+                        className="w-full px-5 py-3.5 text-left flex items-center gap-3 hover:bg-gray-50 transition-colors text-sm font-600 text-secondary"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                           <MapPin size={16} />
+                        </div>
+                        {text}
+                      </button>
+                    ))}
+                 </div>
+               )}
+            </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-            <NotificationBell />
-            <div style={{ height: '24px', width: '1px', background: '#e2e8f0' }}></div>
-            <div className="responsive-header-profile" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div style={{ textAlign: 'right' }}>
-                <p style={{ margin: 0, fontWeight: '700', fontSize: '0.9rem', color: '#1e293b' }}>{user?.name}</p>
-                <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748b', textTransform: 'capitalize' }}>{user?.role}</p>
-              </div>
-              <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#c5a059', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-                <User size={20} />
-              </div>
-            </div>
+          {/* Right: Actions & Profile */}
+          <div className="flex items-center gap-4 md:gap-7">
+             <div className="flex items-center gap-2">
+                <NotificationBell />
+             </div>
+             
+             <div className="h-10 w-[1px] bg-gray-100 hidden sm:block" />
+
+             <div className="flex items-center gap-3 pl-2 group cursor-pointer">
+                <div className="text-right hidden sm:block">
+                   <p className="text-sm font-black text-secondary-dark leading-none mb-1">{user?.name || 'Manager'}</p>
+                   <div className="flex items-center justify-end gap-1.5 opacity-60">
+                      <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />
+                      <p className="text-[10px] font-black uppercase tracking-wider text-primary">Live Session</p>
+                   </div>
+                </div>
+                <div className="relative group">
+                   <div className="w-11 h-11 rounded-2xl bg-gray-100 flex items-center justify-center text-secondary border-2 border-transparent group-hover:border-primary/30 transition-all overflow-hidden">
+                      {user?.avatar ? (
+                        <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
+                      ) : (
+                        <User size={22} className="opacity-50" />
+                      )}
+                   </div>
+                </div>
+                <ChevronDown size={16} className="text-gray-400 group-hover:text-secondary transition-colors" />
+             </div>
           </div>
         </header>
 
-        {/* Dynamic Page Content */}
-        <div style={{ padding: '2rem', maxWidth: '1400px', width: '100%', margin: '0 auto' }}>
+        {/* Dynamic Page Content Area */}
+        <div className="p-6 md:p-10 lg:p-12 max-w-[1600px] mx-auto w-full flex-1">
+          {/* Section Breadcrumb/Title */}
+          <div className="mb-10 animate-slide-up">
+             <div className="flex items-center gap-2 text-xs font-black text-primary uppercase tracking-[2px] mb-2">
+                <CheckCircle2 size={12} /> Partner Central
+             </div>
+             <h1 className="text-4xl lg:text-5xl font-serif text-secondary-dark capitalize font-bold leading-tight">
+                Manage your <span className="text-primary italic">{activeSection}</span>
+             </h1>
+          </div>
+          
           <Outlet />
         </div>
+
+        {/* Footer info */}
+        <footer className="px-10 py-6 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
+           <p className="text-xs font-bold text-gray-400 uppercase tracking-widest leading-none">
+              &copy; 2026 PK UrbanStay Luxury Collection
+           </p>
+           <div className="flex gap-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+              <a href="#" className="hover:text-primary transition-colors">Documentation</a>
+              <a href="#" className="hover:text-primary transition-colors">Privacy</a>
+              <a href="#" className="hover:text-primary transition-colors">Support</a>
+           </div>
+        </footer>
       </main>
 
       <style>{`
-        .nav-link:hover { color: white !important; background: #334155; }
-        .nav-link.active { color: #c5a059 !important; background: #334155; border-right: 4px solid #c5a059; }
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up { animation: slideUp 0.6s ease-out forwards; }
       `}</style>
     </div>
   );

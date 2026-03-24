@@ -26,7 +26,13 @@ import {
   ArrowLeft,
   Users,
   Bed,
-  Check
+  Check,
+  Star,
+  ExternalLink,
+  Info,
+  Camera,
+  Layers,
+  Sparkles
 } from 'lucide-react';
 import { formatCurrency } from '../../utils/helpers';
 
@@ -241,86 +247,233 @@ const ManagerHotels = () => {
   };
 
   if (loading && hotels.length === 0) return (
-    <div style={{ display: 'flex', justifyContent: 'center', padding: '10rem' }}>
-      <Loader2 className="animate-spin" size={40} color="var(--primary)" />
+    <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+      <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+      <p className="text-xs font-black text-gray-400 uppercase tracking-widest animate-pulse">Retrieving Portfolio...</p>
     </div>
   );
 
   return (
-    <div className="animate-fade">
+    <div className="space-y-8 animate-fade-in relative">
+      
       {!selectedHotelForRooms ? (
         <>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-            <div>
-              <h1 className="luxury-font" style={{ fontSize: '2.2rem', margin: '0 0 0.5rem 0' }}>Manage Hotels</h1>
-              <p style={{ color: '#64748b' }}>List and organize your luxury properties.</p>
+          {/* Header Section */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div className="space-y-1">
+              <h2 className="text-2xl font-serif text-secondary-dark font-black">Your Luxury Portfolio</h2>
+              <p className="text-gray-400 font-medium">Manage and refine your property experiences.</p>
             </div>
-            <button onClick={() => navigate('/manager/add-hotel')} className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.8rem 1.6rem' }}>
-              <Plus size={20} /> Add New Hotel
+            <button 
+              onClick={() => navigate('/manager/add-hotel')} 
+              className="px-8 py-4 bg-gradient-to-r from-secondary-light to-secondary-dark text-white font-bold rounded-2xl shadow-xl shadow-secondary/20 hover:shadow-secondary/30 transition-all flex items-center gap-3 active:scale-95 whitespace-nowrap"
+            >
+              <Plus size={20} /> Add New Property
             </button>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}>
+          {/* Hotels Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8">
             {hotels.map((hotel) => (
-              <div key={hotel._id} className="glass-panel" style={{ borderRadius: '24px', overflow: 'hidden', border: '1px solid #f1f5f9', background: 'white' }}>
-                <div style={{ height: '220px', position: 'relative' }}>
-                  <img src={hotel.images?.[0] || "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=600"} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={hotel.name} />
-                  <div style={{ position: 'absolute', top: '15px', right: '15px', display: 'flex', gap: '0.5rem' }}>
-                    <button onClick={() => handleOpenModal(hotel)} style={{ background: 'white', border: 'none', width: '36px', height: '36px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6366f1', cursor: 'pointer', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}><Edit2 size={18} /></button>
-                    <button onClick={() => handleDelete(hotel._id)} style={{ background: 'white', border: 'none', width: '36px', height: '36px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ef4444', cursor: 'pointer', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}><Trash2 size={18} /></button>
+              <div key={hotel._id} className="group bg-white rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-premium transition-all duration-500 overflow-hidden flex flex-col">
+                {/* Image Section */}
+                <div className="relative h-[250px] overflow-hidden">
+                  <img 
+                    src={hotel.images?.[0] || "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=1200"} 
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
+                    alt={hotel.name} 
+                  />
+                  
+                  {/* Status Badges */}
+                  <div className="absolute top-5 left-5 flex gap-2">
+                    {!hotel.isApproved ? (
+                       <div className="px-3 py-1.5 bg-amber-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg">Pending Review</div>
+                    ) : (
+                       <div className="px-3 py-1.5 bg-emerald-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg">Verified</div>
+                    )}
                   </div>
-                  {!hotel.isApproved && <div style={{ position: 'absolute', top: '15px', left: '15px', background: '#fef9c3', color: '#854d0e', padding: '4px 10px', borderRadius: '8px', fontSize: '0.7rem', fontWeight: '800' }}>PENDING</div>}
+
+                  {/* Quick Actions overlay */}
+                  <div className="absolute top-5 right-5 flex gap-2 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                    <button 
+                      onClick={() => handleOpenModal(hotel)} 
+                      className="w-10 h-10 bg-white/90 backdrop-blur-md rounded-xl flex items-center justify-center text-secondary hover:bg-white hover:text-primary shadow-lg transition-all"
+                    >
+                       <Edit2 size={18} />
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(hotel._id)} 
+                      className="w-10 h-10 bg-white/90 backdrop-blur-md rounded-xl flex items-center justify-center text-red-500 hover:bg-red-500 hover:text-white shadow-lg transition-all"
+                    >
+                       <Trash2 size={18} />
+                    </button>
+                  </div>
+
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
                 </div>
-                <div style={{ padding: '2rem' }}>
-                  <h3 className="luxury-font" style={{ fontSize: '1.6rem', margin: '0 0 0.5rem 0' }}>{hotel.name}</h3>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#64748b', fontSize: '0.95rem', marginBottom: '1.25rem' }}><MapPin size={18} /> {hotel.city}, {hotel.location}</div>
-                  <button onClick={() => { setSelectedHotelForRooms(hotel); loadRooms(hotel._id); }} style={{ width: '100%', padding: '1rem', background: '#1e293b', color: 'white', border: 'none', borderRadius: '16px', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', transition: '0.2s', marginTop: '1.5rem' }}>
-                    <BedDouble size={20} /> Manage Rooms <ChevronRight size={18} />
-                  </button>
+
+                {/* Content Section */}
+                <div className="p-8 flex-1 flex flex-col">
+                  <div className="flex justify-between items-start mb-4">
+                     <div>
+                        <h3 className="text-2xl font-serif text-secondary-dark font-bold group-hover:text-primary transition-colors">{hotel.name}</h3>
+                        <div className="flex items-center gap-1.5 text-gray-400 font-medium text-sm mt-1">
+                           <MapPin size={14} className="text-primary" />
+                           {hotel.city || 'Global Destination'}
+                        </div>
+                     </div>
+                     <div className="flex items-center gap-1 bg-amber-50 px-2 py-1 rounded-lg">
+                        <Star size={14} className="text-amber-500 fill-amber-500" />
+                        <span className="text-xs font-black text-amber-700">4.9</span>
+                     </div>
+                  </div>
+
+                  <p className="text-gray-500 text-sm line-clamp-2 mb-8 leading-relaxed italic">
+                    {hotel.description || "A sanctuary of luxury and sophistication, offering unparalleled comfort."}
+                  </p>
+
+                  <div className="mt-auto pt-6 border-t border-gray-50 flex items-center justify-between gap-4">
+                     <button 
+                       onClick={() => { setSelectedHotelForRooms(hotel); loadRooms(hotel._id); }} 
+                       className="flex-1 h-14 bg-gray-50 text-secondary-dark font-bold rounded-2xl hover:bg-primary hover:text-white hover:shadow-lg hover:shadow-primary/20 transition-all flex items-center justify-center gap-2 group/btn"
+                     >
+                       <BedDouble size={20} className="group-hover/btn:scale-110 transition-transform" />
+                       Manage Inventory
+                     </button>
+                     <button className="w-14 h-14 bg-gray-50 text-gray-400 rounded-2xl flex items-center justify-center hover:bg-secondary-dark hover:text-white transition-all">
+                        <ExternalLink size={20} />
+                     </button>
+                  </div>
                 </div>
               </div>
             ))}
+
+            {/* Empty State / Add Card */}
+            <button 
+              onClick={() => navigate('/manager/add-hotel')}
+              className="h-[550px] border-4 border-dashed border-gray-100 rounded-[2.5rem] flex flex-col items-center justify-center gap-6 group hover:border-primary/20 hover:bg-gray-50/50 transition-all"
+            >
+              <div className="w-20 h-20 bg-gray-50 rounded-3xl flex items-center justify-center text-gray-300 group-hover:bg-primary/10 group-hover:text-primary transition-all">
+                 <Plus size={40} className="group-hover:rotate-90 transition-transform duration-500" />
+              </div>
+              <div className="text-center">
+                 <p className="font-serif text-xl text-gray-400 font-bold group-hover:text-secondary-dark transition-colors">List New Property</p>
+                 <p className="text-sm text-gray-400 mt-1">Expansion awaits your portfolio.</p>
+              </div>
+            </button>
           </div>
         </>
       ) : (
-        <div className="rooms-management animate-fade">
-          <button onClick={() => setSelectedHotelForRooms(null)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontWeight: '600', marginBottom: '2rem', padding: 0 }}><ArrowLeft size={20} /> Back to My Hotels</button>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-            <div>
-              <h1 className="luxury-font" style={{ fontSize: '2.4rem', margin: '0 0 0.5rem 0' }}>{selectedHotelForRooms.name}</h1>
-              <p style={{ color: '#64748b' }}>Inventory and Room Management</p>
+        <div className="animate-fade-in space-y-10">
+          {/* Room Management View */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div className="space-y-4">
+               <button 
+                 onClick={() => setSelectedHotelForRooms(null)} 
+                 className="flex items-center gap-2 text-primary font-black uppercase text-xs tracking-widest hover:-translate-x-1 transition-transform"
+               >
+                 <ArrowLeft size={16} /> Portfolio Overview
+               </button>
+               <div>
+                  <h2 className="text-3xl font-serif text-secondary-dark font-black tracking-tight flex items-center gap-3">
+                     <Sparkles size={28} className="text-primary animate-pulse" />
+                     {selectedHotelForRooms.name}
+                  </h2>
+                  <p className="text-gray-400 font-medium">Room Categories & Global Inventory Management</p>
+               </div>
             </div>
-            <button onClick={() => handleOpenRoomModal()} className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.9rem 1.8rem' }}><Plus size={20} /> Add Room Type</button>
+            
+            <button 
+              onClick={() => handleOpenRoomModal()} 
+              className="px-8 py-4 bg-primary text-white font-bold rounded-2xl shadow-xl shadow-primary/20 hover:shadow-primary/30 active:scale-95 transition-all flex items-center gap-3"
+            >
+              <Plus size={20} /> Create Room Category
+            </button>
           </div>
 
           {loadingRooms ? (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '5rem' }}><Loader2 className="animate-spin" size={32} color="var(--primary)" /></div>
+            <div className="py-20 flex flex-col items-center justify-center gap-4">
+               <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+               <p className="text-xs font-black text-gray-400 tracking-widest uppercase">Syncing Inventory...</p>
+            </div>
           ) : rooms.length === 0 ? (
-            <div style={{ padding: '8rem 2rem', textAlign: 'center', background: 'white', borderRadius: '32px', border: '2px dashed #e2e8f0' }}>
-              <BedDouble size={48} color="#cbd5e1" style={{ marginBottom: '1.5rem' }} /><h2 className="luxury-font" style={{ fontSize: '1.8rem', margin: '0 0 1rem 0' }}>No rooms yet</h2><button onClick={() => handleOpenRoomModal()} className="btn-primary" style={{ padding: '1rem 2.5rem', borderRadius: '16px' }}>Create Room Type</button>
+            <div className="py-32 bg-gray-50/50 border-2 border-dashed border-gray-100 rounded-[3rem] flex flex-col items-center justify-center text-center">
+               <div className="w-24 h-24 bg-white rounded-3xl shadow-sm flex items-center justify-center text-gray-300 mb-8">
+                  <Layers size={48} />
+               </div>
+               <h3 className="text-2xl font-serif text-secondary-dark font-bold mb-3">No Room Categories Defined</h3>
+               <p className="text-gray-400 max-w-sm mb-10 font-medium leading-relaxed">Establish your first room collection to start accepting world-class travelers.</p>
+               <button onClick={() => handleOpenRoomModal()} className="btn-gold">Create First Category</button>
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2.5rem' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-10">
               {rooms.map((room) => (
-                <div key={room._id} className="glass-panel" style={{ borderRadius: '28px', overflow: 'hidden', border: '1px solid #f1f5f9', background: 'white' }}>
-                  <div style={{ height: '220px', position: 'relative' }}>
-                    <img src={room.images?.[0] || "https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&q=80&w=600"} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={room.type} />
-                    <div style={{ position: 'absolute', bottom: '20px', right: '20px', background: 'rgba(255,255,255,0.95)', padding: '8px 16px', borderRadius: '40px', fontWeight: '800', color: '#c5a059', fontSize: '1rem', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>{formatCurrency(room.price)}/night</div>
+                <div key={room._id} className="group bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-sm hover:shadow-premium transition-all duration-500">
+                  <div className="relative h-56 overflow-hidden">
+                    <img 
+                      src={room.images?.[0] || "https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&q=80&w=800"} 
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
+                      alt={room.type} 
+                    />
+                    <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 to-transparent" />
+                    <div className="absolute bottom-5 left-5 right-5 flex justify-between items-end">
+                       <div>
+                          <p className="text-[10px] font-black text-primary uppercase tracking-[2px] mb-1">Luxury Tier</p>
+                          <h4 className="text-lg font-bold text-white leading-none">{room.type}</h4>
+                       </div>
+                       <div className="text-right">
+                          <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1">Starts at</p>
+                          <p className="text-xl font-black text-white">{formatCurrency(room.price)}<span className="text-[10px] text-gray-400">/nt</span></p>
+                       </div>
+                    </div>
                   </div>
-                  <div style={{ padding: '2rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
-                      <h3 className="luxury-font" style={{ margin: 0, fontSize: '1.6rem' }}>{room.type}</h3>
-                      <div style={{ display: 'flex', gap: '0.75rem' }}>
-                        <button onClick={() => handleOpenRoomModal(room)} style={{ color: '#6366f1', background: '#f5f3ff', width: '38px', height: '38px', borderRadius: '12px', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Edit2 size={18} /></button>
-                        <button onClick={() => handleDeleteRoom(room._id)} style={{ color: '#ef4444', background: '#fef2f2', width: '38px', height: '38px', borderRadius: '12px', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><Trash2 size={18} /></button>
-                      </div>
+
+                  <div className="p-7 space-y-6">
+                    <div className="grid grid-cols-2 gap-4">
+                       <div className="bg-gray-50 rounded-2xl p-4 flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-primary">
+                             <Users size={16} />
+                          </div>
+                          <div>
+                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Max Load</p>
+                             <p className="text-sm font-bold text-secondary-dark">{room.capacity} Guests</p>
+                          </div>
+                       </div>
+                       <div className="bg-gray-50 rounded-2xl p-4 flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-emerald-500">
+                             <Bed size={16} />
+                          </div>
+                          <div>
+                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Available</p>
+                             <p className="text-sm font-bold text-emerald-600">{room.totalRooms} Units</p>
+                          </div>
+                       </div>
                     </div>
-                    <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1.5rem' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#64748b', fontWeight: '600' }}><Users size={18} /> {room.capacity} Guests</div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#64748b', fontWeight: '600' }}><Bed size={18} /> {room.totalRooms} Units</div>
+
+                    <div className="flex flex-wrap gap-1.5 min-h-[60px]">
+                       {room.amenities?.slice(0, 4).map((a, i) => (
+                         <span key={i} className="px-3 py-1.5 bg-gray-50 text-[10px] font-black text-gray-500 uppercase tracking-wider rounded-lg border border-gray-100 flex items-center gap-1.5">
+                            <Check size={10} className="text-primary" /> {a}
+                         </span>
+                       ))}
+                       {room.amenities?.length > 4 && (
+                         <span className="px-3 py-1.5 bg-secondary-dark text-[10px] font-black text-white uppercase tracking-wider rounded-lg">+{room.amenities.length - 4} More</span>
+                       )}
                     </div>
-                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                      {room.amenities?.map((a, i) => (<span key={i} style={{ padding: '5px 14px', background: '#f1f5f9', borderRadius: '10px', fontSize: '0.75rem', color: '#1e293b', fontWeight: '700', border: '1px solid #e2e8f0' }}>{a}</span>))}
+
+                    <div className="flex gap-3 pt-2">
+                       <button 
+                         onClick={() => handleOpenRoomModal(room)} 
+                         className="flex-1 h-12 bg-white border border-gray-100 text-secondary font-bold rounded-xl hover:bg-gray-50 transition-all flex items-center justify-center gap-2 text-sm shadow-sm"
+                       >
+                          <Edit2 size={16} /> Edit Category
+                       </button>
+                       <button 
+                         onClick={() => handleDeleteRoom(room._id)} 
+                         className="w-12 h-12 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all border border-rose-100 shadow-sm"
+                       >
+                          <Trash2 size={18} />
+                       </button>
                     </div>
                   </div>
                 </div>
@@ -330,153 +483,210 @@ const ManagerHotels = () => {
         </div>
       )}
 
-      {/* --- ROOM MODAL (Refactored for Alignment & Mobile) --- */}
-      {showRoomModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.75)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000, padding: '15px' }}>
-          <div className="animate-fade modal-content" style={{ background: 'white', width: '100%', maxWidth: '800px', borderRadius: '32px', maxHeight: '90vh', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' }}>
-            <div style={{ padding: '1.5rem 2.5rem', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 className="luxury-font" style={{ fontSize: '1.8rem', margin: 0 }}>{editingRoom ? 'Update Room Type' : 'Register Room Type'}</h2>
-              <button onClick={() => setShowRoomModal(false)} style={{ background: '#f1f5f9', border: 'none', width: '40px', height: '40px', borderRadius: '50%', cursor: 'pointer' }}><X size={20} /></button>
-            </div>
-
-            <div style={{ padding: '2rem 2.5rem', overflowY: 'auto', flex: 1 }} className="modal-body">
-              <form onSubmit={handleRoomSubmit} id="roomForm">
-                <div className="modal-grid">
-                  <div className="form-group">
-                    <label className="form-label">Classification</label>
-                    <select value={roomForm.type} onChange={e => setRoomForm({...roomForm, type: e.target.value})} className="form-input">
-                      {ROOM_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                      {!ROOM_TYPES.includes(roomForm.type) && <option value={roomForm.type}>{roomForm.type}</option>}
-                    </select>
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Nightly Rate (USD)</label>
-                    <input required type="number" value={roomForm.price} onChange={e => setRoomForm({...roomForm, price: e.target.value})} className="form-input" placeholder="$ 0.00" />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Occupancy (Max Guests)</label>
-                    <div style={{ display: 'flex', background: '#f8fafc', borderRadius: '12px', border: '1.5px solid #e2e8f0', padding: '4px' }} className="capacity-pills">
-                      {[1, 2, 3, 4, 5, 6].map(num => (
-                        <button key={num} type="button" onClick={() => setRoomForm({...roomForm, capacity: num})} style={{ flex: 1, height: '36px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '800', fontSize: '0.85rem', background: roomForm.capacity === num ? '#c5a059' : 'transparent', color: roomForm.capacity === num ? 'white' : '#64748b', transition: '0.2s' }}>{num}</button>
-                      ))}
+      {/* --- MODALS (Overlays) --- */}
+      {(showModal || showRoomModal) && (
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 md:p-8 animate-fade-in">
+           <div className="absolute inset-0 bg-secondary-dark/60 backdrop-blur-md" onClick={() => { setShowModal(false); setShowRoomModal(false); }} />
+           
+           <div className="relative w-full max-w-4xl bg-white rounded-[2.5rem] shadow-premium overflow-hidden flex flex-col max-h-[90vh]">
+              {/* Modal Header */}
+              <div className="p-8 md:px-12 md:py-8 border-b border-gray-1 primary bg-gray-50/50 flex items-center justify-between">
+                 <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center text-primary">
+                       {showModal ? <Layers size={24} /> : <BedDouble size={24} />}
                     </div>
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Total Inventory (Units)</label>
-                    <input required type="number" value={roomForm.totalRooms} onChange={e => setRoomForm({...roomForm, totalRooms: e.target.value})} className="form-input" />
-                  </div>
-                </div>
+                    <div>
+                       <h3 className="text-2xl font-serif text-secondary-dark font-bold leading-none mb-1">
+                          {showModal ? (editingHotel ? 'Refine Property' : 'New Property Registration') : (editingRoom ? 'Update Category' : 'Register Category')}
+                       </h3>
+                       <p className="text-xs text-gray-400 font-bold uppercase tracking-widest leading-none">Global Standard Registration</p>
+                    </div>
+                 </div>
+                 <button 
+                   onClick={() => { setShowModal(false); setShowRoomModal(false); }} 
+                   className="w-10 h-10 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-secondary hover:shadow-sm transition-all flex items-center justify-center"
+                 >
+                    <X size={20} />
+                 </button>
+              </div>
 
-                <div style={{ marginTop: '2.5rem' }}>
-                  <label className="form-label" style={{ marginBottom: '1.25rem', display: 'block' }}>Room Amenities</label>
-                  <div className="amenities-grid-custom">
-                    {ROOM_AMENITIES.map((item) => (
-                      <div key={item.name} onClick={() => toggleRoomAmenity(item.name)} style={{ padding: '0.85rem', borderRadius: '16px', border: `2px solid ${roomForm.amenities.includes(item.name) ? '#c5a059' : '#f1f5f9'}`, background: roomForm.amenities.includes(item.name) ? 'rgba(197, 160, 89, 0.05)' : '#f8fafc', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '1rem', transition: '0.2s', position: 'relative' }}>
-                        <span style={{ fontSize: '1.25rem' }}>{item.icon}</span>
-                        <span style={{ fontSize: '0.8rem', fontWeight: '700', color: roomForm.amenities.includes(item.name) ? '#1e293b' : '#64748b' }}>{item.name}</span>
-                        {roomForm.amenities.includes(item.name) && <div style={{ position: 'absolute', top: '-5px', right: '-5px', background: '#c5a059', color: 'white', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Check size={12} strokeWidth={4} /></div>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
+              {/* Modal Body */}
+              <div className="flex-1 overflow-y-auto p-8 md:p-12 space-y-10 custom-scrollbar">
+                 {showModal ? (
+                    <form id="hotelForm" onSubmit={handleSubmit} className="space-y-10">
+                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+                          <div className="space-y-2">
+                             <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1">Property Name</label>
+                             <input required type="text" value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="input-premium" placeholder="Ex: PK Urban Ritz" />
+                          </div>
+                          <div className="space-y-2">
+                             <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1">Elite Location / Area</label>
+                             <input required type="text" value={form.location} onChange={e => setForm({...form, location: e.target.value})} className="input-premium" placeholder="Ex: Downtown Plaza" />
+                          </div>
+                          <div className="space-y-2">
+                             <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1">Metropolitan City</label>
+                             <input required type="text" value={form.city} onChange={e => setForm({...form, city: e.target.value})} className="input-premium" placeholder="Ex: New York" />
+                          </div>
+                          <div className="space-y-2">
+                             <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1">Registry Address</label>
+                             <input required type="text" value={form.address} onChange={e => setForm({...form, address: e.target.value})} className="input-premium" placeholder="Full street address" />
+                          </div>
+                       </div>
+                       
+                       <div className="space-y-2">
+                          <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1">Property Narrative</label>
+                          <textarea required rows="4" value={form.description} onChange={e => setForm({...form, description: e.target.value})} className="input-premium py-5 min-h-[120px]" placeholder="Explain the heritage and luxury of this property..."></textarea>
+                       </div>
 
-                <div style={{ marginTop: '2.5rem' }}>
-                  <label className="form-label" style={{ marginBottom: '1.25rem', display: 'block' }}>Room Images</label>
-                  <div className="image-grid-pills">
-                    {roomForm.images.map((img, i) => (
-                      <div key={i} style={{ position: 'relative', height: '100px', borderRadius: '16px', overflow: 'hidden' }}>
-                        <img src={img} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        <button type="button" onClick={() => setRoomForm({...roomForm, images: roomForm.images.filter((_, idx) => idx !== i)})} style={{ position: 'absolute', top: '5px', right: '5px', background: 'rgba(239, 68, 68, 0.9)', borderRadius: '50%', width: '22px', height: '22px', border: 'none', color: 'white', cursor: 'pointer' }}><X size={12} /></button>
-                      </div>
-                    ))}
-                    <label style={{ height: '100px', border: '2px dashed #cbd5e1', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#94a3b8', background: '#f8fafc' }} className="image-label">
-                      <ImageIcon size={24} />
-                      <input type="file" multiple hidden onChange={handleRoomImageUpload} />
-                    </label>
-                  </div>
-                </div>
-              </form>
-            </div>
+                       <div className="space-y-6">
+                          <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+                             <label className="text-xs font-black text-secondary-dark uppercase tracking-widest">Available Amenities</label>
+                             <span className="text-[10px] font-black text-primary bg-primary/10 px-3 py-1 rounded-full uppercase tracking-widest">{form.amenities.length} Selected</span>
+                          </div>
+                          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                             {HOTEL_AMENITIES.map((item) => (
+                               <button 
+                                 key={item.id} 
+                                 type="button"
+                                 onClick={() => toggleHotelAmenity(item.name)} 
+                                 className={`p-4 rounded-2xl border transition-all text-left flex flex-col gap-3 group relative overflow-hidden ${form.amenities.includes(item.name) ? 'border-primary bg-primary/5' : 'border-gray-100 bg-gray-50/50 hover:bg-white hover:border-gray-200'}`}
+                               >
+                                  <span className="text-2xl">{item.icon}</span>
+                                  <span className={`text-[10px] font-black uppercase tracking-wider ${form.amenities.includes(item.name) ? 'text-secondary-dark' : 'text-gray-400'}`}>{item.name}</span>
+                                  {form.amenities.includes(item.name) && (
+                                    <div className="absolute top-2 right-2 flex items-center justify-center w-5 h-5 bg-primary text-white rounded-full">
+                                       <Check size={12} strokeWidth={4} />
+                                    </div>
+                                  )}
+                               </button>
+                             ))}
+                          </div>
+                       </div>
 
-            <div style={{ padding: '1.5rem 2.5rem', borderTop: '1px solid #f1f5f9', background: '#fdfcfb', display: 'flex', gap: '1rem' }}>
-              <button type="button" onClick={() => setShowRoomModal(false)} className="btn-cancel">Cancel</button>
-              <button type="submit" form="roomForm" disabled={submitting} className="btn-primary" style={{ flex: 2, height: '54px' }}>
-                {submitting ? <Loader2 className="animate-spin" size={20} /> : <CheckCircle2 size={20} />} {editingRoom ? 'Update Room Type' : 'Create Room Type'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+                       <div className="space-y-6">
+                          <label className="text-xs font-black text-secondary-dark uppercase tracking-widest block border-b border-gray-100 pb-4">Visual Gallery</label>
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                             {form.images.map((img, i) => (
+                               <div key={i} className="group relative aspect-square rounded-2xl overflow-hidden border-2 border-white shadow-sm">
+                                  <img src={img} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Preview" />
+                                  <button type="button" onClick={() => setForm({...form, images: form.images.filter((_, idx) => idx !== i)})} className="absolute top-2 right-2 w-8 h-8 bg-black/60 backdrop-blur-md rounded-lg text-white opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center hover:bg-rose-500">
+                                     <X size={14} />
+                                  </button>
+                               </div>
+                             ))}
+                             <label className="aspect-square border-2 border-dashed border-gray-100 rounded-2xl flex flex-col items-center justify-center gap-2 text-gray-300 cursor-pointer hover:border-primary/30 hover:bg-primary/5 hover:text-primary transition-all">
+                                <Camera size={24} />
+                                <span className="text-[10px] font-black uppercase tracking-widest">Add Photo</span>
+                                <input type="file" multiple hidden onChange={handleImageUpload} />
+                             </label>
+                          </div>
+                       </div>
+                    </form>
+                 ) : (
+                    <form id="roomForm" onSubmit={handleRoomSubmit} className="space-y-12">
+                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+                          <div className="space-y-4">
+                             <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1">Category Tier</label>
+                             <div className="relative group">
+                                <select value={roomForm.type} onChange={e => setRoomForm({...roomForm, type: e.target.value})} className="input-premium font-bold appearance-none cursor-pointer">
+                                  {ROOM_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                                  {!ROOM_TYPES.includes(roomForm.type) && <option value={roomForm.type}>{roomForm.type}</option>}
+                                </select>
+                                <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-primary pointer-events-none transition-colors" size={20} />
+                             </div>
+                          </div>
+                          
+                          <div className="space-y-4">
+                             <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1">Nightly Rate Index (USD)</label>
+                             <div className="relative group">
+                                <div className="absolute left-5 top-1/2 -translate-y-1/2 text-primary font-black opacity-60">$</div>
+                                <input required type="number" value={roomForm.price} onChange={e => setRoomForm({...roomForm, price: e.target.value})} className="input-premium pl-10 font-black text-lg" placeholder="0.00" />
+                             </div>
+                          </div>
 
-      {/* --- HOTEL MODAL (Responsive Refactor) --- */}
-      {showModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.75)', backdropFilter: 'blur(8px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '15px' }}>
-          <div className="animate-fade modal-content" style={{ background: 'white', width: '100%', maxWidth: '900px', maxHeight: '90vh', borderRadius: '32px', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)', overflow: 'hidden' }}>
-            <div style={{ padding: '1.5rem 2.5rem', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 className="luxury-font" style={{ fontSize: '1.8rem', margin: 0 }}>{editingHotel ? 'Edit Property' : 'New Property'}</h2>
-              <button onClick={() => setShowModal(false)} style={{ background: '#f1f5f9', border: 'none', color: '#64748b', cursor: 'pointer', width: '38px', height: '38px', borderRadius: '50%' }}><X size={20} /></button>
-            </div>
-            <div style={{ padding: '2rem 2.5rem', overflowY: 'auto', flex: 1 }} className="modal-body">
-              {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c', padding: '1.25rem', borderRadius: '16px', marginBottom: '1.5rem' }}>{error}</div>}
-              <form id="hotelForm" onSubmit={handleSubmit}>
-                <div className="modal-grid">
-                  <div className="form-group"><label className="form-label">Hotel Name</label><input required type="text" value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="form-input" /></div>
-                  <div className="form-group"><label className="form-label">Area</label><input required type="text" value={form.location} onChange={e => setForm({...form, location: e.target.value})} className="form-input" /></div>
-                  <div className="form-group"><label className="form-label">City</label><input required type="text" value={form.city} onChange={e => setForm({...form, city: e.target.value})} className="form-input" /></div>
-                  <div className="form-group"><label className="form-label">Address</label><input required type="text" value={form.address} onChange={e => setForm({...form, address: e.target.value})} className="form-input" /></div>
-                </div>
-                <div style={{ marginTop: '1.5rem' }}><label className="form-label">Description</label><textarea required rows="4" value={form.description} onChange={e => setForm({...form, description: e.target.value})} className="form-input" style={{ resize: 'none' }}></textarea></div>
-                <div style={{ marginTop: '2.5rem' }}><label className="form-label" style={{ marginBottom: '1.25rem', display: 'block' }}>Hotel Amenities</label>
-                  <div className="amenities-grid-custom">
-                    {HOTEL_AMENITIES.map((item) => (
-                      <div key={item.name} onClick={() => toggleHotelAmenity(item.name)} style={{ padding: '0.85rem 1rem', borderRadius: '14px', border: `2px solid ${form.amenities.includes(item.name) ? '#c5a059' : '#f1f5f9'}`, background: form.amenities.includes(item.name) ? 'rgba(197, 160, 89, 0.05)' : '#f8fafc', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.75rem', transition: '0.2s', position: 'relative' }}>
-                        <span style={{ fontSize: '1.2rem' }}>{item.icon}</span><span style={{ fontSize: '0.8rem', fontWeight: '700' }}>{item.name}</span>
-                        {form.amenities.includes(item.name) && <div style={{ position: 'absolute', top: '-5px', right: '-5px', background: '#c5a059', color: 'white', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Check size={12} strokeWidth={4} /></div>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div style={{ marginTop: '2.5rem' }}><label className="form-label">Gallery</label><div className="image-grid-pills">
-                  {form.images.map((img, i) => (<div key={i} style={{ position: 'relative', height: '100px', borderRadius: '16px', overflow: 'hidden' }}><img src={img} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /><button type="button" onClick={() => setForm({...form, images: form.images.filter((_, idx) => idx !== i)})} style={{ position: 'absolute', top: '5px', right: '5px', background: 'rgba(239, 68, 68, 0.9)', borderRadius: '50%', width: '22px', height: '22px', color: 'white', border: 'none' }}><X size={12} /></button></div>))}
-                  <label className="image-label" style={{ height: '100px', border: '2px dashed #e2e8f0', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><ImageIcon size={24} /><input type="file" multiple hidden onChange={handleImageUpload} /></label>
-                </div></div>
-              </form>
-            </div>
-            <div style={{ padding: '1.5rem 2.5rem', borderTop: '1px solid #f1f5f9', display: 'flex', gap: '1rem', background: '#fdfcfb' }}>
-              <button type="button" onClick={() => setShowModal(false)} className="btn-cancel">Cancel</button>
-              <button type="submit" form="hotelForm" disabled={submitting} className="btn-primary" style={{ flex: 1, height: '54px' }}>{submitting ? <Loader2 className="animate-spin" size={20} /> : <CheckCircle2 size={20} />} {editingHotel ? 'Save' : 'Publish'}</button>
-            </div>
-          </div>
+                          <div className="space-y-4">
+                             <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1">Optimum Guest Capacity</label>
+                             <div className="flex bg-gray-50 p-1.5 rounded-[1.25rem] border border-gray-100">
+                                {[1, 2, 3, 4, 5, 6].map(num => (
+                                  <button 
+                                    key={num} 
+                                    type="button" 
+                                    onClick={() => setRoomForm({...roomForm, capacity: num})} 
+                                    className={`flex-1 h-11 rounded-xl text-xs font-black transition-all ${roomForm.capacity === num ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-gray-400 hover:text-secondary-dark'}`}
+                                  >
+                                    {num}
+                                  </button>
+                                ))}
+                             </div>
+                          </div>
+
+                          <div className="space-y-4">
+                             <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1">Total Unit Inventory</label>
+                             <div className="relative group">
+                                <input required type="number" value={roomForm.totalRooms} onChange={e => setRoomForm({...roomForm, totalRooms: e.target.value})} className="input-premium font-black" placeholder="Total available units" />
+                                <div className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-300 font-bold uppercase tracking-widest text-[10px]">Active Units</div>
+                             </div>
+                          </div>
+                       </div>
+
+                       <div className="space-y-8">
+                          <label className="text-xs font-black text-secondary-dark uppercase tracking-widest block border-b border-gray-100 pb-4">Room Exclusive Amenities</label>
+                          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {ROOM_AMENITIES.map((item) => (
+                              <button 
+                                key={item.name} 
+                                type="button"
+                                onClick={() => toggleRoomAmenity(item.name)} 
+                                className={`p-4 rounded-2xl border transition-all text-left flex items-center gap-4 group relative overflow-hidden ${roomForm.amenities.includes(item.name) ? 'border-primary bg-primary/5' : 'border-gray-100 bg-gray-50/50 hover:bg-white hover:border-gray-200'}`}
+                              >
+                                 <span className="text-2xl">{item.icon}</span>
+                                 <span className={`text-[10px] font-black uppercase tracking-wider ${roomForm.amenities.includes(item.name) ? 'text-secondary-dark' : 'text-gray-400'}`}>{item.name}</span>
+                                 {roomForm.amenities.includes(item.name) && (
+                                   <div className="absolute top-2 right-2 flex items-center justify-center w-5 h-5 bg-primary text-white rounded-full">
+                                      <Check size={12} strokeWidth={4} />
+                                   </div>
+                                 )}
+                              </button>
+                            ))}
+                          </div>
+                       </div>
+                    </form>
+                 )}
+              </div>
+
+              {/* Modal Footer */}
+              <div className="p-10 border-t border-gray-100 bg-gray-50/50 flex flex-col md:flex-row gap-4">
+                 <button 
+                   type="button" 
+                   onClick={() => { setShowModal(false); setShowRoomModal(false); }} 
+                   className="flex-1 h-14 bg-white border border-gray-200 rounded-2xl text-gray-500 font-bold hover:bg-gray-50 transition-all uppercase tracking-widest text-xs"
+                 >
+                    Cancel Transaction
+                 </button>
+                 <button 
+                   type="submit" 
+                   form={showModal ? "hotelForm" : "roomForm"} 
+                   disabled={submitting} 
+                   className="flex-[2] h-14 bg-secondary-dark text-white font-bold rounded-2xl shadow-xl shadow-secondary-dark/20 hover:shadow-secondary-dark/40 active:scale-95 transition-all flex items-center justify-center gap-3 uppercase tracking-widest text-xs group"
+                 >
+                   {submitting ? (
+                     <Loader2 className="animate-spin" size={20} />
+                   ) : (
+                     <>
+                        {showModal ? (editingHotel ? 'Commit Changes' : 'Initialize Property') : (editingRoom ? 'Commit Category Update' : 'Initialize Category')}
+                        <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform text-primary" />
+                     </>
+                   )}
+                 </button>
+              </div>
+           </div>
         </div>
       )}
 
       <style>{`
-        .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-        .form-group { display: flex; flex-direction: column; gap: 0.6rem; }
-        .form-label { font-weight: 800; font-size: 0.85rem; color: #1e293b; text-transform: uppercase; letter-spacing: 0.5px; }
-        .form-input { 
-          padding: 0.9rem 1.25rem; border: 1.5px solid #e2e8f0; border-radius: 12px; outline: none; transition: 0.2s; 
-          font-family: inherit; font-size: 1rem; width: 100%; box-sizing: border-box; 
-        }
-        .form-input:focus { border-color: #c5a059; box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.1); }
-        .amenities-grid-custom { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.75rem; }
-        .image-grid-pills { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 1rem; }
-        .btn-cancel { flex: 1; height: 54px; border-radius: 16px; background: #f1f5f9; color: #64748b; border: none; font-weight: 700; cursor: pointer; transition: 0.2s; }
-        .btn-cancel:hover { background: #e2e8f0; }
-        .image-label:hover { border-color: #c5a059; color: #c5a059; background: #fffcf5; }
-        
-        @media (max-width: 768px) {
-          .modal-grid { grid-template-columns: 1fr; gap: 1.25rem; }
-          .modal-body { padding: 1.5rem !important; }
-          .modal-content { max-height: 95vh; border-radius: 24px; }
-          .capacity-pills { overflow-x: auto; padding: 2px; }
-          .capacity-pills button { min-width: 45px; }
-          .amenities-grid-custom { grid-template-columns: 1fr 1fr; }
-        }
-        @media (max-width: 480px) {
-           .amenities-grid-custom { grid-template-columns: 1fr; }
-           .luxury-font { fontSize: 1.5rem !important; }
-        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
       `}</style>
     </div>
   );
