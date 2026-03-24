@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronDown, MapPin, Calendar, Users, Minus, Plus } from 'lucide-react';
 
 const SearchBar = () => {
