@@ -77,26 +77,19 @@ const ManagerDashboard = () => {
   );
 
   return (
-    <div className="space-y-10 animate-fade-in">
+    <div className="space-y-12 animate-fade-in pb-10">
       
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {statCards.map((card, idx) => (
-          <div key={idx} className="group relative bg-white rounded-3xl p-6 md:p-8 border border-gray-100 shadow-sm hover:shadow-premium transition-all duration-500 overflow-hidden">
-            <div className={`absolute top-0 right-0 w-32 h-32 ${card.bg} rounded-full -mr-16 -mt-16 opacity-40 group-hover:scale-110 transition-transform duration-700`} />
+          <div key={idx} className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex items-center gap-5 hover:border-[#c5a059]/20 transition-all group">
+            <div className={`w-14 h-14 ${card.bg} ${card.color} rounded-xl flex items-center justify-center shrink-0`}>
+              <card.icon size={24} />
+            </div>
             
-            <div className="relative z-10 space-y-6">
-              <div className={`w-14 h-14 ${card.bg} ${card.color} rounded-2xl flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-500`}>
-                <card.icon size={28} />
-              </div>
-              
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                   <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest">{card.title}</p>
-                   <span className="text-[10px] font-black text-primary uppercase bg-primary/10 px-2 py-0.5 rounded-full">{card.trend}</span>
-                </div>
-                <h3 className="text-3xl font-serif text-secondary-dark font-black tracking-tight group-hover:text-primary transition-colors">{card.value}</h3>
-              </div>
+            <div className="min-w-0">
+               <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest truncate">{card.title}</p>
+               <h3 className="text-2xl font-bold text-slate-900 mt-0.5">{card.value}</h3>
             </div>
           </div>
         ))}
