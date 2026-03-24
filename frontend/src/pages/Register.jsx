@@ -85,15 +85,15 @@ const Register = () => {
                 value={formData.name}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
                 required 
-                className="w-full h-14 px-5 bg-white border border-slate-200 rounded-xl text-slate-900 font-bold text-base
+                className="w-full h-14 px-5 bg-white border border-slate-300 rounded-xl text-slate-900 font-bold text-base
                            focus:border-luxury-gold focus:ring-4 focus:ring-luxury-gold/5 transition-all outline-none"
               />
-              <User className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-luxury-gold transition-colors" size={20} />
+              <User className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-luxury-gold transition-colors" size={20} />
             </div>
           </div>
 
           <div className="space-y-2.5">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1 block text-left">Electronic Mail</label>
+            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1 block text-left">Electronic Mail</label>
             <div className="relative group">
               <input 
                 type="email" 
@@ -101,40 +101,40 @@ const Register = () => {
                 value={formData.email}
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
                 required 
-                className="w-full h-14 px-5 bg-white border border-slate-200 rounded-xl text-slate-900 font-bold text-base
+                className="w-full h-14 px-5 bg-white border border-slate-300 rounded-xl text-slate-900 font-bold text-base
                            focus:border-luxury-gold focus:ring-4 focus:ring-luxury-gold/5 transition-all outline-none"
               />
-              <Mail className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-luxury-gold transition-colors" size={20} />
+              <Mail className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-luxury-gold transition-colors" size={20} />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="space-y-2.5">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1 block text-left">Secure Password</label>
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1 block text-left">Secure Password</label>
               <div className="relative group">
                 <input 
                   type="password"
                   value={formData.password}
                   onChange={(e) => setFormData({...formData, password: e.target.value})}
                   required 
-                  className="w-full h-14 px-5 bg-white border border-slate-200 rounded-xl text-slate-900 font-bold text-base
+                  className="w-full h-14 px-5 bg-white border border-slate-300 rounded-xl text-slate-900 font-bold text-base
                              focus:border-luxury-gold focus:ring-4 focus:ring-luxury-gold/5 transition-all outline-none"
                 />
-                <Lock className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-luxury-gold transition-colors" size={20} />
+                <Lock className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-luxury-gold transition-colors" size={20} />
               </div>
             </div>
             <div className="space-y-2.5">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1 block text-left">Verify Key</label>
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1 block text-left">Verify Key</label>
               <div className="relative group">
                 <input 
                   type="password"
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
                   required 
-                  className="w-full h-14 px-5 bg-white border border-slate-200 rounded-xl text-slate-900 font-bold text-base
+                  className="w-full h-14 px-5 bg-white border border-slate-300 rounded-xl text-slate-900 font-bold text-base
                              focus:border-luxury-gold focus:ring-4 focus:ring-luxury-gold/5 transition-all outline-none"
                 />
-                <ShieldCheck className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-luxury-gold transition-colors" size={20} />
+                <ShieldCheck className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-luxury-gold transition-colors" size={20} />
               </div>
             </div>
           </div>

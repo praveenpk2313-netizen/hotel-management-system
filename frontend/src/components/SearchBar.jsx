@@ -78,30 +78,38 @@ const SearchBar = () => {
           </div>
 
           {showGuests && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-slate-100 p-6 z-[100] animate-fade-in" onClick={(e) => e.stopPropagation()}>
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 p-6 z-[100] animate-fade-in" onClick={(e) => e.stopPropagation()}>
                <div className="space-y-6">
                   <div className="flex items-center justify-between">
                      <div>
-                        <p className="text-sm font-bold text-slate-900">Adults</p>
-                        <p className="text-[10px] text-slate-400">Ages 13 or above</p>
+                        <p className="text-sm font-bold text-slate-900 font-sans">Adults</p>
+                        <p className="text-[10px] text-slate-400 font-sans">Ages 13 or above</p>
                      </div>
                      <div className="flex items-center gap-4">
-                        <button onClick={() => updateGuests('adults', 'sub')} className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center hover:border-luxury-gold hover:text-luxury-gold transition-all"><Minus size={14} /></button>
-                        <span className="w-4 text-center text-sm font-bold">{guests.adults}</span>
-                        <button onClick={() => updateGuests('adults', 'add')} className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center hover:border-luxury-gold hover:text-luxury-gold transition-all"><Plus size={14} /></button>
+                        <button type="button" onClick={() => updateGuests('adults', 'sub')} className="w-9 h-9 rounded-full border border-slate-200 flex items-center justify-center hover:border-luxury-gold hover:text-luxury-gold transition-all active:scale-90"><Minus size={14} /></button>
+                        <span className="w-5 text-center text-sm font-black text-slate-900">{guests.adults}</span>
+                        <button type="button" onClick={() => updateGuests('adults', 'add')} className="w-9 h-9 rounded-full border border-slate-200 flex items-center justify-center hover:border-luxury-gold hover:text-luxury-gold transition-all active:scale-90"><Plus size={14} /></button>
                      </div>
                   </div>
                   <div className="flex items-center justify-between">
                      <div>
-                        <p className="text-sm font-bold text-slate-900">Children</p>
-                        <p className="text-[10px] text-slate-400">Ages 2-12</p>
+                        <p className="text-sm font-bold text-slate-900 font-sans">Children</p>
+                        <p className="text-[10px] text-slate-400 font-sans">Ages 2-12</p>
                      </div>
                      <div className="flex items-center gap-4">
-                        <button onClick={() => updateGuests('children', 'sub')} className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center hover:border-luxury-gold hover:text-luxury-gold transition-all"><Minus size={14} /></button>
-                        <span className="w-4 text-center text-sm font-bold">{guests.children}</span>
-                        <button onClick={() => updateGuests('children', 'add')} className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center hover:border-luxury-gold hover:text-luxury-gold transition-all"><Plus size={14} /></button>
+                        <button type="button" onClick={() => updateGuests('children', 'sub')} className="w-9 h-9 rounded-full border border-slate-200 flex items-center justify-center hover:border-luxury-gold hover:text-luxury-gold transition-all active:scale-90"><Minus size={14} /></button>
+                        <span className="w-5 text-center text-sm font-black text-slate-900">{guests.children}</span>
+                        <button type="button" onClick={() => updateGuests('children', 'add')} className="w-9 h-9 rounded-full border border-slate-200 flex items-center justify-center hover:border-luxury-gold hover:text-luxury-gold transition-all active:scale-90"><Plus size={14} /></button>
                      </div>
                   </div>
+
+                  <button 
+                    type="button"
+                    onClick={() => setShowGuests(false)}
+                    className="w-full py-3 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-luxury-gold transition-colors"
+                  >
+                    Apply Selection
+                  </button>
                </div>
             </div>
           )}

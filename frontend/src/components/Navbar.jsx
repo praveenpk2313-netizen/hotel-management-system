@@ -40,9 +40,11 @@ const Navbar = () => {
     setIsMenuOpen(false);
   };
 
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/register' || location.pathname === '/forgot-password';
+
   return (
     <nav className={`fixed top-0 left-0 w-full z-[1000] py-6 transition-all duration-500 ${
-      scrolled ? 'bg-white/80 backdrop-blur-xl shadow-sm py-4' : 'bg-transparent'
+      (scrolled || isAuthPage) ? 'bg-white shadow-[0_4px_30px_rgba(0,0,0,0.03)] py-4' : 'bg-transparent'
     }`}>
       <div className="max-w-7xl mx-auto px-6 md:px-10 flex justify-between items-center">
         
@@ -51,7 +53,7 @@ const Navbar = () => {
           to="/" 
           onClick={scrollToTop}
           className={`text-2xl font-serif font-black tracking-tighter transition-colors ${
-            scrolled ? 'text-slate-900' : 'text-white'
+            (scrolled || isAuthPage) ? 'text-slate-900' : 'text-white'
           }`}
         >
           URBAN<span className="text-luxury-gold italic">STAY</span>
@@ -59,7 +61,7 @@ const Navbar = () => {
         
         {/* Navigation Links */}
         <div className={`hidden lg:flex items-center gap-12 font-bold text-[10px] uppercase tracking-[0.2em] ${
-          scrolled ? 'text-slate-600' : 'text-white/80'
+          (scrolled || isAuthPage) ? 'text-slate-600' : 'text-white/80'
         }`}>
           <button onClick={scrollToTop} className="hover:text-luxury-gold transition-colors">Home</button>
           <button onClick={() => scrollToSection('about')} className="hover:text-luxury-gold transition-colors">About</button>
@@ -71,11 +73,11 @@ const Navbar = () => {
         <div className="flex items-center gap-6">
           {user ? (
              <div className="flex items-center gap-6">
-                <NotificationBell scrolled={scrolled} />
+                <NotificationBell scrolled={scrolled || isAuthPage} />
                 <button 
                   onClick={() => navigate(user.role === 'admin' ? '/admin/dashboard' : user.role === 'manager' ? '/manager/dashboard' : '/customer/dashboard')}
                   className={`flex items-center gap-3 px-6 py-2.5 rounded-full border transition-all text-[10px] font-black uppercase tracking-widest ${
-                    scrolled 
+                    (scrolled || isAuthPage) 
                     ? 'border-slate-200 text-slate-900 hover:bg-slate-900 hover:text-white' 
                     : 'border-white/20 text-white hover:bg-white hover:text-slate-900'
                   }`}
@@ -93,7 +95,7 @@ const Navbar = () => {
             <Link 
               to="/login" 
               className={`flex items-center gap-3 px-8 py-3 rounded-full transition-all text-[10px] font-black uppercase tracking-widest shadow-xl ${
-                scrolled 
+                (scrolled || isAuthPage) 
                 ? 'bg-slate-900 text-white hover:bg-luxury-gold' 
                 : 'bg-white text-slate-900 hover:bg-luxury-gold hover:text-white'
               }`}
@@ -103,8 +105,8 @@ const Navbar = () => {
           )}
 
           {/* Mobile Menu Toggle */}
-          <button className="lg:hidden text-white">
-             <Menu size={24} className={scrolled ? 'text-slate-900' : 'text-white'} />
+          <button className="lg:hidden">
+             <Menu size={24} className={(scrolled || isAuthPage) ? 'text-slate-900' : 'text-white'} />
           </button>
         </div>
       </div>
