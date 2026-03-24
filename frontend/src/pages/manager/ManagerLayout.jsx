@@ -97,15 +97,15 @@ const ManagerLayout = () => {
                <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors">
                   <Search size={20} />
                </div>
-               <input 
-                 type="text" 
-                 placeholder="Audit guest, booking, or property data..." 
-                 value={searchTerm}
-                 onChange={handleSearchChange}
-                 className="w-full h-14 pl-14 pr-12 bg-gray-50 border-2 border-transparent rounded-[1.25rem] text-[13px] font-bold focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 transition-all outline-none text-secondary-dark placeholder:text-gray-400 placeholder:font-medium placeholder:uppercase placeholder:tracking-widest placeholder:text-[10px]"
-                 onFocus={() => { if (searchTerm && suggestions.length > 0) setShowSuggestions(true); }}
-                 onBlur={() => setTimeout(() => setShowSuggestions(false), 300)}
-               />
+                <input 
+                  type="text" 
+                  placeholder="Search guests, bookings, or hotels..." 
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  className="w-full h-12 pl-12 pr-10 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium focus:bg-white focus:border-[#006ce4] focus:ring-4 focus:ring-blue-50 transition-all outline-none text-gray-900"
+                  onFocus={() => { if (searchTerm && suggestions.length > 0) setShowSuggestions(true); }}
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 300)}
+                />
                {loadingSuggestions && (
                  <div className="absolute right-5 top-1/2 -translate-y-1/2">
                     <Loader2 size={16} className="animate-spin text-primary" />
@@ -159,11 +159,11 @@ const ManagerLayout = () => {
            <div className="max-w-[1600px] mx-auto px-6 lg:px-10">
               {/* Dynamic Header Badge/Breadcrumb */}
               <div className="mb-12 animate-slide-up">
-                 <div className="flex items-center gap-3 text-[9px] font-black text-primary uppercase tracking-[4px] mb-3">
-                    <CheckCircle2 size={12} className="animate-pulse" /> Verified Intelligence Stream 2026
+                 <div className="flex items-center gap-2 text-[11px] font-bold text-[#003b95] uppercase tracking-wider mb-2">
+                    <CheckCircle2 size={14} /> Property Management Portal
                  </div>
-                 <h1 className="text-5xl lg:text-6xl font-serif text-secondary-dark font-black tracking-tighter leading-none">
-                    Audit your <span className="text-primary italic">{activeSection}</span>
+                 <h1 className="text-4xl lg:text-5xl font-black text-gray-900 tracking-tight leading-none">
+                    Manage your <span className="text-[#006ce4]">{activeSection}</span>
                  </h1>
               </div>
               

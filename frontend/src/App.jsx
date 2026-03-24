@@ -111,11 +111,11 @@ function App() {
     location.pathname.startsWith('/dashboard');
 
   return (
-    <div className="min-h-screen flex flex-col bg-background selection:bg-primary/20 selection:text-primary">
+    <div className="min-h-screen flex flex-col bg-white selection:bg-blue-100 selection:text-blue-900">
       <ServerWakeUpBanner />
       {!isDashboard && <Navbar />}
 
-      <main className="flex-grow">
+      <main className="flex-grow pt-0">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />

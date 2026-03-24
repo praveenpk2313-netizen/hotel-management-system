@@ -1,98 +1,83 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Star, Users, Heart, ArrowUpRight, Sparkles, ShieldCheck, Zap } from 'lucide-react';
+import { MapPin, Star, Heart, ShieldCheck, Zap, User } from 'lucide-react';
 import { formatCurrency } from '../utils/helpers';
 
 const HotelCard = ({ hotel }) => {
   return (
     <Link 
       to={`/hotel/${hotel._id || hotel.id}`} 
-      className="group block relative"
+      className="group block relative bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 h-full flex flex-col"
     >
-      <div className="bg-white rounded-[3rem] overflow-hidden border border-gray-100 shadow-sm hover:shadow-premium transition-all duration-700 flex flex-col h-full transform hover:-translate-y-4">
+      {/* Property Visual */}
+      <div className="relative h-56 overflow-hidden">
+        <img 
+          src={(hotel.images && hotel.images[0]) || hotel.image || 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=1200'} 
+          alt={hotel.name} 
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
         
-        {/* Visual Terminal */}
-        <div className="relative h-[340px] overflow-hidden m-4 rounded-[2.5rem]">
-          {/* Main Content Image */}
-          <img 
-            src={(hotel.images && hotel.images[0]) || hotel.image || 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=1200'} 
-            alt={hotel.name} 
-            className="w-full h-full object-cover transition-transform duration-[4s] group-hover:scale-110"
-          />
-          
-          {/* Elite Overlays */}
-          <div className="absolute inset-0 bg-gradient-to-t from-secondary-dark/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-          
-          {/* Status Badges */}
-          <div className="absolute top-6 left-6 flex flex-col gap-2">
-             <div className="px-4 py-1.5 bg-white/90 backdrop-blur-xl rounded-full flex items-center gap-2 text-[9px] font-black text-secondary-dark uppercase tracking-[2px] shadow-sm">
-                <ShieldCheck size={12} className="text-primary" /> Verified Heritage
-             </div>
-             {hotel.isFeatured && (
-               <div className="px-4 py-1.5 bg-primary rounded-full flex items-center gap-2 text-[9px] font-black text-white uppercase tracking-[2px] shadow-lg animate-pulse">
-                  <Sparkles size={12} /> Curated
-               </div>
-             )}
-          </div>
+        {/* Wishlist Toggle */}
+        <button className="absolute top-3 right-3 w-8 h-8 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center text-secondary hover:bg-white hover:text-rose-500 transition-all shadow-sm">
+           <Heart size={16} />
+        </button>
 
-          <div className="absolute top-6 right-6">
-             <button className="w-12 h-12 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl flex items-center justify-center text-white hover:bg-white hover:text-secondary-dark transition-all transform hover:rotate-12">
-                <Heart size={20} />
-             </button>
-          </div>
-
-          {/* Rating Badge */}
-          <div className="absolute bottom-6 left-6 px-4 h-10 bg-white/95 backdrop-blur-xl rounded-2xl flex items-center gap-2 shadow-xl border border-white/20">
-             <Star size={16} fill="#C5A059" className="text-primary" />
-             <span className="text-sm font-black text-secondary-dark">{hotel.averageRating ? hotel.averageRating.toFixed(1) : '4.9'}</span>
-             <span className="text-[10px] font-bold text-gray-300 uppercase tracking-widest hidden sm:block">Audit Score</span>
-          </div>
-          
-          {/* Interaction Pointer */}
-          <div className="absolute bottom-6 right-6 w-14 h-14 bg-primary text-white rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:translate-x-0 translate-x-10 transition-all duration-500 shadow-2xl">
-             <ArrowUpRight size={24} />
-          </div>
+        {/* Status Badges */}
+        <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+           <div className="px-2 py-1 bg-white/90 backdrop-blur-md rounded text-[9px] font-black text-secondary-dark uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
+              <ShieldCheck size={10} className="text-blue-600" /> TOP RATED
+           </div>
         </div>
+      </div>
 
-        {/* Intelligence Data */}
-        <div className="px-8 pb-10 flex-1 flex flex-col space-y-6">
-          <div className="flex justify-between items-start gap-4">
-            <div className="space-y-1 flex-1">
-               <h3 className="text-2xl font-serif font-black text-secondary-dark tracking-tight leading-tight group-hover:text-primary transition-colors line-clamp-1">
-                  {hotel.name}
-               </h3>
-               <div className="flex items-center gap-2 text-gray-400 font-bold text-[10px] uppercase tracking-widest">
-                  <MapPin size={14} className="text-primary" /> {hotel.location || hotel.city}
-               </div>
-            </div>
-            <div className="text-right">
-               <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest mb-1 leading-none">Investment</p>
-               <p className="text-2xl font-black text-secondary-dark italic font-serif leading-none tracking-tighter">
-                  {formatCurrency(hotel.minPrice || hotel.pricePerNight || 0)}
-               </p>
-            </div>
+      {/* Property Data */}
+      <div className="p-4 flex-1 flex flex-col">
+          <div className="flex justify-between items-start gap-2 mb-2">
+             <div className="flex-1 min-w-0">
+                <h3 className="text-lg font-bold text-[#003b95] leading-tight group-hover:underline truncate">
+                   {hotel.name}
+                </h3>
+                <div className="flex items-center gap-1.5 text-gray-500 font-medium text-[11px] mt-1">
+                   <MapPin size={12} className="text-blue-600" /> 
+                   <span className="truncate underline cursor-pointer hover:text-blue-700">{hotel.location || hotel.city}</span>
+                </div>
+             </div>
+             
+             {/* Score Badge (Booking.com style) */}
+             <div className="flex flex-col items-end">
+                <div className="flex items-center gap-2">
+                   <div className="text-right">
+                      <p className="text-[11px] font-bold text-gray-900 leading-none">Excellent</p>
+                      <p className="text-[10px] text-gray-500 mt-0.5">2,500 reviews</p>
+                   </div>
+                   <div className="w-8 h-8 bg-[#003580] text-white rounded-t-lg rounded-br-lg flex items-center justify-center text-xs font-bold shadow-sm">
+                      {hotel.averageRating ? hotel.averageRating.toFixed(1) : '8.8'}
+                   </div>
+                </div>
+             </div>
           </div>
 
-          <p className="text-xs font-medium text-gray-400 leading-relaxed italic line-clamp-2 pb-6 border-b border-gray-50 flex-1">
-            {hotel.description ? (hotel.description.length > 110 ? hotel.description.substring(0, 110) + '...' : hotel.description) : 'An audited collection of heritage suites offering unparalleled perspective and architectural excellence.'}
+          <p className="text-[12px] text-gray-600 leading-relaxed line-clamp-2 mt-auto pb-4">
+             {hotel.description || 'Verified property with elite amenities and exceptional service in high-demand coordinates.'}
           </p>
 
-          <div className="flex items-center justify-between pt-2">
-             <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-secondary-dark border border-gray-100 group-hover:bg-primary group-hover:text-white transition-all">
-                   <Users size={18} />
+          <div className="pt-3 border-t border-gray-100 flex items-end justify-between">
+             <div className="space-y-1">
+                <div className="flex items-center gap-1.5 text-emerald-600 font-bold text-[11px]">
+                   <Zap size={10} /> Limited-time Deal
                 </div>
-                <div>
-                   <p className="text-[9px] font-black text-gray-300 uppercase tracking-widest">Capacity</p>
-                   <p className="text-[10px] font-bold text-secondary-dark uppercase tracking-widest">{hotel.capacity || 2} Qualified Guests</p>
-                </div>
+                <p className="text-[10px] text-gray-400 font-medium">1 night, 2 adults</p>
              </div>
-             <div className="flex items-center gap-2 px-4 h-10 bg-gray-50 rounded-xl border border-gray-100 group-hover:border-primary/30 transition-all">
-                <Zap size={14} className="text-primary" />
-                <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">Instant Scope</span>
+             <div className="text-right">
+                <p className="text-[10px] text-gray-400 line-through opacity-60">
+                   {formatCurrency((hotel.minPrice || hotel.pricePerNight || 0) * 1.25)}
+                </p>
+                <p className="text-xl font-black text-gray-900 leading-none">
+                   {formatCurrency(hotel.minPrice || hotel.pricePerNight || 0)}
+                </p>
+                <p className="text-[10px] text-gray-400 mt-1.5">+ taxes & charges</p>
              </div>
           </div>
-        </div>
       </div>
     </Link>
   );

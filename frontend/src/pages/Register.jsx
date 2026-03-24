@@ -257,9 +257,9 @@ const Register = () => {
               <button 
                 type="submit" 
                 disabled={loading} 
-                className="w-full h-15 mt-4 bg-gradient-to-r from-secondary-light to-secondary-dark text-white font-bold rounded-2xl 
+                className="w-full h-14 mt-4 bg-gradient-to-r from-secondary-light to-secondary-dark text-white font-bold rounded-2xl 
                            shadow-2xl shadow-secondary/20 flex items-center justify-center gap-3 active:scale-[0.98] transition-all 
-                           hover:shadow-secondary/40 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed group h-14"
+                           hover:shadow-secondary/40 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed group"
               >
                 {loading ? (
                   <><Loader2 size={24} className="animate-spin" /> Creating Account...</>

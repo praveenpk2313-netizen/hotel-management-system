@@ -4,97 +4,84 @@
 
 @layer base {
   :root {
-    --primary: 197 160 89; /* #c5a059 */
-    --secondary-dark: 2 6 23; /* #020617 */
-    --background: 253 252 251; /* #fdfcfb */
+    --primary: 0 59 149; /* #003b95 - Booking Blue */
+    --accent: 255 183 0; /* #ffb700 - Booking Yellow */
+    --secondary: 2 6 23; /* #020617 - Deep Navy */
+    --background: 255 255 255; 
   }
 
   body {
-    @apply font-sans antialiased text-secondary-dark bg-background m-0 p-0;
+    @apply font-sans antialiased text-secondary bg-background m-0 p-0;
     overflow-x: hidden;
   }
 
-  /* Standardizing interactive elements */
   button, a {
-    @apply transition-all duration-300;
+    @apply transition-all duration-200;
   }
 
-  /* Consistent scrollbar */
   ::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
   }
   ::-webkit-scrollbar-track {
-    @apply bg-transparent;
+    @apply bg-gray-100;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-primary/20 rounded-full hover:bg-primary/40;
+    @apply bg-primary/30 rounded-full hover:bg-primary/50;
   }
 }
 
 @layer components {
-  /* Ultra-Premium Design Tokens */
-  .container-luxury {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  .container-booking {
+    @apply max-w-[1140px] mx-auto px-4 sm:px-6 lg:px-8;
   }
 
-  .btn-gold {
-    @apply px-8 py-4 bg-primary text-white font-bold rounded-2xl 
-           shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 
-           hover:-translate-y-0.5 active:scale-95 flex items-center justify-center gap-2;
+  .btn-primary-booking {
+    @apply flex items-center justify-center gap-2 px-6 py-3.5 bg-[#006ce4] text-white font-bold rounded-lg 
+           hover:bg-[#0052ad] active:scale-95 transition-all text-sm;
   }
 
-  .glass-header {
-    @apply bg-white/80 backdrop-blur-2xl border-b border-white/20 shadow-sm;
+  .btn-secondary-booking {
+    @apply flex items-center justify-center gap-2 px-6 py-2.5 bg-white text-[#006ce4] font-bold rounded-lg 
+           border border-[#006ce4] hover:bg-blue-50 active:scale-95 transition-all text-sm;
   }
 
-  .luxury-card {
-    @apply bg-white rounded-[2.5rem] border border-gray-100 shadow-premium hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 overflow-hidden;
+  /* Booking Search Bar Segmented Architecture */
+  .search-segment {
+    @apply flex items-center gap-3 px-4 py-3 min-w-[200px] border-r border-gray-100 last:border-none;
   }
 
-  .input-luxury {
-    @apply w-full px-6 py-4 bg-gray-50 border-2 border-transparent rounded-2xl text-sm font-bold 
-           focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none;
+  .booking-card {
+    @apply bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden;
   }
 
-  /* Typography Hierarchy */
-  .h1-hero {
-    @apply font-serif text-5xl md:text-7xl lg:text-9xl text-white font-black tracking-tighter leading-[0.85];
+  .h1-booking {
+    @apply text-4xl md:text-5xl lg:text-6xl text-white font-black tracking-tight leading-[1.1];
   }
 
-  .h2-luxury {
-    @apply font-serif text-3xl md:text-5xl lg:text-6xl text-secondary-dark font-black tracking-tight leading-tight;
+  .h2-booking {
+    @apply text-2xl md:text-2xl lg:text-2xl text-secondary font-black tracking-tight leading-tight;
   }
 }
 
 @layer utilities {
-  .shadow-premium {
-    box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08), 0 5px 15px -5px rgba(0,0,0,0.04);
+  .bg-booking-blue {
+    background-color: #003b95;
   }
   
+  .border-booking-yellow {
+    border-color: #ffb700;
+  }
+
+  .shadow-booking {
+    box-shadow: 0 4px 16px rgba(0,0,0,.15);
+  }
+
   .animate-fade-in {
-    @apply animate-[fadeIn_0.8s_ease-out_forwards];
-  }
-  
-  .animate-slide-up {
-    @apply animate-[slideUp_0.8s_ease-out_forwards];
+    @apply animate-[fadeIn_0.5s_ease-out_forwards];
   }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(30px); }
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.animate-spin {
-  animation: spin 1s linear infinite;
 }
