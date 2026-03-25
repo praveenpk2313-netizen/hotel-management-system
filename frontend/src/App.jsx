@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -48,9 +47,14 @@ const ProtectedRoute = ({ children, allowedRoles, redirectTo = '/login' }) => {
 
   if (loading || !isInitialized) return (
     <div className="min-h-screen flex items-center justify-center bg-white">
-       <div className="flex flex-col items-center gap-4">
-          <Loader2 size={40} className="animate-spin text-[#c5a059]" />
-          <p className="text-[10px] font-black uppercase tracking-[3px] text-slate-400">Authenticating...</p>
+       <div className="flex flex-col items-center gap-6">
+          <div className="relative">
+             <div className="w-16 h-16 border-4 border-[#c5a059]/10 border-t-[#c5a059] rounded-full animate-spin" />
+             <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-2 h-2 bg-[#c5a059] rounded-full animate-pulse" />
+             </div>
+          </div>
+          <p className="text-[10px] font-black uppercase tracking-[4px] text-slate-400 animate-pulse">Authenticating Session</p>
        </div>
     </div>
   );

@@ -3,7 +3,7 @@ import { useNavigate, Link, useLocation, useSearchParams } from 'react-router-do
 import { useAuth } from '../context/AuthContext';
 import { useDispatch } from 'react-redux';
 import { loginStart, loginFailure } from '../redux/slices/authSlice';
-import { AlertCircle, CheckCircle2, Eye, EyeOff, Github, X, ShieldCheck, ArrowRight, UserCheck } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Eye, EyeOff, Github, X, ShieldCheck, ArrowRight, UserCheck, Loader2 } from 'lucide-react';
 import api, { getApiErrorMessage } from '../services/api';
 
 const ManagerLoginPage = () => {
