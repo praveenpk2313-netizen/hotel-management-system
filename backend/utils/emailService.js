@@ -34,16 +34,23 @@ console.log('[EMAIL] SMTP Config:', {
   from_email: process.env.FROM_EMAIL || '(not set)',
 });
 
-// Verify transporter at startup
-transporter.verify((error, success) => {
-  if (error) {
-    console.error('[EMAIL] SMTP transporter verification FAILED:', error.message);
-    console.error('[EMAIL] Error code:', error.code);
-    console.error('[EMAIL] Check SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS on Render');
-  } else {
-    console.log('[EMAIL] SMTP transporter ready — emails can be sent');
+// Verify transporter at startup in a non-blocking way
+if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+  try {
+    transporter.verify((error, success) => {
+      if (error) {
+        console.error('[EMAIL] SMTP transporter verification FAILED:', error.message);
+        console.warn('[EMAIL] Continuing server startup without functional email service.');
+      } else {
+        console.log('[EMAIL] SMTP transporter ready — emails can be sent');
+      }
+    });
+  } catch (verifyErr) {
+    console.error('[EMAIL] Critical error during transporter.verify():', verifyErr.message);
   }
-});
+} else {
+  console.warn('[EMAIL] Disabling SMTP verification: Missing SMTP_USER or SMTP_PASS');
+}
 
 // ─── From Address ─────────────────────────────────────────────────────────────
 const getFromAddress = () => {
