@@ -77,7 +77,6 @@ const Navbar = () => {
 
                 <div className="relative">
                    <NotificationBell scrolled={true} />
-                   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">5</span>
                 </div>
 
                 <div className="flex items-center gap-4">

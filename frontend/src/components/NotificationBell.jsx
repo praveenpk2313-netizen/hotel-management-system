@@ -39,7 +39,7 @@ const NotificationBell = () => {
       case 'booking': return <Calendar size={18} color="#0ea5e9" />;
       case 'payment': return <CreditCard size={18} color="#10b981" />;
       case 'cancellation': return <XCircle size={18} color="#ef4444" />;
-      default: return <Info size={18} color="#var(--primary)" />;
+      default: return <Info size={18} color="#C5A059" />;
     }
   };
 
@@ -59,7 +59,7 @@ const NotificationBell = () => {
         onMouseEnter={e => e.currentTarget.style.background = '#f1f5f9'}
         onMouseLeave={e => e.currentTarget.style.background = 'none'}
       >
-        <Bell size={22} color={isOpen ? 'var(--primary)' : '#64748b'} />
+        <Bell size={22} color={isOpen ? '#C5A059' : '#64748b'} />
         {unreadCount > 0 && (
           <span style={{ 
             position: 'absolute', 
@@ -96,7 +96,7 @@ const NotificationBell = () => {
           <div style={{ padding: '1.25rem', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fdfcfb' }}>
             <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '700' }}>Notifications</h4>
             {unreadCount > 0 && (
-              <button onClick={handleMarkAllRead} style={{ background: 'none', border: 'none', color: 'var(--primary)', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer' }}>
+              <button onClick={handleMarkAllRead} style={{ background: 'none', border: 'none', color: '#C5A059', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer' }}>
                 Mark all as read
               </button>
             )}
@@ -172,7 +172,7 @@ const NotificationBell = () => {
               padding: '1rem', 
               fontSize: '0.9rem', 
               fontWeight: '700', 
-              color: 'var(--primary)', 
+              color: '#C5A059', 
               textDecoration: 'none', 
               background: '#fdfcfb',
               borderTop: '1px solid #f1f5f9'
