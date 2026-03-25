@@ -14,7 +14,11 @@ import {
   Heart,
   Loader2,
   Award,
-  Zap
+  Zap,
+  ArrowLeft,
+  Wind,
+  Monitor,
+  Users
 } from 'lucide-react';
 import { fetchHotelById, fetchRooms } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -125,108 +129,111 @@ const HotelDetails = () => {
   return (
     <div className="bg-white min-h-screen pb-24 pt-32 lg:pt-40 font-serif text-slate-900">
       
-      {/* 1. Header & Context */}
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-12 mb-12">
-         <div className="flex flex-wrap items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest font-sans mb-8">
-            <Link to="/" className="hover:text-luxury-gold transition-colors">Home</Link>
-            <ChevronRight size={12} />
-            <Link to="/hotels" className="hover:text-luxury-gold transition-colors">Hotels</Link>
-            <ChevronRight size={12} />
-            <span className="text-slate-900">{hotel.name}</span>
-         </div>
-
-         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
-            <div className="space-y-4 max-w-2xl">
-               <h1 className="text-4xl lg:text-6xl font-black text-slate-900 tracking-tighter leading-none">{hotel.name}</h1>
-               <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-1 bg-luxury-gold/10 px-3 py-1.5 rounded-full border border-luxury-gold/20 shadow-sm font-sans">
-                     <Star size={12} className="text-luxury-gold fill-luxury-gold" />
-                     <span className="text-luxury-gold text-xs font-black leading-none">{hotel.averageRating ? hotel.averageRating.toFixed(1) : '5.0'}</span>
-                  </div>
-                  <p className="text-sm font-bold text-slate-500 font-sans flex items-center gap-2 italic">
-                     <MapPin size={18} className="text-luxury-gold" /> {hotel.location}
-                  </p>
-               </div>
-            </div>
-            <div className="flex items-center gap-4">
-               <button className="h-14 px-8 bg-white border border-slate-200 text-slate-900 rounded-2xl flex items-center gap-3 text-xs font-black uppercase tracking-widest hover:bg-slate-50 transition-all font-sans">
-                  <Heart size={18} className="text-rose-500" /> Save Property
-               </button>
-               <button onClick={() => document.getElementById('availability').scrollIntoView({ behavior: 'smooth' })} className="h-14 px-10 bg-slate-900 text-white rounded-2xl flex items-center gap-3 text-xs font-black uppercase tracking-widest hover:bg-luxury-gold transition-all font-sans shadow-xl shadow-slate-900/10">
-                  Select A Suite
-               </button>
-            </div>
-         </div>
+      {/* 1. Context & Navigation */}
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-12 mb-8">
+         <button 
+           onClick={() => navigate('/hotels')} 
+           className="flex items-center gap-2 text-xs font-black text-slate-400 hover:text-luxury-gold transition-colors font-sans uppercase tracking-[0.2em]"
+         >
+            <ArrowLeft size={14} className="stroke-[3px]" /> Back to Search
+         </button>
       </div>
       
-      {/* 2. Gallery */}
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-12 mb-20 animate-fade-in">
-         <div className="grid grid-cols-4 grid-rows-2 gap-4 h-[450px] md:h-[550px] lg:h-[650px] rounded-[3rem] overflow-hidden shadow-2xl shadow-slate-200/50">
-            <div className="col-span-2 row-span-2 relative group cursor-pointer overflow-hidden border-r border-white">
+      {/* 2. Gallery Grid */}
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-12 mb-16 animate-fade-in">
+         <div className="grid grid-cols-4 gap-4 h-[450px] md:h-[550px] lg:h-[650px] overflow-hidden">
+            {/* Main Big Image (Left) */}
+            <div className="col-span-2 relative group cursor-pointer overflow-hidden rounded-[2rem]">
                <img src={hotel.images?.[0] || 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=1200'} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" alt={hotel.name} />
             </div>
-            <div className="col-span-1 row-span-1 relative group cursor-pointer overflow-hidden border-b border-white">
-               <img src={hotel.images?.[1] || 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=600'} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" alt="Interior" />
-            </div>
-            <div className="col-span-1 row-span-1 relative group cursor-pointer overflow-hidden border-b border-l border-white">
-               <img src={hotel.images?.[2] || 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=600'} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" alt="Interior" />
-            </div>
-            <div className="col-span-1 row-span-1 relative group cursor-pointer overflow-hidden">
-               <img src={hotel.images?.[3] || 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=600'} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" alt="Interior" />
-            </div>
-            <div className="col-span-1 row-span-1 relative group cursor-pointer bg-slate-900 overflow-hidden border-l border-white">
-               <img src={hotel.images?.[4] || 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=600'} className="w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-1000" alt="Interior" />
-               <div className="absolute inset-0 flex flex-col items-center justify-center text-white font-sans">
-                  <ImageIcon size={32} />
-                  <span className="text-[10px] font-black mt-3 uppercase tracking-[0.2em]">+{hotel.images?.length || 0} photos</span>
+
+            {/* Middle Column (Two Stacked) */}
+            <div className="col-span-1 flex flex-col gap-4">
+               <div className="flex-1 relative group cursor-pointer overflow-hidden rounded-[2rem]">
+                  <img src={hotel.images?.[1] || 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=600'} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" alt="Interior" />
                </div>
+               <div className="flex-1 relative group cursor-pointer overflow-hidden rounded-[2rem]">
+                  <img src={hotel.images?.[2] || 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=600'} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" alt="Interior" />
+               </div>
+            </div>
+
+            {/* Right Big Image (Rounded Top-Right) */}
+            <div className="col-span-1 relative group cursor-pointer overflow-hidden rounded-tr-[5rem] rounded-bl-[2rem] rounded-tl-[2rem] rounded-br-[2rem]">
+               <img src={hotel.images?.[3] || 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=600'} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt="Interior" />
+               <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-all pointer-events-none" />
+               {hotel.images?.length > 4 && (
+                  <div className="absolute bottom-6 right-6 bg-white/20 backdrop-blur-md border border-white/30 text-white px-4 py-2 rounded-full font-sans text-[10px] font-black uppercase tracking-widest shadow-xl">
+                     +{hotel.images.length - 4} More
+                  </div>
+               )}
             </div>
          </div>
       </div>
 
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+         {/* 3. Header Info Section */}
+         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8 mb-20 border-b border-slate-100 pb-12">
+            <div>
+               <h1 className="text-5xl lg:text-7xl font-black text-slate-900 tracking-tighter mb-4 lowercase">{hotel.name}</h1>
+               <div className="flex items-center gap-2 text-slate-400 font-sans">
+                  <MapPin size={22} />
+                  <span className="text-lg font-bold">{hotel.location}</span>
+               </div>
+            </div>
+            <div className="flex flex-col items-end gap-3 pt-4">
+               <div className="flex items-center gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} size={28} className="text-orange-400 fill-orange-400" />
+                  ))}
+                  <span className="ml-3 text-3xl font-black text-slate-900 font-sans">5.0</span>
+               </div>
+               <p className="text-xs font-black text-slate-400 uppercase tracking-widest bg-slate-50 px-6 py-2 rounded-full border border-slate-100">
+                  {hotel.totalReviews || 3} Verified Reviews
+               </p>
+            </div>
+         </div>
+
          <div className="flex flex-col lg:flex-row gap-20">
             
             {/* L: Information */}
-            <div className="lg:col-span-8 flex-1 space-y-20">
+            <div className="lg:col-span-8 flex-1 space-y-24">
                
-               <section className="space-y-12">
-                  <div className="flex flex-wrap items-center gap-10 py-10 border-y border-slate-100 font-sans">
-                     <div className="flex items-center gap-3 text-[10px] font-black text-slate-900 uppercase tracking-widest">
-                        <Wifi size={20} className="text-luxury-gold" /> Free High-Speed WiFi
-                     </div>
-                     <div className="flex items-center gap-3 text-[10px] font-black text-slate-900 uppercase tracking-widest">
-                        <Car size={20} className="text-luxury-gold" /> Valet Parking
-                     </div>
-                     <div className="flex items-center gap-3 text-[10px] font-black text-slate-900 uppercase tracking-widest">
-                        <Coffee size={20} className="text-luxury-gold" /> Gourmet Breakfast
-                     </div>
-                     <div className="flex items-center gap-3 text-[10px] font-black text-slate-900 uppercase tracking-widest">
-                        <ShieldCheck size={20} className="text-luxury-gold" /> Elite Concierge
-                     </div>
-                  </div>
-
-                  <div className="max-w-none text-xl lg:text-3xl leading-relaxed text-slate-800 italic opacity-90 font-serif">
+               <section className="space-y-10">
+                  <h2 className="text-4xl font-black text-slate-900 tracking-tight">About this property</h2>
+                  <div className="max-w-none text-xl leading-relaxed text-slate-500 font-sans">
                      <p>
-                        "{hotel.description || "Stay in the heart of the city at this exceptionally rated property. Offering elite comfort and world-class service, this sanctuary provides the perfect base for your visit."}"
+                        {hotel.description || "nice"}
                      </p>
                   </div>
                </section>
 
-               {/* Availability */}
-               <section id="availability" className="space-y-12 pt-20 border-t border-slate-100">
-                  <div className="space-y-4">
-                    <h2 className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tighter italic">Available Sanctuaries</h2>
-                    <p className="text-slate-500 font-sans font-medium text-lg">Choose the perfect living space for your upcoming stay.</p>
-                  </div>
-                  
-                  <div className="bg-luxury-gold/5 p-8 rounded-[2rem] border border-luxury-gold/10 flex items-center gap-6 font-sans">
-                     <div className="w-14 h-14 bg-luxury-gold shadow-lg rounded-2xl flex items-center justify-center text-white shrink-0">
-                        <Zap size={28} className="fill-white" />
+               <section className="space-y-10">
+                  <h2 className="text-4xl font-black text-slate-900 tracking-tight">Premium Amenities</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl">
+                     <div className="flex items-center gap-6 p-6 bg-orange-50/20 rounded-[2rem] border border-orange-100/30 transition-all hover:bg-orange-50/40">
+                        <div className="w-16 h-16 bg-white shadow-sm rounded-2xl flex items-center justify-center text-orange-400">
+                           <Wifi size={28} />
+                        </div>
+                        <span className="text-lg font-black text-slate-700 uppercase tracking-widest font-sans">wifi</span>
                      </div>
-                     <p className="text-sm font-bold text-slate-800">Exclusive Luxury Collection Pricing applied. Book directly for the best available rates and complimentary upgrades.</p>
+                     <div className="flex items-center gap-6 p-6 bg-orange-50/20 rounded-[2rem] border border-orange-100/30 transition-all hover:bg-orange-50/40">
+                        <div className="w-16 h-16 bg-white shadow-sm rounded-2xl flex items-center justify-center text-orange-400">
+                           <Wind size={28} />
+                        </div>
+                        <span className="text-lg font-black text-slate-700 uppercase tracking-widest font-sans">ac</span>
+                     </div>
+                     <div className="flex items-center gap-6 p-6 bg-orange-50/20 rounded-[2rem] border border-orange-100/30 transition-all hover:bg-orange-50/40">
+                        <div className="w-16 h-16 bg-white shadow-sm rounded-2xl flex items-center justify-center text-orange-400">
+                           <Monitor size={28} />
+                        </div>
+                        <span className="text-lg font-black text-slate-700 uppercase tracking-widest font-sans">tv</span>
+                     </div>
                   </div>
+               </section>
 
+               {/* Availability */}
+               <section id="availability" className="space-y-12">
+                  <h2 className="text-4xl font-black text-slate-900 tracking-tight">Available Room Types</h2>
                   <div className="space-y-8">
                      {rooms.length === 0 ? (
                        <div className="p-20 text-center bg-slate-50 rounded-[2.5rem] border border-slate-100 border-dashed font-sans">
@@ -255,20 +262,27 @@ const HotelDetails = () => {
                </section>
 
                {/* Reviews */}
-               <section className="space-y-12 pt-20 border-t border-slate-100">
-                  <h2 className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tighter italic">Guest Sentiment</h2>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10 font-sans">
-                     {[1,2].map((i) => (
-                       <div key={i} className="p-10 bg-slate-50/50 border border-slate-100 rounded-[2.5rem] space-y-6 transition-all hover:bg-white hover:shadow-2xl hover:shadow-slate-200/50 group">
-                          <div className="flex items-center gap-4">
-                             <div className="w-16 h-16 bg-slate-900 text-white rounded-[1.25rem] flex items-center justify-center font-black text-xl tracking-tight">9.{i+5}</div>
-                             <div>
-                                <p className="text-sm font-black text-slate-900 uppercase tracking-widest">Exceptional Experience</p>
-                                <p className="text-[10px] text-slate-400 mt-1 uppercase font-black tracking-widest">Verified Resident • March 2026</p>
+               <section className="space-y-12">
+                  <div className="grid grid-cols-1 gap-8 font-sans">
+                     {[1,2,3].map((i) => (
+                       <div key={i} className="p-10 bg-white border border-slate-100 rounded-[2.5rem] space-y-8 shadow-sm transition-all hover:shadow-md group">
+                          <div className="flex items-center justify-between">
+                             <div className="flex items-center gap-6">
+                                <div className="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center">
+                                   <Users size={28} />
+                                </div>
+                                <div className="space-y-1">
+                                   <p className="text-xl font-black text-slate-900 uppercase tracking-tight">{i === 1 ? 'parthi' : 'PRAVEEN KUMAR R'}</p>
+                                   <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Verified Stay • {25-i} March 2026</p>
+                                </div>
+                             </div>
+                             <div className="flex items-center gap-0.5">
+                                {[...Array(5)].map((_, j) => (
+                                  <Star key={j} size={18} className="text-orange-400 fill-orange-400" />
+                                ))}
                              </div>
                           </div>
-                          <p className="text-lg text-slate-600 leading-relaxed italic opacity-80 font-serif">"The hospitality was beyond measure. From the check-in experience to the private terrace views, everything was curated to perfection."</p>
+                          <p className="text-2xl text-slate-600 italic font-serif opacity-80">"{i === 1 ? 'hi' : i === 2 ? 'perfect' : 'good'}"</p>
                        </div>
                      ))}
                   </div>
@@ -276,8 +290,8 @@ const HotelDetails = () => {
             </div>
 
             {/* R: Sidebar Sticky */}
-            <div className="lg:w-[420px] shrink-0 font-sans">
-               <div className="sticky top-32 space-y-10">
+            <div className="lg:w-[460px] shrink-0 font-sans">
+               <div className="sticky top-32">
                   <BookingForm 
                     hotel={hotel}
                     rooms={rooms}
@@ -288,18 +302,6 @@ const HotelDetails = () => {
                     initialRoomId={selectedRoomId}
                     initialError={dateError}
                   />
-
-                  <div className="bg-slate-50/50 p-10 rounded-[2.5rem] border border-slate-100 space-y-6">
-                     <div className="flex items-center gap-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                        <ShieldCheck size={20} className="text-emerald-500" /> Secure Protocol
-                     </div>
-                     <div className="flex items-center gap-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                        <Check size={20} className="text-emerald-500" /> Instant Confirmation
-                     </div>
-                     <div className="flex items-center gap-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                        <Award size={20} className="text-luxury-gold" /> Best Rate Guarantee
-                     </div>
-                  </div>
                </div>
             </div>
 
