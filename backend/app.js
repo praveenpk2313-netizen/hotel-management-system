@@ -117,7 +117,7 @@ app.get('/api/test-email', async (req, res) => {
           host: process.env.SMTP_HOST,
           port: process.env.SMTP_PORT,
           user: process.env.SMTP_USER,
-          pass_set: !!process.env.SMTP_PASS,
+          pass_set: !!(process.env.SMTP_PASS || process.env.SMTP_PASSWORD),
           from_name: process.env.FROM_NAME,
           from_email: process.env.FROM_EMAIL,
         }

@@ -7,13 +7,14 @@ const nodemailer = require('nodemailer');
 //   secure: false  (STARTTLS auto-upgrades)
 //   auth: { user, pass }   ← pass = 16-char Google App Password
 
+const smtpPort = Number(process.env.SMTP_PORT) || 587;
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: Number(process.env.SMTP_PORT) || 587,
-  secure: false,               // false for port 587 (STARTTLS)
+  port: smtpPort,
+  secure: smtpPort === 465, // true for port 465 (implicit TLS), false for 587 (STARTTLS)
   auth: {
     user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
+    pass: process.env.SMTP_PASS || process.env.SMTP_PASSWORD,
   },
   tls: {
     rejectUnauthorized: false, // avoids cert issues on Render/Heroku
@@ -29,13 +30,13 @@ console.log('[EMAIL] SMTP Config:', {
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
   port: Number(process.env.SMTP_PORT) || 587,
   user: process.env.SMTP_USER || '(not set)',
-  pass: process.env.SMTP_PASS ? '****' + process.env.SMTP_PASS.slice(-4) : '(not set)',
+  pass: (process.env.SMTP_PASS || process.env.SMTP_PASSWORD) ? '****' + (process.env.SMTP_PASS || process.env.SMTP_PASSWORD).slice(-4) : '(not set)',
   from_name: process.env.FROM_NAME || '(not set)',
   from_email: process.env.FROM_EMAIL || '(not set)',
 });
 
 // Verify transporter at startup in a non-blocking way
-if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+if (process.env.SMTP_USER && (process.env.SMTP_PASS || process.env.SMTP_PASSWORD)) {
   try {
     transporter.verify((error, success) => {
       if (error) {
@@ -49,7 +50,7 @@ if (process.env.SMTP_USER && process.env.SMTP_PASS) {
     console.error('[EMAIL] Critical error during transporter.verify():', verifyErr.message);
   }
 } else {
-  console.warn('[EMAIL] Disabling SMTP verification: Missing SMTP_USER or SMTP_PASS');
+  console.warn('[EMAIL] Disabling SMTP verification: Missing SMTP_USER or SMTP_PASSWORD');
 }
 
 // ─── From Address ─────────────────────────────────────────────────────────────
