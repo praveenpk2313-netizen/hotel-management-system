@@ -101,15 +101,24 @@ const PaymentPage = () => {
       };
 
       if (MOCK_PAYMENT) {
+        // Log status to helper console if needed
+        console.log("💳 MOCK MODE: Initiating demo payment sequence...");
+        
+        // Brief delay to simulate gateway initialization
+        await new Promise(r => setTimeout(r, 1500));
+        
         const bookingPayload = {
           ...bookingData,
-          paymentMethod: 'Mock/Pay',
+          paymentMethod: paymentMethod === 'stripe' ? 'Mock/Stripe' : 'Mock/Pay',
           transactionId: paymentMethod === 'stripe' ? stripeTxnRef.current : razorpayTxnRef.current
         };
+
         try {
           const { data: finalBooking } = await confirmBookingAfterPayment(bookingPayload);
+          console.log("✅ MOCK SUCCESS: Booking finalized in database.");
           handlePaymentSuccess(finalBooking);
         } catch (err) {
+          console.error("❌ MOCK FAILED: Backend rejected mock transaction.", err);
           handlePaymentError(err);
         }
         return;
@@ -393,6 +402,10 @@ const StripeCheckoutForm = ({ bookingData, stripeTxnId, navigate, onSuccess, onE
 
     try {
       if (MOCK_PAYMENT) {
+        setLoading(true);
+        console.log("💳 STRIPE MOCK: Processing synthetic card info...");
+        await new Promise(r => setTimeout(r, 2000));
+
         const payload = {
           ...bookingData,
           paymentMethod: 'Mock/Stripe',
@@ -400,9 +413,11 @@ const StripeCheckoutForm = ({ bookingData, stripeTxnId, navigate, onSuccess, onE
         };
         try {
            const { data: finalBooking } = await confirmBookingAfterPayment(payload);
+           console.log("✅ STRIPE MOCK SUCCESS: Confirmation stored.");
            setLoading(false);
            navigate('/booking-success', { state: { booking: finalBooking } });
         } catch (err) {
+           console.error("❌ STRIPE MOCK FAILURE:", err);
            handleStripeError(err);
         }
         return;
