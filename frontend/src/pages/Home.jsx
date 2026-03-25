@@ -42,13 +42,13 @@ const Home = () => {
         <div className="relative z-10 max-w-4xl mx-auto text-center px-6 animate-fade-in">
           <div className="flex items-center justify-center gap-3 mb-6">
             <span className="h-[1px] w-8 bg-luxury-gold" />
-            <span className="text-white text-xs font-black uppercase tracking-[0.4em]">Welcome to UrbanStay</span>
+            <span className="text-white text-xs font-black uppercase tracking-[0.4em]">Welcome to Stay Savvy</span>
             <span className="h-[1px] w-8 bg-luxury-gold" />
           </div>
 
           <h1 className="text-6xl md:text-8xl text-white font-serif leading-tight mb-8">
             The Pinnacle of <br />
-            <span className="text-luxury-gold italic">Luxury Living</span>
+            <span className="text-luxury-gold italic font-black">Luxury Living</span>
           </h1>
 
           <p className="text-slate-200 text-lg md:text-xl max-w-2xl mx-auto mb-12 font-medium leading-relaxed">

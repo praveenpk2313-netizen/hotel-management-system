@@ -18,7 +18,7 @@ const Footer = () => {
           
           <div className="space-y-8">
             <Link to="/" className="text-3xl font-serif font-black tracking-tight flex justify-center md:justify-start">
-               UrbanStay<span className="text-[#c5a059]">.</span>
+               Stay Savvy<span className="text-[#c5a059]">.</span>
             </Link>
             <p className="text-slate-500 text-sm font-medium leading-relaxed max-w-xs mx-auto md:mx-0">
                Founded on architectural preservation, we connect travelers with historic havens reimagined for luxury.
@@ -35,7 +35,7 @@ const Footer = () => {
              <ul className="space-y-6 text-sm font-bold">
                 <li><Link to="/" className="hover:text-[#c5a059] transition-colors">Home Experience</Link></li>
                 <li><Link to="/hotels" className="hover:text-[#c5a059] transition-colors">Portfolio Search</Link></li>
-                <li><Link to="/booking-history" className="hover:text-[#c5a059] transition-colors">Manage Reservations</Link></li>
+                <li><Link to="/customer/dashboard" className="hover:text-[#c5a059] transition-colors">Manage Reservations</Link></li>
              </ul>
           </div>
 
@@ -57,7 +57,7 @@ const Footer = () => {
                 </div>
                 <div className="flex items-center justify-center md:justify-start gap-4">
                    <Globe size={16} className="text-[#c5a059]" />
-                   <span>support@urbanstay.com</span>
+                   <span>support@staysavvy.com</span>
                 </div>
              </div>
           </div>
@@ -76,7 +76,7 @@ const Footer = () => {
            </div>
            
            <p className="text-slate-500 text-[9px] font-black uppercase tracking-[0.5em] text-center">
-              © 2026 URBANSTAY COLLECTION. WORLDWIDE RIGHTS RESERVED.
+              © 2026 STAY SAVVY COLLECTION. WORLDWIDE RIGHTS RESERVED.
            </p>
         </div>
       </div>

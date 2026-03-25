@@ -142,7 +142,7 @@ const Login = () => {
         </button>
 
         <p className="text-center text-slate-400 text-sm font-bold">
-           New to UrbanStay? <Link to="/register" className="text-luxury-gold font-black uppercase tracking-widest hover:underline ml-2">Create Account</Link>
+           New to Stay Savvy? <Link to="/register" className="text-luxury-gold font-black uppercase tracking-widest hover:underline ml-2">Create Account</Link>
         </p>
 
         <div className="flex items-center justify-center gap-4 pt-4 border-t border-gray-100 opacity-50 grayscale">

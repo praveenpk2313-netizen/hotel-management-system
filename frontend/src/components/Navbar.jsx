@@ -43,62 +43,61 @@ const Navbar = () => {
   const isAuthPage = location.pathname === '/login' || location.pathname === '/register' || location.pathname === '/forgot-password';
 
   return (
-    <nav className={`fixed top-0 left-0 w-full z-[1000] py-6 transition-all duration-500 ${
-      (scrolled || isAuthPage) ? 'bg-white shadow-[0_4px_30px_rgba(0,0,0,0.03)] py-4' : 'bg-transparent'
-    }`}>
+    <nav className={`fixed top-0 left-0 w-full z-[1000] py-4 transition-all duration-500 bg-white border-b border-gray-100`}>
       <div className="max-w-7xl mx-auto px-6 md:px-10 flex justify-between items-center">
         
         {/* Brand Logo */}
         <Link 
           to="/" 
           onClick={scrollToTop}
-          className={`text-2xl font-serif font-black tracking-tighter transition-colors ${
-            (scrolled || isAuthPage) ? 'text-slate-900' : 'text-white'
-          }`}
+          className="text-2xl font-serif font-black tracking-tighter text-slate-900"
         >
-          URBAN<span className="text-luxury-gold italic">STAY</span>
+          Stay <span className="italic">Savvy</span>
         </Link>
         
         {/* Navigation Links */}
-        <div className={`hidden lg:flex items-center gap-12 font-bold text-[10px] uppercase tracking-[0.2em] ${
-          (scrolled || isAuthPage) ? 'text-slate-600' : 'text-white/80'
-        }`}>
-          <button onClick={scrollToTop} className="hover:text-luxury-gold transition-colors">Home</button>
-          <button onClick={() => scrollToSection('about')} className="hover:text-luxury-gold transition-colors">About</button>
-          <button onClick={() => scrollToSection('hotels')} className="hover:text-luxury-gold transition-colors">Properties</button>
-          <button onClick={() => scrollToSection('contact')} className="hover:text-luxury-gold transition-colors">Contact</button>
+        <div className="hidden lg:flex items-center gap-10 font-bold text-xs text-slate-600">
+          <Link to="/" className="hover:text-luxury-gold transition-colors">Home</Link>
+          <Link to="/hotels" className="hover:text-luxury-gold transition-colors">Hotels</Link>
+          <button className="hover:text-luxury-gold transition-colors uppercase text-[10px] tracking-widest">Deals</button>
+          <Link to="/customer/dashboard" className="hover:text-luxury-gold transition-colors">Trips</Link>
         </div>
 
         {/* Auth & Actions */}
         <div className="flex items-center gap-6">
           {user ? (
              <div className="flex items-center gap-6">
-                <NotificationBell scrolled={scrolled || isAuthPage} />
-                <button 
-                  onClick={() => navigate(user.role === 'admin' ? '/admin/dashboard' : user.role === 'manager' ? '/manager/dashboard' : '/customer/dashboard')}
-                  className={`flex items-center gap-3 px-6 py-2.5 rounded-full border transition-all text-[10px] font-black uppercase tracking-widest ${
-                    (scrolled || isAuthPage) 
-                    ? 'border-slate-200 text-slate-900 hover:bg-slate-900 hover:text-white' 
-                    : 'border-white/20 text-white hover:bg-white hover:text-slate-900'
-                  }`}
-                >
-                  Dashboard
-                </button>
-                <button 
-                  onClick={handleLogout}
-                  className="p-2.5 rounded-full bg-rose-50 text-rose-600 hover:bg-rose-100 transition-colors"
-                >
-                  <LogOut size={18} />
-                </button>
+                {/* Language Toggle */}
+                <div className="hidden md:flex items-center bg-gray-50 px-2 py-1 rounded-full gap-2 border border-gray-100">
+                   <span className="text-[10px] font-black px-2">EN</span>
+                   <div className="w-8 h-4 bg-white rounded-full border border-gray-200 shadow-sm relative">
+                      <div className="absolute left-1 top-0.5 w-2.5 h-2.5 bg-gray-400 rounded-full" />
+                   </div>
+                </div>
+
+                <div className="relative">
+                   <NotificationBell scrolled={true} />
+                   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">5</span>
+                </div>
+
+                <div className="flex items-center gap-4">
+                   <div className="flex flex-col items-end">
+                      <span className="text-[11px] font-black uppercase tracking-widest text-slate-900">
+                         {user.name || "PRAVEEN KUMAR R"}
+                      </span>
+                   </div>
+                   <button 
+                     onClick={handleLogout}
+                     className="flex items-center gap-2 text-rose-500 hover:text-rose-600 text-[10px] font-black uppercase tracking-widest transition-colors"
+                   >
+                     <LogOut size={14} /> Logout
+                   </button>
+                </div>
              </div>
           ) : (
             <Link 
               to="/login" 
-              className={`flex items-center gap-3 px-8 py-3 rounded-full transition-all text-[10px] font-black uppercase tracking-widest shadow-xl ${
-                (scrolled || isAuthPage) 
-                ? 'bg-slate-900 text-white hover:bg-luxury-gold' 
-                : 'bg-white text-slate-900 hover:bg-luxury-gold hover:text-white'
-              }`}
+              className="flex items-center gap-3 px-8 py-3 rounded-full bg-slate-900 text-white hover:bg-luxury-gold text-[10px] font-black uppercase tracking-widest shadow-xl transition-all"
             >
               Sign In
             </Link>
@@ -106,7 +105,7 @@ const Navbar = () => {
 
           {/* Mobile Menu Toggle */}
           <button className="lg:hidden">
-             <Menu size={24} className={(scrolled || isAuthPage) ? 'text-slate-900' : 'text-white'} />
+             <Menu size={24} className="text-slate-900" />
           </button>
         </div>
       </div>

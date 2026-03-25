@@ -183,40 +183,26 @@ const BookingHistory = () => {
   );
 
   return (
-    <div className="bg-white min-h-screen pb-24 pt-32 lg:pt-40">
-      <div className="container-booking space-y-10 animate-fade-in">
+    <div className="bg-white min-h-screen pb-24 pt-32 lg:pt-40 font-serif">
+      <div className="max-w-5xl mx-auto px-6 space-y-12 animate-fade-in">
         
         {/* Page Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 pb-6 border-b border-gray-100">
-           <div className="space-y-2">
-              <nav className="text-[11px] font-medium text-gray-500 flex items-center gap-2 mb-2">
-                 <Link to="/" className="text-[#006ce4] hover:underline">Home</Link>
-                 <ChevronRight size={10} />
-                 <span>My Bookings</span>
-              </nav>
-              <h1 className="text-3xl font-black text-gray-900 tracking-tight">Bookings & Trips</h1>
-              <p className="text-gray-500 font-medium">Manage your stays and share your experiences</p>
-           </div>
-           
-           <div className="flex items-center gap-4">
-              <div className="bg-blue-50 px-4 py-2 rounded-lg border border-blue-100 flex items-center gap-2">
-                 <div className="w-2 h-2 rounded-full bg-[#006ce4] animate-pulse" />
-                 <span className="text-xs font-bold text-[#003b95]">{bookings.filter(b => b.status === 'confirmed').length} Confirmed Stays</span>
-              </div>
-           </div>
+        <div className="space-y-4">
+           <h1 className="text-6xl font-black text-slate-900 tracking-tight">My Journeys</h1>
+           <p className="text-xl text-slate-500 font-sans font-medium">Manage your stays and share your experiences.</p>
         </div>
 
         {/* Notifications Hub */}
         {(success || error) && (
-          <div className="space-y-4">
+          <div className="space-y-4 font-sans">
             {success && (
-              <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-lg flex items-center gap-3 text-emerald-700 text-sm font-bold animate-slide-up">
+              <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center gap-3 text-emerald-700 text-sm font-bold animate-slide-up">
                  <CheckCircle2 size={18} /> {success}
                  <button onClick={() => setSuccess('')} className="ml-auto opacity-50 hover:opacity-100"><X size={16} /></button>
               </div>
             )}
             {error && (
-              <div className="p-4 bg-rose-50 border border-rose-100 rounded-lg flex items-center gap-3 text-rose-700 text-sm font-bold">
+              <div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 text-rose-700 text-sm font-bold">
                  <AlertTriangle size={18} /> {error}
                  <button onClick={() => setError('')} className="ml-auto opacity-50 hover:opacity-100"><X size={16} /></button>
               </div>
@@ -226,7 +212,7 @@ const BookingHistory = () => {
 
         {/* Bookings Feed */}
         {bookings.length === 0 ? (
-          <div className="py-24 text-center bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 space-y-6">
+          <div className="py-24 text-center bg-gray-50 rounded-[2rem] border-2 border-dashed border-gray-200 space-y-6 font-sans">
              <div className="w-20 h-20 bg-white border border-gray-200 rounded-full flex items-center justify-center mx-auto text-gray-300">
                 <Hotel size={40} />
              </div>
@@ -239,109 +225,70 @@ const BookingHistory = () => {
              </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 gap-10">
             {bookings.map((booking) => (
-              <div key={booking._id} className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden hover:border-[#006ce4] transition-all group">
-                 <div className="flex flex-col md:flex-row">
+              <div key={booking._id} className="bg-slate-50/50 rounded-[2.5rem] p-8 transition-all hover:bg-white hover:shadow-2xl hover:shadow-slate-200/50 group border border-transparent hover:border-slate-100">
+                 <div className="flex flex-col md:flex-row items-center gap-10">
                     
                     {/* Property Image Area */}
-                    <div className="md:w-64 h-48 md:h-auto relative">
+                    <div className="w-full md:w-64 h-48 md:h-44 shrink-0 relative overflow-hidden rounded-3xl">
                        <img 
                          src={booking.hotelId?.images?.[0] || "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&q=80&w=400"} 
-                         className="w-full h-full object-cover"
+                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                          alt={booking.hotelId?.name}
                        />
-                       <div className={`absolute top-4 left-4 px-3 py-1 rounded text-[10px] font-black uppercase tracking-widest shadow-lg ${
-                         booking.status === 'confirmed' ? 'bg-emerald-500 text-white' : 
-                         booking.status === 'cancelled' ? 'bg-gray-400 text-white' : 
-                         'bg-orange-500 text-white'
-                       }`}>
-                          {booking.status}
-                       </div>
                     </div>
 
                     {/* Booking Informatics */}
-                    <div className="flex-1 p-6 md:p-8 space-y-6">
-                       <div className="flex flex-col md:flex-row justify-between gap-4">
+                    <div className="flex-1 flex flex-col md:flex-row justify-between items-center gap-8 w-full">
+                       <div className="space-y-4 text-center md:text-left">
                           <div className="space-y-1">
-                             <h2 className="text-xl font-black text-gray-900 group-hover:text-[#006ce4] transition-colors">
-                                {booking.hotelId?.name}
-                             </h2>
-                             <p className="text-xs font-bold text-gray-400 flex items-center gap-1">
-                                <MapPin size={14} className="text-[#006ce4]" /> {booking.hotelId?.location}
-                             </p>
+                             <div className="flex flex-col md:flex-row items-center gap-4">
+                                <h2 className="text-3xl font-black text-slate-900">
+                                   {booking.hotelId?.name || "Premium Resort"}
+                                </h2>
+                                <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                                  booking.status === 'confirmed' ? 'bg-emerald-100 text-emerald-700' : 
+                                  booking.status === 'cancelled' ? 'bg-gray-100 text-gray-500' : 
+                                  'bg-amber-100 text-amber-700'
+                                }`}>
+                                   {booking.status === 'confirmed' ? 'COMPLETED' : booking.status}
+                                </span>
+                             </div>
                           </div>
-                          <div className="text-left md:text-right">
-                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Confirmation #</p>
-                             <p className="text-sm font-bold text-gray-900 uppercase">{booking._id.slice(-8)}</p>
-                          </div>
-                       </div>
 
-                       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 py-4 border-y border-gray-50">
-                          <div className="space-y-1">
-                             <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Check-in</p>
-                             <p className="text-sm font-bold text-gray-900">{formatDate(booking.checkInDate)}</p>
-                          </div>
-                          <div className="space-y-1">
-                             <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Check-out</p>
-                             <p className="text-sm font-bold text-gray-900">{formatDate(booking.checkOutDate)}</p>
-                          </div>
-                          <div className="space-y-1">
-                             <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Room Type</p>
-                             <p className="text-sm font-bold text-gray-900 truncate">{booking.roomId?.type || 'Standard Room'}</p>
-                          </div>
-                          <div className="space-y-1">
-                             <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Total Price</p>
-                             <p className="text-lg font-black text-[#006ce4]">{formatCurrency(booking.totalPrice)}</p>
+                          <div className="flex flex-col md:flex-row items-center gap-6 font-sans">
+                             <p className="text-sm font-bold text-slate-400">
+                                {formatDate(booking.checkInDate)} — {formatDate(booking.checkOutDate)}
+                             </p>
+                             <p className="text-2xl font-black text-slate-900 border-l-0 md:border-l border-slate-200 pl-0 md:pl-6">
+                                {formatCurrency(booking.totalPrice)}
+                             </p>
                           </div>
                        </div>
 
                        {/* Action Strip */}
-                       <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
-                          <div className="flex items-center gap-3">
-                             {booking.status === 'confirmed' && (
-                               <button 
-                                 onClick={() => handleReviewClick(booking)}
-                                 className="h-10 px-5 bg-white border border-[#006ce4] text-[#006ce4] rounded-md font-bold text-xs flex items-center gap-2 hover:bg-blue-50 transition-all"
-                               >
-                                  {booking.isReviewed ? <Edit2 size={14} /> : <StarIcon size={14} />}
-                                  {booking.isReviewed ? 'Update Review' : 'Write a review'}
-                               </button>
-                             )}
-                             {booking.status !== 'cancelled' && booking.paymentStatus !== 'paid' && (
-                               <button 
-                                 onClick={() => handlePayment(booking)}
-                                 className="h-10 px-6 bg-[#006ce4] text-white rounded-md font-bold text-xs flex items-center gap-2 hover:bg-[#0052ad] transition-all"
-                               >
-                                  <CreditCard size={14} /> Pay Now
-                               </button>
-                             )}
-                             {booking.status === 'pending' && (
-                               <button 
-                                 onClick={() => handleModifyClick(booking)}
-                                 className="h-10 px-5 bg-white border border-gray-200 text-gray-700 rounded-md font-bold text-xs flex items-center gap-2 hover:bg-gray-50 transition-all"
-                               >
-                                  <Clock size={14} /> Modify
-                               </button>
-                             )}
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                             <Link 
-                               to={`/hotel/${booking.hotelId?._id}`}
-                               className="h-10 px-4 text-[#006ce4] font-bold text-xs hover:underline flex items-center gap-2"
-                             >
-                                Property details <ChevronRight size={14} />
-                             </Link>
-                             {booking.status === 'pending' && (
-                               <button 
-                                 onClick={() => handleCancel(booking._id)}
-                                 className="h-10 px-4 text-rose-500 font-bold text-xs hover:text-rose-700 transition-colors"
-                               >
-                                  Cancel Booking
-                               </button>
-                             )}
-                          </div>
+                       <div className="flex flex-col gap-3 shrink-0 font-sans">
+                          <button 
+                            onClick={() => handleModifyClick(booking)}
+                            className="w-44 py-3 bg-white border border-slate-100 text-slate-900 rounded-2xl font-black text-xs hover:bg-slate-900 hover:text-white transition-all shadow-sm"
+                          >
+                             Modify Trip
+                          </button>
+                          <Link 
+                            to={`/hotel/${booking.hotelId?._id}`}
+                            className="w-44 py-3 bg-white border border-slate-100 text-slate-900 rounded-2xl font-black text-xs hover:bg-slate-900 hover:text-white transition-all shadow-sm text-center"
+                          >
+                             View Resort
+                          </Link>
+                          {booking.status !== 'cancelled' && booking.paymentStatus !== 'paid' && (
+                            <button 
+                              onClick={() => handlePayment(booking)}
+                              className="w-44 py-3 bg-blue-600 text-white rounded-2xl font-bold text-xs hover:bg-blue-700 transition-all shadow-lg shadow-blue-200"
+                            >
+                               Pay Now
+                            </button>
+                          )}
                        </div>
                     </div>
 
