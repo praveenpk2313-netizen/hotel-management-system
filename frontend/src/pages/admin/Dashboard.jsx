@@ -22,6 +22,7 @@ import {
   ResponsiveContainer 
 } from 'recharts';
 import { formatCurrency, formatDate } from '../../utils/helpers';
+import { useAuth } from '../../context/AuthContext';
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
