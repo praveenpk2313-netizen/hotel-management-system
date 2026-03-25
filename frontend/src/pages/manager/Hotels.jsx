@@ -33,7 +33,8 @@ import {
   Info,
   Camera,
   Layers,
-  Sparkles
+  Sparkles,
+  ArrowRight
 } from 'lucide-react';
 import { formatCurrency } from '../../utils/helpers';
 
