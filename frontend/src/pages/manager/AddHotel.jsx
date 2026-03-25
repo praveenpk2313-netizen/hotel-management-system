@@ -5,20 +5,13 @@ import {
   uploadImage 
 } from '../../services/api';
 import { 
-  Plus, 
-  Image as ImageIcon, 
   X, 
   Loader2,
   AlertCircle,
   Save,
   ArrowLeft,
-  Check,
   Building2,
-  MapPin,
-  Sparkles,
-  Camera,
-  ChevronRight,
-  Info
+  Camera
 } from 'lucide-react';
 
 const AMENITIES_LIST = [
@@ -83,11 +76,11 @@ const AddHotel = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (form.images.length === 0) {
-      setError('Please upload at least one hotel image for the collection.');
+      setError('Please upload at least one hotel image.');
       return;
     }
     if (form.amenities.length === 0) {
-      setError('Please select at least one amenity to highlight your property.');
+      setError('Please select at least one amenity.');
       return;
     }
 
@@ -98,181 +91,168 @@ const AddHotel = () => {
       await createManagerHotel(form);
       navigate('/manager/hotels');
     } catch (err) {
-      setError(err.response?.data?.message || 'Property registration failed. Please verify credentials.');
+      setError(err.response?.data?.message || 'Failed to add hotel. Please try again.');
     } finally {
       setSubmitting(false);
     }
   };
 
+  const inputClass = "w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-gray-800 placeholder-gray-400 font-sans text-sm";
+
   return (
-    <div className="animate-fade-in max-w-5xl mx-auto pb-20">
+    <div className="animate-fade-in max-w-4xl mx-auto pb-12">
       {/* Back Button */}
       <button 
         onClick={() => navigate('/manager/hotels')}
-        className="group flex items-center gap-2 text-primary font-black uppercase text-xs tracking-[2px] mb-10 hover:-translate-x-1 transition-transform"
+        className="flex items-center gap-2 text-gray-500 hover:text-primary font-semibold text-sm mb-6 transition-colors font-sans"
       >
-        <ArrowLeft size={16} /> Portfolio Collection
+        <ArrowLeft size={16} /> Back to Hotels
       </button>
 
-      {/* Main Container */}
-      <div className="bg-white rounded-[3rem] border border-gray-100 shadow-premium overflow-hidden">
-        
-        {/* Header Section */}
-        <div className="p-10 md:p-16 border-b border-gray-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 bg-gray-50/50">
-          <div className="space-y-3">
-             <div className="flex items-center gap-2 text-primary font-black text-xs uppercase tracking-[3px]">
-                <Sparkles size={16} className="animate-pulse" /> Global Standard Registration
-             </div>
-             <h1 className="text-4xl md:text-5xl font-serif text-secondary-dark font-black tracking-tight leading-none">
-                Expand Your <br />
-                <span className="text-primary italic">Heritage</span>
-             </h1>
-             <p className="text-gray-400 font-medium max-w-md leading-relaxed">
-                Provide precise details to register your property within the PK UrbanStay luxury elite collection.
-             </p>
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        {/* Header */}
+        <div className="p-8 md:p-10 border-b border-gray-100 flex items-center gap-6 bg-gray-50/50">
+          <div className="w-16 h-16 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center text-primary shrink-0">
+            <Building2 size={32} />
           </div>
-          <div className="w-24 h-24 bg-white rounded-3xl shadow-sm border border-gray-100 flex items-center justify-center text-primary transform rotate-6">
-             <Building2 size={40} />
+          <div>
+            <h1 className="text-3xl font-serif font-bold text-secondary-dark mb-2">Add New Hotel</h1>
+            <p className="text-gray-500 text-sm font-sans">Fill in the details below to register a new property in your portfolio.</p>
           </div>
         </div>
 
-        {/* Content Body */}
-        <div className="p-10 md:p-16">
+        {/* Content */}
+        <div className="p-8 md:p-10">
           {error && (
-            <div className="p-6 bg-rose-50 border border-rose-100 rounded-[2rem] flex items-center gap-4 text-rose-600 text-sm font-bold mb-12 animate-shake">
-               <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-rose-500 shadow-sm">
-                  <AlertCircle size={20} />
-               </div>
-               {error}
+            <div className="mb-8 p-4 bg-red-50 border border-red-100 rounded-xl flex items-start gap-3 text-red-600 text-sm font-medium font-sans">
+               <AlertCircle size={20} className="shrink-0 mt-0.5" />
+               <p>{error}</p>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-16">
+          <form onSubmit={handleSubmit} className="space-y-10">
             
-            {/* Section 1: Core Details */}
-            <div className="space-y-10">
-               <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-secondary-dark text-white flex items-center justify-center font-black text-xs">01</div>
-                  <h3 className="text-xl font-bold text-secondary-dark font-serif uppercase tracking-wider">Identity & Location</h3>
-               </div>
-               
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
-                  <div className="space-y-2 group">
-                     <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1 group-focus-within:text-primary transition-colors">Property Moniker</label>
-                     <input required type="text" value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="input-premium" placeholder="Ex: PK Urban Ritz" />
-                  </div>
-                  <div className="space-y-2 group">
-                     <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1 group-focus-within:text-primary transition-colors">Strategic Area</label>
-                     <input required type="text" value={form.location} onChange={e => setForm({...form, location: e.target.value})} className="input-premium" placeholder="Ex: Downtown Plaza" />
-                  </div>
-                  <div className="space-y-2 group">
-                     <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1 group-focus-within:text-primary transition-colors">Metropolitan City</label>
-                     <input required type="text" value={form.city} onChange={e => setForm({...form, city: e.target.value})} className="input-premium" placeholder="Ex: London" />
-                  </div>
-                  <div className="space-y-2 group">
-                     <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1 group-focus-within:text-primary transition-colors">Verified Registry Address</label>
-                     <input required type="text" value={form.address} onChange={e => setForm({...form, address: e.target.value})} className="input-premium" placeholder="Full street address" />
-                  </div>
-               </div>
-
-               <div className="space-y-2 group">
-                  <div className="flex justify-between items-center ml-1">
-                     <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest group-focus-within:text-primary transition-colors">Property Narrative</label>
-                     <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Min 50 chars</span>
-                  </div>
-                  <textarea required rows={5} value={form.description} onChange={e => setForm({...form, description: e.target.value})} className="input-premium py-6 min-h-[160px]" placeholder="Explain the heritage and unique atmosphere of this property..."></textarea>
-               </div>
+            {/* Section 1: Basic Info */}
+            <div className="space-y-6">
+              <div className="border-b border-gray-100 pb-3">
+                <h3 className="text-lg font-serif font-bold text-secondary-dark">Basic Information</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-sans">
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-gray-700">Property Name</label>
+                  <input required type="text" value={form.name} onChange={e => setForm({...form, name: e.target.value})} className={inputClass} placeholder="e.g. Grand Plaza Hotel" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-gray-700">Area / Neighborhood</label>
+                  <input required type="text" value={form.location} onChange={e => setForm({...form, location: e.target.value})} className={inputClass} placeholder="e.g. Downtown" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-gray-700">City</label>
+                  <input required type="text" value={form.city} onChange={e => setForm({...form, city: e.target.value})} className={inputClass} placeholder="e.g. New York" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-gray-700">Full Address</label>
+                  <input required type="text" value={form.address} onChange={e => setForm({...form, address: e.target.value})} className={inputClass} placeholder="e.g. 123 Main Street" />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-sm font-semibold text-gray-700">Property Description</label>
+                  <textarea required rows={4} value={form.description} onChange={e => setForm({...form, description: e.target.value})} className={`${inputClass} resize-none`} placeholder="Describe the hotel's features, ambiance, and location..."></textarea>
+                </div>
+              </div>
             </div>
 
             {/* Section 2: Amenities */}
-            <div className="space-y-10">
-               <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-secondary-dark text-white flex items-center justify-center font-black text-xs">02</div>
-                  <h3 className="text-xl font-bold text-secondary-dark font-serif uppercase tracking-wider">Features & Amenities</h3>
-               </div>
-               
-               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                  {AMENITIES_LIST.map((item) => (
+            <div className="space-y-6">
+              <div className="border-b border-gray-100 pb-3">
+                <h3 className="text-lg font-serif font-bold text-secondary-dark">Amenities & Features</h3>
+              </div>
+              
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 font-sans">
+                {AMENITIES_LIST.map((item) => {
+                  const isSelected = form.amenities.includes(item.name);
+                  return (
                     <button 
                       key={item.id}
                       type="button"
                       onClick={() => toggleAmenity(item.name)}
-                      className={`p-5 rounded-3xl border transition-all text-left flex flex-col gap-4 group relative overflow-hidden ${form.amenities.includes(item.name) ? 'border-primary bg-primary/5 shadow-premium' : 'border-gray-100 bg-gray-50/50 hover:bg-white hover:border-gray-200'}`}
+                      className={`p-4 rounded-xl border transition-all text-center flex flex-col items-center gap-3 ${
+                        isSelected 
+                        ? 'border-primary bg-primary/5 shadow-sm' 
+                        : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
+                      }`}
                     >
-                       <span className="text-3xl group-hover:scale-110 transition-transform inline-block">{item.icon}</span>
-                       <span className={`text-[10px] font-black uppercase tracking-wider leading-tight ${form.amenities.includes(item.name) ? 'text-secondary-dark' : 'text-gray-400'}`}>{item.name}</span>
-                       {form.amenities.includes(item.name) && (
-                         <div className="absolute top-3 right-3 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center shadow-lg border-2 border-white">
-                            <Check size={14} strokeWidth={4} />
-                         </div>
-                       )}
+                      <span className="text-2xl">{item.icon}</span>
+                      <span className={`text-xs font-semibold ${isSelected ? 'text-primary' : 'text-gray-600'}`}>
+                        {item.name}
+                      </span>
                     </button>
-                  ))}
-               </div>
+                  );
+                })}
+              </div>
             </div>
 
-            {/* Section 3: Visual Identity */}
-            <div className="space-y-10">
-               <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-secondary-dark text-white flex items-center justify-center font-black text-xs">03</div>
-                  <h3 className="text-xl font-bold text-secondary-dark font-serif uppercase tracking-wider">Visual Heritage (Gallery)</h3>
-               </div>
-               
-               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                  {form.images.map((img, i) => (
-                    <div key={i} className="group relative aspect-square rounded-[2rem] overflow-hidden border-4 border-white shadow-premium">
-                       <img src={img} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="Preview" />
-                       <button 
-                         type="button" 
-                         onClick={() => setForm({...form, images: form.images.filter((_, idx) => idx !== i)})} 
-                         className="absolute top-4 right-4 w-9 h-9 bg-black/60 backdrop-blur-md rounded-xl text-white opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center hover:bg-rose-500 shadow-lg"
-                       >
-                          <X size={16} />
-                       </button>
-                    </div>
-                  ))}
-                  <label className="aspect-square border-4 border-dashed border-gray-100 rounded-[2rem] flex flex-col items-center justify-center gap-3 text-gray-300 cursor-pointer hover:border-primary/30 hover:bg-primary/5 hover:text-primary transition-all group shadow-sm hover:shadow-premium">
-                     <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
-                        <Camera size={28} />
-                     </div>
-                     <span className="text-[10px] font-black uppercase tracking-widest">Add Legacy Photo</span>
-                     <input type="file" multiple hidden onChange={handleImageUpload} />
-                  </label>
-               </div>
+            {/* Section 3: Gallery */}
+            <div className="space-y-6">
+              <div className="border-b border-gray-100 pb-3">
+                <h3 className="text-lg font-serif font-bold text-secondary-dark">Property Gallery</h3>
+                <p className="text-sm text-gray-500 mt-1 font-sans">Upload high-quality images of the exterior, lobby, and amenities.</p>
+              </div>
+              
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 font-sans">
+                {form.images.map((img, i) => (
+                  <div key={i} className="group relative aspect-square rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
+                    <img src={img} className="w-full h-full object-cover" alt="Hotel preview" />
+                    <button 
+                      type="button" 
+                      onClick={() => setForm({...form, images: form.images.filter((_, idx) => idx !== i)})} 
+                      className="absolute top-2 right-2 w-8 h-8 bg-white/90 rounded-lg text-red-500 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hover:bg-red-50"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                ))}
+                
+                <label className="aspect-square border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center gap-2 text-gray-400 cursor-pointer hover:border-primary hover:text-primary hover:bg-primary/5 transition-colors bg-gray-50/50">
+                  <Camera size={24} />
+                  <span className="text-xs font-semibold">Upload Photo</span>
+                  <input type="file" multiple hidden onChange={handleImageUpload} accept="image/*" />
+                </label>
+              </div>
             </div>
 
-            {/* Submit Block */}
-            <div className="pt-16 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-8">
-               <div className="flex items-center gap-3 text-gray-400">
-                  <Info size={20} className="text-primary" />
-                  <p className="text-sm font-medium">Verified properties receive priority indexing.</p>
-               </div>
-               
-               <button 
-                 type="submit" 
-                 disabled={submitting} 
-                 className="w-full md:w-[320px] h-16 bg-secondary-dark text-white font-bold rounded-2xl shadow-xl shadow-secondary-dark/20 hover:shadow-secondary-dark/40 active:scale-95 transition-all flex items-center justify-center gap-3 uppercase tracking-widest text-xs group relative overflow-hidden"
-               >
-                 <div className="absolute inset-0 bg-primary opacity-0 group-hover:opacity-10 transition-opacity" />
-                 {submitting ? (
-                   <Loader2 className="animate-spin" size={20} />
-                 ) : (
-                   <>
-                      Submit for Global Audit <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform text-primary" />
-                   </>
-                 )}
-               </button>
+            {/* Actions */}
+            <div className="pt-6 border-t border-gray-100 flex items-center justify-end gap-4 font-sans">
+              <button 
+                type="button"
+                onClick={() => navigate('/manager/hotels')}
+                className="px-6 py-3 rounded-xl font-semibold text-gray-600 hover:bg-gray-100 transition-colors"
+                disabled={submitting}
+              >
+                Cancel
+              </button>
+              <button 
+                type="submit" 
+                disabled={submitting} 
+                className="px-8 py-3 bg-secondary-dark text-white font-bold rounded-xl shadow-md shadow-secondary-dark/20 hover:shadow-lg active:scale-95 transition-all flex items-center gap-2"
+              >
+                {submitting ? (
+                  <>
+                    <Loader2 className="animate-spin" size={18} />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save size={18} />
+                    Save Property
+                  </>
+                )}
+              </button>
             </div>
+            
           </form>
         </div>
       </div>
-      
-      <style>{`
-        @keyframes fade-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in { animation: fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
-        .animate-shake { animation: shake 0.4s ease-in-out; }
-      `}</style>
     </div>
   );
 };
