@@ -59,6 +59,24 @@ const Register = () => {
     }
   };
 
+  useEffect(() => {
+    const handleOAuthMessage = (e) => {
+      if (e.data?.type === 'OAUTH_SUCCESS') {
+        try {
+          const userData = JSON.parse(decodeURIComponent(e.data.payload));
+          login(userData);
+          navigate('/customer/dashboard', { replace: true });
+        } catch (err) {
+          setError('Failed to process OAuth data');
+        }
+      } else if (e.data?.type === 'OAUTH_ERROR') {
+        setError(e.data.message || 'OAuth authentication failed.');
+      }
+    };
+    window.addEventListener('message', handleOAuthMessage);
+    return () => window.removeEventListener('message', handleOAuthMessage);
+  }, [login, navigate]);
+
   return (
     <div className="min-h-screen bg-white pt-32 lg:pt-40 pb-24 flex items-center justify-center px-4">
       <div className="max-w-md w-full space-y-10 animate-fade-in">

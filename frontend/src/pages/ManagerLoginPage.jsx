@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useDispatch } from 'react-redux';
 import { loginStart, loginFailure } from '../redux/slices/authSlice';
 import { AlertCircle, CheckCircle2, Eye, EyeOff, Github, X, ShieldCheck, ArrowRight, UserCheck, Loader2 } from 'lucide-react';
-import api, { getApiErrorMessage } from '../services/api';
+import api, { getApiErrorMessage, API_BASE_URL } from '../services/api';
 
 const ManagerLoginPage = () => {
   const [email,    setEmail]    = useState('');
@@ -55,13 +55,35 @@ const ManagerLoginPage = () => {
   };
 
   const openOAuthPopup = (provider) => {
-    const baseURL = api.API_BASE_URL;
-    const url = `${baseURL}/auth/${provider}`;
+    const origin = window.location.origin;
+    const url = `${API_BASE_URL}/auth/${provider}?from=${encodeURIComponent(origin)}`;
     const w = 500, h = 600;
     const left = window.screenX + (window.outerWidth  - w) / 2;
     const top  = window.screenY + (window.outerHeight - h) / 2;
     window.open(url, `${provider} Login`, `width=${w},height=${h},left=${left},top=${top},popup=true`);
   };
+
+  useEffect(() => {
+    const handleOAuthMessage = (e) => {
+      if (e.data?.type === 'OAUTH_SUCCESS') {
+        try {
+          const userData = JSON.parse(decodeURIComponent(e.data.payload));
+          if (userData.role !== 'manager' && userData.role !== 'admin') {
+            setError('Access denied. Valid Manager credentials required.');
+            return;
+          }
+          login(userData);
+          navigate('/manager/dashboard');
+        } catch (err) {
+          setError('Failed to process OAuth data');
+        }
+      } else if (e.data?.type === 'OAUTH_ERROR') {
+        setError(e.data.message || 'OAuth authentication failed.');
+      }
+    };
+    window.addEventListener('message', handleOAuthMessage);
+    return () => window.removeEventListener('message', handleOAuthMessage);
+  }, [login, navigate]);
 
   return (
     <div className="min-h-screen bg-secondary-dark flex flex-col lg:flex-row font-sans overflow-hidden">

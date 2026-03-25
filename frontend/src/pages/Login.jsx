@@ -58,6 +58,29 @@ const Login = () => {
     }
   };
 
+  useEffect(() => {
+    const handleOAuthMessage = (e) => {
+      if (e.data?.type === 'OAUTH_SUCCESS') {
+        try {
+          const userData = JSON.parse(decodeURIComponent(e.data.payload));
+          login(userData);
+          const from = location.state?.from || (
+            userData.role === 'admin'   ? '/admin/dashboard'   :
+            userData.role === 'manager' ? '/manager/dashboard' :
+            '/customer/dashboard'
+          );
+          navigate(from, { state: location.state, replace: true });
+        } catch (err) {
+          setError('Failed to process OAuth data');
+        }
+      } else if (e.data?.type === 'OAUTH_ERROR') {
+        setError(e.data.message || 'OAuth authentication failed.');
+      }
+    };
+    window.addEventListener('message', handleOAuthMessage);
+    return () => window.removeEventListener('message', handleOAuthMessage);
+  }, [login, navigate, location.state]);
+
   return (
     <div className="min-h-screen bg-white pt-32 lg:pt-40 pb-20 px-4 flex items-center justify-center">
       <div className="max-w-md w-full space-y-10 animate-fade-in">
