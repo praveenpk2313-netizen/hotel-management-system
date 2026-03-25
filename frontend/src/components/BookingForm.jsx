@@ -13,7 +13,6 @@ const BookingForm = ({ hotel, rooms, onSubmit, initialCheckIn, initialCheckOut, 
   const [error, setError] = useState(initialError || '');
   const [isRoomDropdownOpen, setIsRoomDropdownOpen] = useState(false);
 
-  // Auto-select first room if available
   useEffect(() => {
     if (rooms && rooms.length > 0 && !selectedRoomId) {
       const firstAvailable = rooms.find(r => r.isAvailable) || rooms[0];
@@ -21,12 +20,10 @@ const BookingForm = ({ hotel, rooms, onSubmit, initialCheckIn, initialCheckOut, 
     }
   }, [rooms, selectedRoomId]);
 
-  // Sync with props if they change
   useEffect(() => {
     if (initialError) setError(initialError);
   }, [initialError]);
 
-  // Sync with props if they change
   useEffect(() => {
     if (initialCheckIn) setStartDate(initialCheckIn);
     if (initialCheckOut) setEndDate(initialCheckOut);
@@ -40,7 +37,6 @@ const BookingForm = ({ hotel, rooms, onSubmit, initialCheckIn, initialCheckOut, 
 
   const selectedRoom = rooms?.find(r => r._id === selectedRoomId);
 
-  // Calculate nights and total
   const calculateNights = () => {
     if (!startDate || !endDate) return 0;
     const diffTime = Math.abs(endDate - startDate);
@@ -50,7 +46,7 @@ const BookingForm = ({ hotel, rooms, onSubmit, initialCheckIn, initialCheckOut, 
 
   const nights = calculateNights();
   const subtotal = selectedRoom ? nights * selectedRoom.price : 0;
-  const taxes = subtotal * 0.12; // 12% taxes
+  const taxes = subtotal * 0.12; 
   const totalPrice = subtotal + taxes;
 
   const handleGuestChange = (delta) => {
@@ -63,11 +59,11 @@ const BookingForm = ({ hotel, rooms, onSubmit, initialCheckIn, initialCheckOut, 
     setError('');
 
     if (!startDate || !endDate) {
-      setError('Check-in and check-out dates are required.');
+      setError('Preferred stay period required.');
       return;
     }
     if (!selectedRoomId) {
-      setError('Please choose a preferred room type.');
+      setError('Please choose a sanctuary.');
       return;
     }
 
@@ -93,7 +89,7 @@ const BookingForm = ({ hotel, rooms, onSubmit, initialCheckIn, initialCheckOut, 
       {/* 1. Header & Dynamic Pricing */}
       <div className="booking-premium-card__header">
         <div className="price-tag animate-slide-up">
-          <span className="price-tag__label">Prices from</span>
+          <span className="price-tag__label">Sanctuary Rates After</span>
           <div className="price-tag__value">
             {selectedRoom ? formatCurrency(selectedRoom.price) : '---'}
             <span className="price-tag__unit"> / night</span>
@@ -102,9 +98,9 @@ const BookingForm = ({ hotel, rooms, onSubmit, initialCheckIn, initialCheckOut, 
         
         {hotel.averageRating > 0 && (
           <div className="rating-pill">
-            <Sparkles size={14} className="text-amber-500" />
+            <Sparkles size={14} className="text-luxury-gold" />
             <span className="rating-pill__value">{hotel.averageRating?.toFixed(1)}</span>
-            <span className="rating-pill__count">({hotel.totalReviews || 0} reviews)</span>
+            <span className="rating-pill__count">({hotel.totalReviews || 0})</span>
           </div>
         )}
       </div>
@@ -116,7 +112,7 @@ const BookingForm = ({ hotel, rooms, onSubmit, initialCheckIn, initialCheckOut, 
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="booking-premium-form">
+      <form onSubmit={handleSubmit} className="booking-premium-form font-sans">
         {/* 3. Integrated Stay Period Selector */}
         <div className="stay-period-selector">
           <div className="period-field">
@@ -130,7 +126,7 @@ const BookingForm = ({ hotel, rooms, onSubmit, initialCheckIn, initialCheckOut, 
                 startDate={startDate}
                 endDate={endDate}
                 minDate={new Date()}
-                placeholderText="Add date"
+                placeholderText="Arrival"
                 className="premium-datepicker"
                 dateFormat="MMM d, yyyy"
               />
@@ -148,7 +144,7 @@ const BookingForm = ({ hotel, rooms, onSubmit, initialCheckIn, initialCheckOut, 
                 startDate={startDate}
                 endDate={endDate}
                 minDate={startDate || new Date()}
-                placeholderText="Add date"
+                placeholderText="Departure"
                 className="premium-datepicker"
                 dateFormat="MMM d, yyyy"
               />
@@ -159,7 +155,7 @@ const BookingForm = ({ hotel, rooms, onSubmit, initialCheckIn, initialCheckOut, 
         {/* 4. Guest and Room Selectors */}
         <div className="selectors-grid">
           <div className="guest-selector-field">
-            <span className="field-label">Guests</span>
+            <span className="field-label">Residents</span>
             <div className="guest-control">
               <Users size={18} className="field-icon" />
               <div className="counter-controls">
@@ -175,10 +171,10 @@ const BookingForm = ({ hotel, rooms, onSubmit, initialCheckIn, initialCheckOut, 
           </div>
 
           <div className="room-selector-field">
-            <span className="field-label">Room Type</span>
+            <span className="field-label">Sanctuary Type</span>
             <div className="room-select-trigger" onClick={() => setIsRoomDropdownOpen(!isRoomDropdownOpen)}>
               <BedDouble size={18} className="field-icon" />
-              <span className="selected-text">{selectedRoom ? selectedRoom.type : 'Select Room'}</span>
+              <span className="selected-text">{selectedRoom ? selectedRoom.type : 'Choose Sanctuary'}</span>
               <ChevronDown size={16} className={`chevron-icon ${isRoomDropdownOpen ? 'open' : ''}`} />
             </div>
 
@@ -196,7 +192,7 @@ const BookingForm = ({ hotel, rooms, onSubmit, initialCheckIn, initialCheckOut, 
                   >
                     <div className="nav-item__info">
                       <span className="nav-item__name">{room.type}</span>
-                      <span className="nav-item__meta">Up to {room.capacity} guests</span>
+                      <span className="nav-item__meta">Upto {room.capacity} Residents</span>
                     </div>
                     <span className="nav-item__price">{formatCurrency(room.price)}</span>
                   </div>
@@ -208,38 +204,38 @@ const BookingForm = ({ hotel, rooms, onSubmit, initialCheckIn, initialCheckOut, 
 
         {/* 5. Pricing Summary */}
         {startDate && endDate && selectedRoom && (
-          <div className="pricing-dynamic-summary animate-fade-in">
+          <div className="pricing-dynamic-summary animate-fade-in font-sans">
              <div className="summary-row">
-               <span>{formatCurrency(selectedRoom.price)} × {nights} {nights === 1 ? 'night' : 'nights'}</span>
-               <span>{formatCurrency(subtotal)}</span>
+                <span className="italic font-serif">Luxury Accommodation</span>
+                <span>{formatCurrency(subtotal)}</span>
              </div>
              <div className="summary-row">
-               <span>Taxes and fees (12%)</span>
-               <span>{formatCurrency(taxes)}</span>
+                <span className="italic font-serif">Service & Value Taxes (12%)</span>
+                <span>{formatCurrency(taxes)}</span>
              </div>
              <div className="summary-divider"></div>
              <div className="summary-total">
-               <span>Total amount</span>
-               <span className="total-value">{formatCurrency(totalPrice)}</span>
+                <span className="font-serif">Estimated Total</span>
+                <span className="total-value">{formatCurrency(totalPrice)}</span>
              </div>
           </div>
         )}
 
         {/* 6. Primary Action */}
-        <button type="submit" disabled={loading} className="reserve-action-btn">
+        <button type="submit" disabled={loading} className="reserve-action-btn font-sans">
           {loading ? (
-            <><Loader2 className="animate-spin" size={20} /> Securing your stay...</>
+            <><Loader2 className="animate-spin" size={20} /> Finalizing Collection...</>
           ) : !localStorage.getItem('token') ? (
-            <><CreditCard size={20} /> Login & Reserve</>
+            <><CreditCard size={20} /> Unlock & Reserve</>
           ) : (
-            <><Zap size={20} className="fill-white" /> Reserve Your Suite</>
+            <><Zap size={20} className="fill-white" /> Complete Reservation</>
           )}
         </button>
 
         {/* 7. Post-Action Trust Markers */}
         <div className="trust-footer">
-          <div className="trust-item"><ShieldCheck size={14} /> <span>Secure Payment</span></div>
-          <div className="trust-item"><CheckCircle size={14} /> <span>Instant confirmation</span></div>
+          <div className="trust-item"><ShieldCheck size={14} className="text-emerald-500" /> <span>Encrypted Payment</span></div>
+          <div className="trust-item"><CheckCircle size={14} className="text-emerald-500" /> <span>Instant Access</span></div>
         </div>
       </form>
 
@@ -252,38 +248,34 @@ const bookingFormStyles = `
   /* ── Modern Premium Variables ─────────────────────────────────────────── */
   :root {
     --p-bg: #ffffff;
-    --p-accent: #0284c7; /* Sky 600 */
-    --p-accent-glow: rgba(2, 132, 199, 0.4);
+    --p-accent: #c5a059; /* Luxury Gold */
+    --p-accent-glow: rgba(197, 160, 89, 0.4);
     --p-text-main: #0f172a;
-    --p-text-muted: #64748b;
-    --p-border: #e2e8f0;
-    --p-radius: 24px;
-    --p-font: 'Outfit', 'Inter', sans-serif;
+    --p-text-muted: #94a3b8;
+    --p-border: #f1f5f9;
+    --p-radius: 32px;
   }
 
   /* ── Container ─────────────────────────────────────────────────────────── */
   .booking-premium-card {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: #ffffff;
     border: 1px solid var(--p-border);
     border-radius: var(--p-radius);
-    padding: 32px;
-    box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.08);
+    padding: 40px;
+    box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.1);
     position: sticky;
-    top: 120px;
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    top: 140px;
+    transition: all 0.5s ease;
     z-index: 10;
   }
   .booking-premium-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.12);
-    border-color: var(--p-accent-glow);
+    transform: translateY(-8px);
+    box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.15);
   }
 
   /* ── Header ───────────────────────────────────────────────────────────── */
   .booking-premium-card__header {
-    margin-bottom: 28px;
+    margin-bottom: 32px;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
@@ -291,123 +283,121 @@ const bookingFormStyles = `
   .price-tag {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 4px;
   }
   .price-tag__label {
-    font-size: 0.7rem;
-    font-weight: 800;
+    font-size: 0.6rem;
+    font-weight: 900;
     color: var(--p-text-muted);
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.15em;
   }
   .price-tag__value {
     font-size: 2.25rem;
     font-weight: 900;
     color: var(--p-text-main);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.04em;
     line-height: 1;
+    font-family: 'Playfair Display', serif;
   }
   .price-tag__unit {
-    font-size: 0.95rem;
-    font-weight: 500;
+    font-size: 0.8rem;
+    font-weight: 600;
     color: var(--p-text-muted);
   }
 
   .rating-pill {
     display: flex;
     align-items: center;
-    gap: 6px;
-    background: #f8fafc;
-    padding: 8px 14px;
+    gap: 8px;
+    background: #fdfaf3;
+    padding: 10px 16px;
     border-radius: 100px;
-    border: 1px solid var(--p-border);
+    border: 1px solid rgba(197, 160, 89, 0.2);
   }
   .rating-pill__value {
-    font-weight: 800;
+    font-weight: 900;
     font-size: 0.95rem;
     color: var(--p-text-main);
   }
   .rating-pill__count {
     font-size: 0.8rem;
     color: var(--p-text-muted);
-    font-weight: 500;
+    font-weight: 600;
   }
 
   /* ── Form Elements ─────────────────────────────────────────────────────── */
   .booking-premium-form {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 24px;
   }
 
   .field-label {
     display: block;
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     color: var(--p-text-muted);
-    margin-bottom: 8px;
-    padding-left: 4px;
+    margin-bottom: 10px;
+    padding-left: 2px;
   }
 
-  /* Stay Period Integrated */
   .stay-period-selector {
     display: grid;
     grid-template-columns: 1fr 1px 1fr;
     background: #f8fafc;
     border: 1px solid var(--p-border);
-    border-radius: 16px;
+    border-radius: 20px;
     overflow: hidden;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
   }
   .stay-period-selector:focus-within {
     border-color: var(--p-accent);
     background: #ffffff;
-    box-shadow: 0 0 0 4px var(--p-accent-glow);
+    box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.1);
   }
   .period-field {
-    padding: 14px 18px;
+    padding: 16px 20px;
   }
   .period-divider {
     background: var(--p-border);
     width: 1px;
     align-self: center;
-    height: 60%;
+    height: 50%;
   }
   .date-input-wrapper {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
   }
   .field-icon {
     color: var(--p-accent);
-    opacity: 0.8;
+    opacity: 0.9;
   }
   .premium-datepicker {
     width: 100%;
     background: transparent;
     border: none;
     outline: none;
-    font-weight: 700;
-    font-size: 0.95rem;
+    font-weight: 900;
+    font-size: 0.9rem;
     color: var(--p-text-main);
     cursor: pointer;
-    font-family: var(--p-font);
   }
 
-  /* Selectors Grid */
   .selectors-grid {
     display: grid;
-    grid-template-columns: 1.2fr 2fr;
+    grid-template-columns: 1fr 1.5fr;
     gap: 16px;
   }
 
   .guest-control {
     background: #f8fafc;
     border: 1px solid var(--p-border);
-    border-radius: 16px;
-    padding: 10px 14px;
+    border-radius: 18px;
+    padding: 12px 16px;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -416,7 +406,7 @@ const bookingFormStyles = `
   .counter-controls {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
   }
   .counter-btn {
     width: 32px;
@@ -431,241 +421,94 @@ const bookingFormStyles = `
     transition: all 0.2s;
     color: var(--p-text-main);
   }
-  .counter-btn:hover:not(:disabled) {
-    border-color: var(--p-accent);
-    color: var(--p-accent);
-    transform: scale(1.05);
-  }
-  .counter-btn:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-  }
-  .counter-value {
-    font-weight: 800;
-    font-size: 1rem;
-    min-width: 15px;
-    text-align: center;
-  }
+  .counter-btn:hover { border-color: var(--p-accent); color: var(--p-accent); }
+  .counter-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .counter-value { font-weight: 900; font-size: 1rem; min-width: 15px; text-align: center; }
 
-  .room-selector-field {
-    position: relative;
-  }
   .room-select-trigger {
     background: #f8fafc;
     border: 1px solid var(--p-border);
-    border-radius: 16px;
-    padding: 14px 18px;
+    border-radius: 18px;
+    padding: 14px 20px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s ease;
   }
-  .room-select-trigger:hover {
-    border-color: var(--p-accent);
-    background: white;
-  }
-  .selected-text {
-    flex: 1;
-    font-weight: 700;
-    font-size: 0.95rem;
-    color: var(--p-text-main);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .chevron-icon {
-    transition: transform 0.3s ease;
-    color: var(--p-text-muted);
-  }
-  .chevron-icon.open {
-    transform: rotate(180deg);
-  }
-
-  /* Dropdown Nav */
+  .room-select-trigger:hover { border-color: var(--p-accent); background: #ffffff; }
+  .selected-text { flex: 1; font-weight: 800; font-size: 0.9rem; color: var(--p-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  
   .room-nav-dropdown {
     position: absolute;
-    top: calc(100% + 8px);
-    left: 0;
-    right: 0;
-    background: white;
-    border-radius: 16px;
+    top: calc(100% + 10px);
+    left: 0; right: 0;
+    background: #ffffff;
+    border-radius: 20px;
     border: 1px solid var(--p-border);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
     z-index: 50;
     overflow: hidden;
   }
-  .nav-item {
-    padding: 16px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    border-bottom: 1px solid var(--p-border);
-  }
-  .nav-item:last-child {
-    border-bottom: none;
-  }
-  .nav-item:hover {
-    background: #f0f9ff;
-  }
-  .nav-item.is-active {
-    background: #e0f2fe;
-    border-left: 4px solid var(--p-accent);
-  }
-  .nav-item__info {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-  .nav-item__name {
-    font-weight: 800;
-    font-size: 0.9rem;
-    color: var(--p-text-main);
-  }
-  .nav-item__meta {
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--p-text-muted);
-  }
-  .nav-item__price {
-    font-weight: 800;
-    color: var(--p-accent);
-    font-size: 0.9rem;
-  }
+  .nav-item { padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-bottom: 1px solid var(--p-border); }
+  .nav-item:last-child { border-bottom: none; }
+  .nav-item:hover { background: #fdfaf3; }
+  .nav-item.is-active { background: #fdfaf3; border-left: 4px solid var(--p-accent); }
+  .nav-item__name { font-weight: 900; font-size: 0.9rem; color: var(--p-text-main); }
+  .nav-item__meta { font-size: 0.75rem; font-weight: 600; color: var(--p-text-muted); }
+  .nav-item__price { font-weight: 900; color: var(--p-accent); font-size: 0.95rem; }
 
   /* ── Pricing Summary ───────────────────────────────────────────────────── */
   .pricing-dynamic-summary {
-    background: #f8fafc;
-    border-radius: 16px;
-    padding: 20px;
+    background: #fdfaf3;
+    border-radius: 20px;
+    padding: 24px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
+    border: 1px solid rgba(197, 160, 89, 0.1);
   }
-  .summary-row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--p-text-muted);
-  }
-  .summary-divider {
-    height: 1px;
-    background: var(--p-border);
-    margin: 4px 0;
-  }
-  .summary-total {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: 800;
-    color: var(--p-text-main);
-    font-size: 1rem;
-  }
-  .total-value {
-    font-size: 1.4rem;
-    letter-spacing: -0.02em;
-  }
+  .summary-row { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700; color: #64748b; }
+  .summary-divider { height: 1px; background: rgba(197, 160, 89, 0.1); margin: 6px 0; }
+  .summary-total { display: flex; justify-content: space-between; align-items: center; font-weight: 900; color: var(--p-text-main); }
+  .total-value { font-size: 1.6rem; color: var(--p-text-main); letter-spacing: -0.04em; font-family: 'Playfair Display', serif; }
 
   /* ── Reserve Action ────────────────────────────────────────────────────── */
   .reserve-action-btn {
     width: 100%;
-    height: 64px;
-    background: var(--p-accent);
+    height: 68px;
+    background: var(--p-text-main);
     color: white;
     border: none;
-    border-radius: 16px;
-    font-size: 1.15rem;
+    border-radius: 20px;
+    font-size: 1rem;
     font-weight: 900;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 10px 25px -5px var(--p-accent-glow);
-    font-family: var(--p-font);
+    gap: 14px;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    box-shadow: 0 15px 35px -10px rgba(0,0,0,0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
   }
   .reserve-action-btn:hover:not(:disabled) {
-    background: #0ea5e9;
-    transform: translateY(-2px);
-    box-shadow: 0 15px 30px -5px var(--p-accent-glow);
-  }
-  .reserve-action-btn:active:not(:disabled) {
-    transform: scale(0.98);
-  }
-  .reserve-action-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    filter: grayscale(0.5);
+    background: var(--p-accent);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -10px rgba(197, 160, 89, 0.3);
   }
 
-  /* ── Footer Trust ──────────────────────────────────────────────────────── */
-  .trust-footer {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-top: 8px;
-  }
-  .trust-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.72rem;
-    font-weight: 700;
-    color: var(--p-text-muted);
-    opacity: 0.8;
-  }
+  .trust-footer { display: flex; justify-content: center; gap: 24px; margin-top: 10px; }
+  .trust-item { display: flex; align-items: center; gap: 8px; font-size: 0.7rem; font-weight: 800; color: var(--p-text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
 
-  /* ── Feedback ──────────────────────────────────────────────────────────── */
-  .feedback-message {
-    padding: 14px 18px;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-  .feedback-message--error {
-    background: #fef2f2;
-    border: 1px solid #fee2e2;
-    color: #ef4444;
-  }
+  .feedback-message { padding: 16px 20px; border-radius: 14px; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+  .feedback-message--error { background: #fff1f2; border: 1px solid #fee2e2; color: #e11d48; }
 
-  /* ── Animations ────────────────────────────────────────────────────────── */
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .animate-fade-in {
-    animation: fadeIn 0.4s ease-out;
-  }
-  @keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .animate-slide-up {
-    animation: slideUp 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-  }
-  @keyframes dropdown {
-    from { opacity: 0; transform: translateY(-10px) scale(0.95); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
-  }
-  .animate-dropdown {
-    animation: dropdown 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-  }
-
-  /* Responsive Tweaks */
-  @media (max-width: 640px) {
-    .selectors-grid {
-      grid-template-columns: 1fr;
-    }
-  }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .animate-slide-up { animation: slideUp 0.8s cubic-bezier(0.165, 0.84, 0.44, 1); }
+  .animate-fade-in { animation: slideUp 0.5s ease-out; }
+  .animate-dropdown { animation: slideUp 0.3s ease-out; }
 `;
 
 export default BookingForm;
-
