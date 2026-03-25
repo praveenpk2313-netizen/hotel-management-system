@@ -127,7 +127,7 @@ const HotelDetails = () => {
   );
 
   return (
-    <div className="bg-white min-h-screen pb-24 pt-32 lg:pt-40 font-serif text-slate-900">
+    <div className="bg-white min-h-screen pb-24 pt-32 lg:pt-40 font-serif text-slate-900 overflow-x-hidden">
       
       {/* 1. Context & Navigation */}
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12 mb-8">
@@ -193,10 +193,11 @@ const HotelDetails = () => {
             </div>
          </div>
 
-         <div className="flex flex-col lg:flex-row gap-20">
+         {/* Main Grid Layout */}
+         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 xl:gap-24">
             
-            {/* L: Information */}
-            <div className="lg:col-span-8 flex-1 space-y-24">
+            {/* L: Information (8/12) */}
+            <div className="lg:col-span-8 space-y-24">
                
                <section className="space-y-10">
                   <h2 className="text-4xl font-black text-slate-900 tracking-tight">About this property</h2>
@@ -289,9 +290,9 @@ const HotelDetails = () => {
                </section>
             </div>
 
-            {/* R: Sidebar Sticky */}
-            <div className="lg:w-[460px] shrink-0 font-sans">
-               <div className="sticky top-32">
+            {/* R: Sidebar Sticky (4/12) */}
+            <div className="lg:col-span-4 font-sans">
+               <div className="sticky top-32 h-fit">
                   <BookingForm 
                     hotel={hotel}
                     rooms={rooms}
