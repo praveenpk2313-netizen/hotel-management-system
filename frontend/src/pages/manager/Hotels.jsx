@@ -652,7 +652,26 @@ const ManagerHotels = () => {
                              ))}
                            </div>
                         </div>
-                    </form>
+
+                        <div className="space-y-6">
+                           <label className="text-xs font-black text-secondary-dark uppercase tracking-widest block border-b border-gray-100 pb-4">Room Category Gallery</label>
+                           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                              {roomForm.images.map((img, i) => (
+                                <div key={i} className="group relative aspect-square rounded-2xl overflow-hidden border-2 border-white shadow-sm">
+                                   <img src={img} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Room Preview" />
+                                   <button type="button" onClick={() => setRoomForm({...roomForm, images: roomForm.images.filter((_, idx) => idx !== i)})} className="absolute top-2 right-2 w-8 h-8 bg-black/60 backdrop-blur-md rounded-lg text-white opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center hover:bg-rose-500">
+                                      <X size={14} />
+                                   </button>
+                                </div>
+                              ))}
+                              <label className="aspect-square border-2 border-dashed border-gray-100 rounded-2xl flex flex-col items-center justify-center gap-2 text-gray-300 cursor-pointer hover:border-primary/30 hover:bg-primary/5 hover:text-primary transition-all">
+                                 <Camera size={24} />
+                                 <span className="text-[10px] font-black uppercase tracking-widest text-center px-2">Attach Room Photo</span>
+                                 <input type="file" multiple hidden onChange={handleRoomImageUpload} />
+                              </label>
+                           </div>
+                        </div>
+                     </form>
                  )}
               </div>
 
