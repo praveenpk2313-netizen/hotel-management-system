@@ -31,7 +31,13 @@ const getInitialAuthState = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(getInitialAuthState);
   const [loading, setLoading] = useState(false); 
+  const [isInitialized, setIsInitialized] = useState(false);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    // Flag that we've finished the initial rehydration check
+    setIsInitialized(true);
+  }, []);
 
   // 1. Double-check synchronization with Redux on mount
   useEffect(() => {

@@ -48,7 +48,7 @@ const ManagerDashboard = () => {
     { title: 'Confirmed Stays', value: stats?.totalBookings || 0, icon: Calendar, trend: 'Reservations', color: 'text-rose-600', bg: 'bg-rose-50', border: 'border-rose-100' },
   ];
 
-  if (loading) return (
+  if (loading || (!stats && !error)) return (
     <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
       <div className="relative">
          <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
@@ -217,7 +217,7 @@ const ManagerDashboard = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {stats.recentBookings.map((booking) => (
+              {stats?.recentBookings?.map((booking) => (
                 <tr key={booking._id} className="hover:bg-gray-50/30 transition-colors group">
                   <td className="px-8 py-7">
                     <div className="flex items-center gap-4">

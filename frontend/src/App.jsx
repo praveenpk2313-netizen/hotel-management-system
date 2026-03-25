@@ -43,12 +43,15 @@ import BookingSuccess from './pages/BookingSuccess';
 import api from './services/api';
 
 const ProtectedRoute = ({ children, allowedRoles, redirectTo = '/login' }) => {
-  const { user, loading } = useAuth();
+  const { user, loading, isInitialized } = useAuth();
   const location = useLocation();
 
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-       <Loader2 size={40} className="animate-spin text-primary" />
+  if (loading || !isInitialized) return (
+    <div className="min-h-screen flex items-center justify-center bg-white">
+       <div className="flex flex-col items-center gap-4">
+          <Loader2 size={40} className="animate-spin text-[#c5a059]" />
+          <p className="text-[10px] font-black uppercase tracking-[3px] text-slate-400">Authenticating...</p>
+       </div>
     </div>
   );
 
