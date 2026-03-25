@@ -196,9 +196,8 @@ const confirmAfterPayment = async (req, res) => {
     });
 
   } catch (err) {
-    console.error('🔥 [BOOKING] Confirmation error:', err.message);
     res.status(500).json({
-      message:       'Failed to finalize booking.',
+      message:       `Failed to finalize booking: ${err.message}`,
       error:         err.message,
       transactionId: req.body.transactionId
     });
