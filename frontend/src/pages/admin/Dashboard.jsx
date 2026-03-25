@@ -25,11 +25,14 @@ import { formatCurrency, formatDate } from '../../utils/helpers';
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
-  const { stats, loading } = useSelector((state) => state.admin);
+  const { stats, loading, error } = useSelector((state) => state.admin);
+  const { user, isInitialized } = useAuth();
 
   useEffect(() => {
-    dispatch(getAdminStats());
-  }, [dispatch]);
+    if (user && user.role === 'admin') {
+      dispatch(getAdminStats());
+    }
+  }, [dispatch, user]);
 
   const statCards = [
     { title: 'Total Revenue', value: stats ? formatCurrency(stats.totalRevenue) : '$0', icon: <DollarSign />, color: '#0ea5e9', bg: '#e0f2fe', trend: '+12%', up: true },
@@ -38,9 +41,23 @@ const AdminDashboard = () => {
     { title: 'Total Hotels', value: stats?.hotelCount || 0, icon: <Hotel />, color: '#ec4899', bg: '#fce7f3', trend: '+8%', up: true },
   ];
 
-  if (loading && !stats) return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
+  if (!isInitialized || loading || (!stats && !error)) return (
+    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '60vh', gap: '1rem' }}>
       <Loader2 className="animate-spin" size={40} color="#0ea5e9" />
+      <p style={{ fontSize: '0.8rem', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '2px' }}>Gathering Intelligence...</p>
+    </div>
+  );
+
+  if (error && !stats) return (
+    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '60vh', gap: '1.5rem', textAlign: 'center' }}>
+      <div style={{ padding: '2rem', background: '#fef2f2', borderRadius: '24px', color: '#ef4444' }}>
+         <TrendingUp size={48} style={{ transform: 'rotate(180deg)' }} />
+      </div>
+      <h2 style={{ margin: 0 }}>System Sync Interrupted</h2>
+      <p style={{ color: '#64748b' }}>{error}</p>
+      <button onClick={() => dispatch(getAdminStats())} className="btn-primary" style={{ background: '#0ea5e9', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '12px', fontWeight: '700', cursor: 'pointer' }}>
+        Retry Connection
+      </button>
     </div>
   );
 
@@ -127,7 +144,7 @@ const AdminDashboard = () => {
         <div style={{ background: 'white', padding: '2rem', borderRadius: '24px', border: '1px solid #f1f5f9', overflow: 'hidden' }}>
           <h3 style={{ marginBottom: '1.5rem' }}>Latest Bookings</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {stats?.recentBookings.map((b) => (
+            {stats?.recentBookings?.map((b) => (
               <div key={b._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', borderRadius: '16px', background: '#f8fafc' }}>
                 <div>
                    <p style={{ margin: 0, fontWeight: '700', fontSize: '0.9rem' }}>{b.userId?.name || 'Unknown User'}</p>
@@ -145,7 +162,7 @@ const AdminDashboard = () => {
         <div style={{ background: 'white', padding: '2rem', borderRadius: '24px', border: '1px solid #f1f5f9', overflow: 'hidden' }}>
           <h3 style={{ marginBottom: '1.5rem' }}>New Users</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {stats?.recentUsers.map((u) => (
+            {stats?.recentUsers?.map((u) => (
               <div key={u._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', borderRadius: '16px', background: '#f8fafc' }}>
                 <div>
                    <p style={{ margin: 0, fontWeight: '700', fontSize: '0.9rem' }}>{u.name || 'Anonymous'}</p>

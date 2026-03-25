@@ -82,9 +82,18 @@ const ProtectedRoute = ({ children, allowedRoles, redirectTo = '/login' }) => {
 };
 
 function App() {
-  const { user } = useAuth();
+  const { user, isInitialized } = useAuth();
   useSocket();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  // Redirect admin/manager away from home to dashboard if they land on '/'
+  useEffect(() => {
+    if (isInitialized && user && location.pathname === '/') {
+      if (user.role === 'admin') navigate('/admin/dashboard', { replace: true });
+      else if (user.role === 'manager') navigate('/manager/dashboard', { replace: true });
+    }
+  }, [user, isInitialized, location.pathname, navigate]);
 
   const isDashboard =
     location.pathname.startsWith('/admin') ||

@@ -31,15 +31,15 @@ import { formatCurrency, formatDate } from '../../utils/helpers';
 const ManagerDashboard = () => {
   const dispatch = useDispatch();
   const { stats, analytics, loading, error } = useSelector((state) => state.manager);
-  const { user } = useAuth();
+  const { user, isInitialized } = useAuth();
 
   useEffect(() => {
     // Only fetch if we have a valid manager/admin session ready
-    if (user && (user.role === 'manager' || user.role === 'admin')) {
+    if (isInitialized && user && (user.role === 'manager' || user.role === 'admin')) {
       dispatch(getManagerStats());
       dispatch(getManagerAnalytics());
     }
-  }, [dispatch, user]);
+  }, [dispatch, user, isInitialized]);
 
   const statCards = [
     { title: 'Gross Revenue', value: stats ? formatCurrency(stats.totalRevenue) : '$0', icon: DollarSign, trend: '+12.5%', color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
@@ -48,7 +48,7 @@ const ManagerDashboard = () => {
     { title: 'Confirmed Stays', value: stats?.totalBookings || 0, icon: Calendar, trend: 'Reservations', color: 'text-rose-600', bg: 'bg-rose-50', border: 'border-rose-100' },
   ];
 
-  if (loading || (!stats && !error)) return (
+  if (!isInitialized || loading || (!stats && !error)) return (
     <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
       <div className="relative">
          <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
