@@ -82,7 +82,7 @@ const RoomCard = ({ room, hotelId, hotelName, hotel, checkIn, checkOut, guests, 
             <div className="flex flex-wrap items-center gap-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                <div className="flex items-center gap-1.5"><Users size={14} className="text-luxury-gold" /> {room.capacity} Residents</div>
                <div className="w-1 h-1 bg-slate-200 rounded-full hidden lg:block" />
-               <div className="flex items-center gap-1.5"><Bed size={14} className="text-luxury-gold" /> King Suite</div>
+               <div className="flex items-center gap-1.5"><Bed size={14} className="text-luxury-gold" /> {room.bedType || 'Standard Suite'}</div>
             </div>
           </div>
 

@@ -11,12 +11,13 @@ const getRooms = async (req, res) => {
 
 const createRoom = async (req, res) => {
   try {
-    const { hotelId, roomNumber, type, price, capacity, totalRooms, amenities, images } = req.body;
+    const { hotelId, roomNumber, type, bedType, price, capacity, totalRooms, amenities, images } = req.body;
 
     const room = new Room({
       hotelId,
       roomNumber,
       type,
+      bedType,
       price,
       capacity,
       totalRooms,
@@ -33,13 +34,14 @@ const createRoom = async (req, res) => {
 
 const updateRoom = async (req, res) => {
   try {
-    const { roomNumber, type, price, capacity, totalRooms, isAvailable, amenities, images } = req.body;
+    const { roomNumber, type, bedType, price, capacity, totalRooms, isAvailable, amenities, images } = req.body;
 
     const room = await Room.findById(req.params.id);
 
     if (room) {
       room.roomNumber = roomNumber || room.roomNumber;
       room.type = type || room.type;
+      room.bedType = bedType || room.bedType;
       room.price = price || room.price;
       room.capacity = capacity || room.capacity;
       room.totalRooms = totalRooms || room.totalRooms;

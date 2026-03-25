@@ -44,9 +44,6 @@ const HOTEL_AMENITIES = [
   { id: 'ac', name: 'Air Conditioning', icon: '❄️' },
   { id: 'room-service', name: 'Room Service', icon: '🍽️' },
   { id: 'housekeeping', name: 'Daily Housekeeping', icon: '🧹' },
-  { id: 'power', name: 'Power Backup', icon: '🔌' },
-  { id: 'restaurant', name: 'Restaurant', icon: '🍴' },
-  { id: 'breakfast', name: 'Complimentary Breakfast', icon: '🥐' },
   { id: 'pool', name: 'Swimming Pool', icon: '🏊' },
   { id: 'gym', name: 'Gym / Fitness Center', icon: '🏋️' },
   { id: 'spa', name: 'Spa & Wellness', icon: '💆' },
@@ -73,8 +70,12 @@ const ROOM_AMENITIES = [
   { name: 'Daily Housekeeping', icon: '🧹' }
 ];
 
-const ROOM_TYPES = [
+const ROOM_CATEGORIES = [
   'Standard Room', 'Deluxe Room', 'Executive Suite', 'Presidential Suite', 'Family Suite', 'Studio Apartment', 'Penthouse'
+];
+
+const BED_TYPES = [
+  'Single Bed', 'Twin Beds', 'Double Bed', 'Triple Beds', 'King-size Bed', 'Queen-size Bed', 'Bunk Beds'
 ];
 
 const ManagerHotels = () => {
@@ -96,7 +97,7 @@ const ManagerHotels = () => {
   const [showRoomModal, setShowRoomModal] = useState(false);
   const [editingRoom, setEditingRoom] = useState(null);
   const [roomForm, setRoomForm] = useState({
-    type: 'Deluxe Room', price: '', capacity: 2, totalRooms: 1, amenities: [], images: []
+    type: 'Deluxe Room', bedType: 'King-size Bed', price: '', capacity: 2, totalRooms: 1, amenities: [], images: []
   });
 
   const loadHotels = async () => {
@@ -123,15 +124,6 @@ const ManagerHotels = () => {
 
   const toggleHotelAmenity = (name) => {
     setForm(prev => ({
-      ...prev,
-      amenities: prev.amenities.includes(name)
-        ? prev.amenities.filter(a => a !== name)
-        : [...prev.amenities, name]
-    }));
-  };
-
-  const toggleRoomAmenity = (name) => {
-    setRoomForm(prev => ({
       ...prev,
       amenities: prev.amenities.includes(name)
         ? prev.amenities.filter(a => a !== name)
@@ -194,6 +186,7 @@ const ManagerHotels = () => {
       setEditingRoom(room);
       setRoomForm({
         type: room.type,
+        bedType: room.bedType || 'King-size Bed',
         price: room.price,
         capacity: room.capacity,
         totalRooms: room.totalRooms,
@@ -202,7 +195,7 @@ const ManagerHotels = () => {
       });
     } else {
       setEditingRoom(null);
-      setRoomForm({ type: 'Deluxe Room', price: '', capacity: 2, totalRooms: 1, amenities: [], images: [] });
+      setRoomForm({ type: 'Deluxe Room', bedType: 'King-size Bed', price: '', capacity: 2, totalRooms: 1, amenities: [], images: [] });
     }
     setShowRoomModal(true);
   };
@@ -226,6 +219,11 @@ const ManagerHotels = () => {
     setSubmitting(true);
     try {
       const roomData = { ...roomForm, hotelId: selectedHotelForRooms._id };
+      if (roomData.images.length === 0) {
+        // Add a default room image if none selected
+        roomData.images = ["https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&q=80&w=800"];
+      }
+
       if (editingRoom) {
         await updateManagerRoom(editingRoom._id, roomData);
       } else {
@@ -278,7 +276,6 @@ const ManagerHotels = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8">
             {hotels.map((hotel) => (
               <div key={hotel._id} className="group bg-white rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-premium transition-all duration-500 overflow-hidden flex flex-col">
-                {/* Image Section */}
                 <div className="relative h-[250px] overflow-hidden">
                   <img 
                     src={hotel.images?.[0] || "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=1200"} 
@@ -286,7 +283,6 @@ const ManagerHotels = () => {
                     alt={hotel.name} 
                   />
                   
-                  {/* Status Badges */}
                   <div className="absolute top-5 left-5 flex gap-2">
                     {!hotel.isApproved ? (
                        <div className="px-3 py-1.5 bg-amber-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg">Pending Review</div>
@@ -295,7 +291,6 @@ const ManagerHotels = () => {
                     )}
                   </div>
 
-                  {/* Quick Actions overlay */}
                   <div className="absolute top-5 right-5 flex gap-2 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
                     <button 
                       onClick={() => handleOpenModal(hotel)} 
@@ -314,7 +309,6 @@ const ManagerHotels = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
                 </div>
 
-                {/* Content Section */}
                 <div className="p-8 flex-1 flex flex-col">
                   <div className="flex justify-between items-start mb-4">
                      <div>
@@ -339,18 +333,14 @@ const ManagerHotels = () => {
                        onClick={() => { setSelectedHotelForRooms(hotel); loadRooms(hotel._id); }} 
                        className="flex-1 h-14 bg-gray-50 text-secondary-dark font-bold rounded-2xl hover:bg-primary hover:text-white hover:shadow-lg hover:shadow-primary/20 transition-all flex items-center justify-center gap-2 group/btn"
                      >
-                       <BedDouble size={20} className="group-hover/btn:scale-110 transition-transform" />
+                       <Layers size={18} className="text-primary group-hover/btn:text-white" />
                        Manage Inventory
-                     </button>
-                     <button className="w-14 h-14 bg-gray-50 text-gray-400 rounded-2xl flex items-center justify-center hover:bg-secondary-dark hover:text-white transition-all">
-                        <ExternalLink size={20} />
                      </button>
                   </div>
                 </div>
               </div>
             ))}
 
-            {/* Empty State / Add Card */}
             <button 
               onClick={() => navigate('/manager/add-hotel')}
               className="h-[550px] border-4 border-dashed border-gray-100 rounded-[2.5rem] flex flex-col items-center justify-center gap-6 group hover:border-primary/20 hover:bg-gray-50/50 transition-all"
@@ -367,7 +357,6 @@ const ManagerHotels = () => {
         </>
       ) : (
         <div className="animate-fade-in space-y-10">
-          {/* Room Management View */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div className="space-y-4">
                <button 
@@ -420,7 +409,7 @@ const ManagerHotels = () => {
                     <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 to-transparent" />
                     <div className="absolute bottom-5 left-5 right-5 flex justify-between items-end">
                        <div>
-                          <p className="text-[10px] font-black text-primary uppercase tracking-[2px] mb-1">Luxury Tier</p>
+                          <p className="text-[10px] font-black text-primary uppercase tracking-[2px] mb-1">{room.bedType || 'Luxury Tier'}</p>
                           <h4 className="text-lg font-bold text-white leading-none">{room.type}</h4>
                        </div>
                        <div className="text-right">
@@ -485,14 +474,12 @@ const ManagerHotels = () => {
         </div>
       )}
 
-      {/* --- MODALS (Overlays) --- */}
       {(showModal || showRoomModal) && (
         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 md:p-8 animate-fade-in">
            <div className="absolute inset-0 bg-secondary-dark/60 backdrop-blur-md" onClick={() => { setShowModal(false); setShowRoomModal(false); }} />
            
            <div className="relative w-full max-w-4xl bg-white rounded-[2.5rem] shadow-premium overflow-hidden flex flex-col max-h-[90vh]">
-              {/* Modal Header */}
-              <div className="p-8 md:px-12 md:py-8 border-b border-gray-1 primary bg-gray-50/50 flex items-center justify-between">
+              <div className="p-8 md:px-12 md:py-8 border-b border-gray-50 bg-gray-50/50 flex items-center justify-between">
                  <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center text-primary">
                        {showModal ? <Layers size={24} /> : <BedDouble size={24} />}
@@ -512,7 +499,6 @@ const ManagerHotels = () => {
                  </button>
               </div>
 
-              {/* Modal Body */}
               <div className="flex-1 overflow-y-auto p-8 md:p-12 space-y-10 custom-scrollbar">
                  {showModal ? (
                     <form id="hotelForm" onSubmit={handleSubmit} className="space-y-10">
@@ -586,77 +572,90 @@ const ManagerHotels = () => {
                     </form>
                  ) : (
                     <form id="roomForm" onSubmit={handleRoomSubmit} className="space-y-12">
-                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
-                          <div className="space-y-4">
-                             <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1">Category Tier</label>
-                             <div className="relative group">
-                                <select value={roomForm.type} onChange={e => setRoomForm({...roomForm, type: e.target.value})} className="input-premium font-bold appearance-none cursor-pointer">
-                                  {ROOM_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                                  {!ROOM_TYPES.includes(roomForm.type) && <option value={roomForm.type}>{roomForm.type}</option>}
-                                </select>
-                                <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-primary pointer-events-none transition-colors" size={20} />
-                             </div>
-                          </div>
-                          
-                          <div className="space-y-4">
-                             <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1">Nightly Rate Index (USD)</label>
-                             <div className="relative group">
-                                <div className="absolute left-5 top-1/2 -translate-y-1/2 text-primary font-black opacity-60">$</div>
-                                <input required type="number" value={roomForm.price} onChange={e => setRoomForm({...roomForm, price: e.target.value})} className="input-premium pl-10 font-black text-lg" placeholder="0.00" />
-                             </div>
-                          </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                           <div className="space-y-2">
+                              <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1">Category Tier</label>
+                              <div className="relative group">
+                                 <select value={roomForm.type} onChange={e => setRoomForm({...roomForm, type: e.target.value})} className="input-premium font-bold appearance-none cursor-pointer bg-white">
+                                   {ROOM_CATEGORIES.map(t => <option key={t} value={t}>{t}</option>)}
+                                 </select>
+                                 <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-primary pointer-events-none transition-colors" size={20} />
+                              </div>
+                           </div>
+                           <div className="space-y-2">
+                              <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1">Room Type</label>
+                              <div className="relative group">
+                                 <select value={roomForm.bedType} onChange={e => setRoomForm({...roomForm, bedType: e.target.value})} className="input-premium font-bold appearance-none cursor-pointer bg-white">
+                                   {BED_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                                 </select>
+                                 <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-primary pointer-events-none transition-colors" size={20} />
+                              </div>
+                           </div>
+                           <div className="space-y-2">
+                              <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1">Nightly Price (USD)</label>
+                              <div className="relative group">
+                                 <div className="absolute left-5 top-1/2 -translate-y-1/2 text-primary font-black opacity-60">$</div>
+                                 <input required type="number" value={roomForm.price} onChange={e => setRoomForm({...roomForm, price: e.target.value})} className="input-premium pl-10 font-black text-lg h-14" placeholder="0.00" />
+                              </div>
+                           </div>
+                        </div>
 
-                          <div className="space-y-4">
-                             <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1">Optimum Guest Capacity</label>
-                             <div className="flex bg-gray-50 p-1.5 rounded-[1.25rem] border border-gray-100">
-                                {[1, 2, 3, 4, 5, 6].map(num => (
-                                  <button 
-                                    key={num} 
-                                    type="button" 
-                                    onClick={() => setRoomForm({...roomForm, capacity: num})} 
-                                    className={`flex-1 h-11 rounded-xl text-xs font-black transition-all ${roomForm.capacity === num ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-gray-400 hover:text-secondary-dark'}`}
-                                  >
-                                    {num}
-                                  </button>
-                                ))}
-                             </div>
-                          </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+                           <div className="space-y-3">
+                              <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1">Guest Capacity</label>
+                              <div className="flex bg-gray-50/50 p-1 rounded-2xl border border-gray-100">
+                                 {[1, 2, 3, 4, 5, 6].map(num => (
+                                   <button 
+                                     key={num} 
+                                     type="button" 
+                                     onClick={() => setRoomForm({...roomForm, capacity: num})} 
+                                     className={`flex-1 h-10 rounded-xl text-xs font-black transition-all ${roomForm.capacity === num ? 'bg-secondary-dark text-white shadow-xl shadow-secondary-dark/20' : 'text-gray-400 hover:text-secondary-dark'}`}
+                                   >
+                                     {num}
+                                   </button>
+                                 ))}
+                              </div>
+                           </div>
+                           <div className="space-y-3">
+                              <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1">Total Inventory</label>
+                              <div className="relative group">
+                                 <input required type="number" value={roomForm.totalRooms} onChange={e => setRoomForm({...roomForm, totalRooms: e.target.value})} className="input-premium font-black h-14" placeholder="Total units" />
+                                 <div className="absolute right-5 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Active Units</div>
+                              </div>
+                           </div>
+                        </div>
 
-                          <div className="space-y-4">
-                             <label className="text-[10px] font-black text-secondary-dark uppercase tracking-widest ml-1">Total Unit Inventory</label>
-                             <div className="relative group">
-                                <input required type="number" value={roomForm.totalRooms} onChange={e => setRoomForm({...roomForm, totalRooms: e.target.value})} className="input-premium font-black" placeholder="Total available units" />
-                                <div className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-300 font-bold uppercase tracking-widest text-[10px]">Active Units</div>
-                             </div>
-                          </div>
-                       </div>
-
-                       <div className="space-y-8">
-                          <label className="text-xs font-black text-secondary-dark uppercase tracking-widest block border-b border-gray-100 pb-4">Room Exclusive Amenities</label>
-                          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                            {ROOM_AMENITIES.map((item) => (
-                              <button 
-                                key={item.name} 
-                                type="button"
-                                onClick={() => toggleRoomAmenity(item.name)} 
-                                className={`p-4 rounded-2xl border transition-all text-left flex items-center gap-4 group relative overflow-hidden ${roomForm.amenities.includes(item.name) ? 'border-primary bg-primary/5' : 'border-gray-100 bg-gray-50/50 hover:bg-white hover:border-gray-200'}`}
-                              >
-                                 <span className="text-2xl">{item.icon}</span>
-                                 <span className={`text-[10px] font-black uppercase tracking-wider ${roomForm.amenities.includes(item.name) ? 'text-secondary-dark' : 'text-gray-400'}`}>{item.name}</span>
-                                 {roomForm.amenities.includes(item.name) && (
-                                   <div className="absolute top-2 right-2 flex items-center justify-center w-5 h-5 bg-primary text-white rounded-full">
-                                      <Check size={12} strokeWidth={4} />
-                                   </div>
-                                 )}
-                              </button>
-                            ))}
-                          </div>
-                       </div>
+                        <div className="space-y-8">
+                           <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+                              <label className="text-xs font-black text-secondary-dark uppercase tracking-widest">Room Specific Amenities</label>
+                              <span className="text-[10px] font-bold text-primary bg-primary/10 px-3 py-1 rounded-full uppercase tracking-widest">{roomForm.amenities.length} selected</span>
+                           </div>
+                           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3">
+                             {ROOM_AMENITIES.map((item) => (
+                               <button 
+                                 key={item.name} 
+                                 type="button"
+                                 onClick={() => {
+                                   const isSelected = roomForm.amenities.includes(item.name);
+                                   setRoomForm({
+                                     ...roomForm,
+                                     amenities: isSelected 
+                                       ? roomForm.amenities.filter(a => a !== item.name)
+                                       : [...roomForm.amenities, item.name]
+                                   });
+                                 }} 
+                                 className={`h-11 px-4 rounded-xl border text-[10px] font-black transition-all flex items-center gap-2 relative overflow-hidden uppercase tracking-tighter ${roomForm.amenities.includes(item.name) ? 'border-primary bg-primary/5 text-primary' : 'border-gray-100 bg-gray-50/50 text-gray-400 hover:bg-white hover:border-gray-200 hover:text-gray-600'}`}
+                               >
+                                  <span className="text-base">{item.icon}</span>
+                                  <span className="truncate">{item.name}</span>
+                               </button>
+                             ))}
+                           </div>
+                        </div>
                     </form>
                  )}
               </div>
 
-              {/* Modal Footer */}
               <div className="p-10 border-t border-gray-100 bg-gray-50/50 flex flex-col md:flex-row gap-4">
                  <button 
                    type="button" 
