@@ -19,6 +19,7 @@ import {
   Shield,
   Filter,
   ArrowRight,
+  Activity,
   MoreVertical,
   ChevronDown
 } from 'lucide-react';
