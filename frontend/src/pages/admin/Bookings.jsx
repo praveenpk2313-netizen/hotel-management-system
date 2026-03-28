@@ -51,19 +51,19 @@ const BookingMonitoring = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
         <div className="space-y-1">
-          <h1 className="text-4xl font-serif text-secondary-dark font-black tracking-tight flex items-center gap-3">
-            <CalendarCheck className="text-primary" size={32} />
+          <h1 className="text-3xl md:text-4xl font-serif text-secondary-dark font-black tracking-tight flex items-center gap-3">
+            <CalendarCheck className="text-primary hidden sm:block" size={32} />
             Reservation Command
           </h1>
-          <p className="text-gray-400 font-medium">Monitor and manage every booking in the global portfolio.</p>
+          <p className="text-xs md:text-sm text-gray-400 font-medium">Global platform reservation monitoring.</p>
         </div>
 
-        <div className="flex items-center gap-2 bg-white p-1 rounded-2xl border border-gray-100 shadow-sm">
+        <div className="flex items-center gap-1.5 bg-white p-1 rounded-2xl border border-gray-100 shadow-sm overflow-x-auto no-scrollbar max-w-full">
           {['all', 'confirmed', 'pending', 'cancelled'].map((s) => (
             <button
               key={s}
               onClick={() => setStatusFilter(s)}
-              className={`px-5 py-2 text-[9px] font-black uppercase tracking-widest rounded-xl transition-all ${statusFilter === s ? 'bg-secondary-dark text-white shadow-lg' : 'text-gray-400 hover:text-secondary'}`}
+              className={`px-4 md:px-5 py-2 text-[8px] md:text-[9px] whitespace-nowrap font-black uppercase tracking-widest rounded-xl transition-all ${statusFilter === s ? 'bg-secondary-dark text-white shadow-lg' : 'text-gray-400 hover:text-secondary'}`}
             >
               {s}
             </button>
@@ -75,7 +75,7 @@ const BookingMonitoring = () => {
       <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
         
         {/* Search Bar */}
-        <div className="p-8 md:p-10 border-b border-gray-50 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div className="p-6 md:p-10 border-b border-gray-50 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="relative w-full max-w-md group">
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-primary transition-colors" size={20} />
             <input
@@ -83,7 +83,7 @@ const BookingMonitoring = () => {
               placeholder="Search guest, hotel, or ID..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="w-full h-14 bg-gray-50/50 border border-gray-100 rounded-2xl pl-14 pr-6 text-sm font-bold text-secondary-dark placeholder:text-gray-300 focus:bg-white focus:border-primary/30 focus:shadow-xl focus:shadow-primary/5 outline-none transition-all"
+              className="w-full h-12 md:h-14 bg-gray-50/50 border border-gray-100 rounded-2xl pl-12 md:pl-14 pr-6 text-sm font-bold text-secondary-dark placeholder:text-gray-300 focus:bg-white focus:border-primary/30 focus:shadow-xl focus:shadow-primary/5 outline-none transition-all"
             />
           </div>
           <span className="text-[10px] font-black text-primary bg-primary/10 px-4 py-2 rounded-full uppercase tracking-widest whitespace-nowrap">
@@ -95,53 +95,51 @@ const BookingMonitoring = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-gray-50/50">
-                <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Reservation ID</th>
-                <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Guest & Property</th>
-                <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Revenue</th>
-                <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Check-in Period</th>
-                <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Status</th>
-                <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Action</th>
+               <tr className="bg-gray-50/50">
+                <th className="px-6 md:px-10 py-5 md:py-6 text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest whitespace-nowrap">Identity</th>
+                <th className="px-6 md:px-10 py-5 md:py-6 text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest whitespace-nowrap">Property Details</th>
+                <th className="px-6 md:px-10 py-5 md:py-6 text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest whitespace-nowrap">Revenue</th>
+                <th className="px-6 md:px-10 py-5 md:py-6 text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest whitespace-nowrap">Period</th>
+                <th className="px-6 md:px-10 py-5 md:py-6 text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest whitespace-nowrap text-center">Status</th>
+                <th className="px-6 md:px-10 py-5 md:py-6 text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest whitespace-nowrap text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
               {filteredBookings.map((b) => {
                 const st = statusMap[b.status] || statusMap.pending;
                 return (
-                  <tr key={b._id} className="hover:bg-gray-50/30 transition-colors group">
-                    <td className="px-10 py-7">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-primary/5 border border-primary/10 flex items-center justify-center text-primary">
-                          <CalendarCheck size={20} />
+                   <tr key={b._id} className="hover:bg-gray-50/30 transition-colors group">
+                    <td className="px-6 md:px-10 py-5 md:py-7">
+                      <div className="flex items-center gap-3 md:gap-4">
+                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-primary/5 border border-primary/10 flex items-center justify-center text-primary">
+                          <CalendarCheck size={18} />
                         </div>
-                        <div>
-                          <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Reference</p>
-                          <p className="font-black text-secondary-dark text-sm font-mono">#{b._id.substr(-8).toUpperCase()}</p>
+                        <div className="min-w-0">
+                          <p className="text-[8px] md:text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">ID</p>
+                          <p className="font-black text-secondary-dark text-[11px] md:text-sm font-mono truncate">#{b._id.substr(-6).toUpperCase()}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-10 py-7">
-                      <p className="font-black text-secondary-dark text-sm mb-1">{b.userId?.name || '—'}</p>
-                      <div className="flex items-center gap-1.5 text-gray-400 text-xs font-bold">
-                        <Hotel size={12} className="text-primary/60" />
-                        {b.hotelId?.name || 'Deleted Property'}
+                    <td className="px-6 md:px-10 py-5 md:py-7">
+                      <p className="font-black text-secondary-dark text-xs md:text-sm mb-1 truncate">{b.userId?.name || '—'}</p>
+                      <div className="flex items-center gap-1.5 text-gray-400 text-[10px] md:text-xs font-bold truncate">
+                        <Hotel size={12} className="text-primary/60 flex-shrink-0" />
+                        {b.hotelId?.name || 'Property'}
                       </div>
                     </td>
-                    <td className="px-10 py-7">
-                      <p className="font-black text-emerald-600 text-base">{formatCurrency(b.totalPrice)}</p>
-                      <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">Total Charged</p>
+                    <td className="px-6 md:px-10 py-5 md:py-7 whitespace-nowrap">
+                      <p className="font-black text-emerald-600 text-sm md:text-base">{formatCurrency(b.totalPrice)}</p>
                     </td>
-                    <td className="px-10 py-7">
-                      <div className="flex items-center gap-2 text-secondary-dark text-xs font-black">
-                        <Clock size={14} className="text-primary/60" />
+                    <td className="px-6 md:px-10 py-5 md:py-7 whitespace-nowrap">
+                      <div className="flex items-center gap-2 text-secondary-dark text-[10px] md:text-xs font-black">
+                        <Clock size={12} className="text-primary/60" />
                         {formatDate(b.checkInDate)}
                       </div>
-                      <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">→ {formatDate(b.checkOutDate)}</p>
                     </td>
-                    <td className="px-10 py-7 text-center">
-                      <div className={`inline-flex items-center gap-2 pl-3 pr-4 py-1.5 rounded-full border ${st.bg} ${st.border}`}>
+                    <td className="px-6 md:px-10 py-5 md:py-7 text-center whitespace-nowrap">
+                      <div className={`inline-flex items-center gap-2 pl-2 md:pl-3 pr-3 md:pr-4 py-1.5 rounded-full border ${st.bg} ${st.border}`}>
                         <div className={`w-1.5 h-1.5 rounded-full ${st.dot}`} />
-                        <span className={`text-[9px] font-black uppercase tracking-widest ${st.color}`}>{b.status}</span>
+                        <span className={`text-[8px] md:text-[9px] font-black uppercase tracking-widest ${st.color}`}>{b.status}</span>
                       </div>
                     </td>
                     <td className="px-10 py-7 text-right">

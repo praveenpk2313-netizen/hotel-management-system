@@ -27,7 +27,7 @@ import { fetchSuggestions } from '../../services/api';
 const AdminLayout = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
+  const [isSidebarOpen, setSidebarOpen] = useState(window.innerWidth > 1024);
   const [searchTerm, setSearchTerm] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -59,6 +59,18 @@ const AdminLayout = () => {
     setShowSuggestions(false);
     navigate(`/admin/hotels?hotel=${text}`);
   };
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 1024) {
+        setSidebarOpen(true);
+      } else {
+        setSidebarOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -144,10 +156,10 @@ const AdminLayout = () => {
       </aside>
 
       {/* ─── MAIN CONTENT ARCHITECTURE ─────────────────────────────────────── */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+       <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
         
         {/* Top Intelligence Bar */}
-        <header className="h-20 bg-white/80 backdrop-blur-2xl border-b border-gray-100 flex items-center justify-between px-6 lg:px-10 flex-shrink-0 z-[500]">
+        <header className="h-16 lg:h-20 bg-white/80 backdrop-blur-2xl border-b border-gray-100 flex items-center justify-between px-4 lg:px-10 flex-shrink-0 z-[500]">
            <div className="flex items-center gap-4 lg:gap-8 flex-1">
               <button 
                 onClick={() => setSidebarOpen(!isSidebarOpen)}
@@ -201,9 +213,9 @@ const AdminLayout = () => {
            </div>
         </header>
 
-        {/* Dynamic Canvas Area */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden pt-8 pb-32 custom-scrollbar">
-           <div className="max-w-[1600px] mx-auto px-6 lg:px-10">
+         {/* Dynamic Canvas Area */}
+        <main className="flex-1 overflow-y-auto overflow-x-hidden pt-6 lg:pt-8 pb-32 custom-scrollbar">
+           <div className="max-w-[1600px] mx-auto px-4 lg:px-10">
               <div className="animate-fade-in">
                  <Outlet />
               </div>
