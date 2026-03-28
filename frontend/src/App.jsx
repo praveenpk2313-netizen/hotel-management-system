@@ -31,7 +31,6 @@ import PaymentManagement from './pages/admin/Payments';
 import ReviewModeration from './pages/admin/Reviews';
 import AdminPromotions from './pages/admin/Promotions';
 import NotificationsPage from './pages/NotificationsPage';
-import AdminRegisterPage from './pages/AdminRegisterPage';
 import { useAuth } from './context/AuthContext';
 import { useSocket } from './hooks/useSocket';
 import RealTimeToast from './components/RealTimeToast';
@@ -131,7 +130,6 @@ function App() {
           <Route path="/admin">
             <Route index element={<AdminLoginPage />} />
             <Route path="login" element={<AdminLoginPage />} />
-            <Route path="register" element={<AdminRegisterPage />} />
             <Route element={<ProtectedRoute allowedRoles={['admin']} redirectTo="/admin/login"><AdminLayout /></ProtectedRoute>}>
               <Route path="dashboard" element={<AdminDashboardPage />} />
               <Route path="users" element={<UserManagement />} />
