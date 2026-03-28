@@ -13,9 +13,16 @@ import {
   Info
 } from 'lucide-react';
 import { formatCurrency } from '../utils/helpers';
+import { API_BASE_URL } from '../services/api';
 
 const RoomCard = ({ room, hotelId, hotelName, hotel, checkIn, checkOut, guests, onBookError, isSelected, onSelect }) => {
   const navigate = useNavigate();
+
+  const getImageUrl = (url) => {
+    if (!url) return "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&q=80&w=800";
+    if (url.startsWith('http')) return url;
+    return `${API_BASE_URL}/${url}`;
+  };
 
   const handleBookNow = () => {
     if (!checkIn || !checkOut) {
@@ -63,7 +70,7 @@ const RoomCard = ({ room, hotelId, hotelName, hotel, checkIn, checkOut, guests, 
       {/* 1. Room Image */}
       <div className="md:col-span-4 h-56 md:h-64 lg:h-auto relative overflow-hidden m-4 rounded-2xl shrink-0">
         <img 
-          src={room.images?.[0] || "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&q=80&w=800"} 
+          src={getImageUrl(room.images?.[0])} 
           alt={room.type} 
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
         />

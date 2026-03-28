@@ -27,7 +27,7 @@ import {
   Hotel
 } from 'lucide-react';
 import { formatCurrency, formatDate } from '../utils/helpers';
-import { fetchUserBookings, cancelBooking, modifyBooking, createRazorpayOrder, verifyRazorpayPayment, fetchReviewByBookingId } from '../services/api';
+import { fetchUserBookings, cancelBooking, modifyBooking, createRazorpayOrder, verifyRazorpayPayment, fetchReviewByBookingId, API_BASE_URL } from '../services/api';
 import { submitReview, editReview, removeReview, resetReviewStatus } from '../redux/slices/reviewSlice';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -47,6 +47,8 @@ const BookingHistory = () => {
   const [modifyingBooking, setModifyingBooking] = useState(null);
   const [modifyingDates, setModifyingDates] = useState({ start: null, end: null, guests: 1 });
   const [submittingMod, setSubmittingMod] = useState(false);
+  
+  const [viewingBooking, setViewingBooking] = useState(null);
   
   const [reviewingBooking, setReviewingBooking] = useState(null);
   const [reviewForm, setReviewForm] = useState({ id: null, rating: 5, comment: '' });
@@ -99,39 +101,14 @@ const BookingHistory = () => {
     }
   };
 
-  const handleModifyClick = (booking) => {
-    setModifyingBooking(booking);
-    setModifyingDates({
-      start: new Date(booking.checkInDate),
-      end: new Date(booking.checkOutDate),
-      guests: booking.numGuests || 1
-    });
+  const handleViewDetails = (booking) => {
+    setViewingBooking(booking);
   };
 
-  const handleModifySubmit = async (e) => {
-    e.preventDefault();
-    setSubmittingMod(true);
-    setError('');
-    try {
-      const diffTime = Math.abs(modifyingDates.end - modifyingDates.start);
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      const newTotal = (diffDays || 1) * (modifyingBooking.roomId?.price || 0);
-
-      await modifyBooking(modifyingBooking._id, {
-        checkInDate: modifyingDates.start,
-        checkOutDate: modifyingDates.end,
-        totalPrice: newTotal,
-        numGuests: modifyingDates.guests
-      });
-
-      setSuccess('Booking modified successfully.');
-      setModifyingBooking(null);
-      loadBookings();
-    } catch (err) {
-      setError(err.response?.data?.message || 'Modification failed.');
-    } finally {
-      setSubmittingMod(false);
-    }
+  const getImageUrl = (url) => {
+    if (!url) return "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&q=80&w=400";
+    if (url.startsWith('http')) return url;
+    return `${API_BASE_URL}/${url}`;
   };
 
   const handlePayment = (booking) => {
@@ -233,7 +210,7 @@ const BookingHistory = () => {
                     {/* Property Image Area */}
                     <div className="w-full md:w-64 h-48 md:h-44 shrink-0 relative overflow-hidden rounded-3xl">
                        <img 
-                         src={booking.hotelId?.images?.[0] || "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&q=80&w=400"} 
+                         src={getImageUrl(booking.hotelId?.images?.[0])} 
                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                          alt={booking.hotelId?.name}
                        />
@@ -270,10 +247,10 @@ const BookingHistory = () => {
                        {/* Action Strip */}
                        <div className="flex flex-col gap-3 shrink-0 font-sans">
                           <button 
-                            onClick={() => handleModifyClick(booking)}
+                            onClick={() => handleViewDetails(booking)}
                             className="w-44 py-3 bg-white border border-slate-100 text-slate-900 rounded-2xl font-black text-xs hover:bg-slate-900 hover:text-white transition-all shadow-sm"
                           >
-                             Modify Trip
+                             View Trip Details
                           </button>
                           <Link 
                             to={`/hotel/${booking.hotelId?._id}`}
@@ -299,6 +276,108 @@ const BookingHistory = () => {
         )}
 
       </div>
+
+      {/* View Details Modal */}
+      {viewingBooking && (
+        <div className="fixed inset-0 z-[1001] flex items-center justify-center p-4">
+           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setViewingBooking(null)} />
+           <div className="relative w-full max-w-2xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden animate-slide-up border border-slate-100">
+              <div className="p-10 space-y-10">
+                 {/* Modal Header */}
+                 <div className="flex justify-between items-start">
+                    <div className="space-y-2">
+                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Reservation Reference</p>
+                       <h2 className="text-3xl font-black text-slate-900">#{(viewingBooking._id || '').slice(-8).toUpperCase()}</h2>
+                    </div>
+                    <button onClick={() => setViewingBooking(null)} className="p-3 hover:bg-slate-50 rounded-2xl transition-all border border-transparent hover:border-slate-100"><X size={24} className="text-slate-400" /></button>
+                 </div>
+
+                 {/* Detail Grid */}
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div className="space-y-8">
+                       <div className="space-y-1.5">
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                             <Hotel size={12} className="text-luxury-gold" /> Property
+                          </p>
+                          <p className="text-xl font-bold text-slate-900 italic font-serif leading-tight">{viewingBooking.hotelId?.name}</p>
+                       </div>
+                       
+                       <div className="space-y-1.5">
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                             <Calendar size={12} className="text-luxury-gold" /> Stay Period
+                          </p>
+                          <p className="text-sm font-bold text-slate-600">
+                             {formatDate(viewingBooking.checkInDate)} — {formatDate(viewingBooking.checkOutDate)}
+                          </p>
+                       </div>
+
+                       <div className="space-y-1.5">
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                             <CreditCard size={12} className="text-luxury-gold" /> Total Payment
+                          </p>
+                          <p className="text-3xl font-black text-slate-900">{formatCurrency(viewingBooking.totalPrice)}</p>
+                       </div>
+                    </div>
+
+                    <div className="space-y-8">
+                       <div className="space-y-1.5">
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                             <ShieldCheck size={12} className="text-luxury-gold" /> Reservation Status
+                          </p>
+                          <span className={`inline-flex px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                            viewingBooking.status === 'confirmed' ? 'bg-emerald-100 text-emerald-700' : 
+                            viewingBooking.status === 'cancelled' ? 'bg-rose-100 text-rose-700' : 
+                            'bg-amber-100 text-amber-700'
+                          }`}>
+                            {viewingBooking.status}
+                          </span>
+                       </div>
+
+                       <div className="space-y-1.5">
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                             <Zap size={12} className="text-luxury-gold" /> Room Information
+                          </p>
+                          <p className="text-sm font-bold text-slate-600">{viewingBooking.roomId?.name || 'Standard Room'}</p>
+                          <p className="text-[10px] font-black text-slate-400 uppercase">{viewingBooking.numGuests} Guests Included</p>
+                       </div>
+
+                       <div className="space-y-1.5">
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                             <ShieldCheck size={12} className="text-luxury-gold" /> Payment Status
+                          </p>
+                          <span className={`inline-flex px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                            viewingBooking.paymentStatus === 'paid' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-400'
+                          }`}>
+                            {viewingBooking.paymentStatus || 'Pending'}
+                          </span>
+                       </div>
+                    </div>
+                 </div>
+
+                 {/* Action Bar */}
+                 <div className="pt-10 border-t border-slate-100 flex items-center justify-between">
+                    {viewingBooking.status !== 'cancelled' ? (
+                       <button 
+                         onClick={() => {
+                           handleCancel(viewingBooking._id);
+                           setViewingBooking(null);
+                         }}
+                         className="flex items-center gap-2 text-[10px] font-black text-rose-500 uppercase tracking-widest hover:text-rose-700 transition-colors"
+                       >
+                          <Trash2 size={14} /> Request Cancellation
+                       </button>
+                    ) : <div></div>}
+                    <button 
+                      onClick={() => setViewingBooking(null)}
+                      className="px-10 py-4 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-luxury-gold transition-all shadow-xl"
+                    >
+                       Close Details
+                    </button>
+                 </div>
+              </div>
+           </div>
+        </div>
+      )}
 
       {/* Review Modal */}
       {reviewingBooking && (

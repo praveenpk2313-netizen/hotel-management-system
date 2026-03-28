@@ -20,7 +20,7 @@ import {
   Monitor,
   Users
 } from 'lucide-react';
-import { fetchHotelById, fetchRooms } from '../services/api';
+import { fetchHotelById, fetchRooms, API_BASE_URL } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import RoomCard from '../components/RoomCard';
 import BookingForm from '../components/BookingForm';
@@ -86,6 +86,12 @@ const HotelDetails = () => {
     });
   };
 
+  const getImageUrl = (url) => {
+    if (!url) return null;
+    if (url.startsWith('http')) return url;
+    return `${API_BASE_URL}/${url}`;
+  };
+
   useEffect(() => {
     const loadHotelData = async () => {
       setLoading(true);
@@ -141,33 +147,75 @@ const HotelDetails = () => {
       
       {/* 2. Gallery Grid */}
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12 mb-16 animate-fade-in">
-         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 h-[300px] md:h-[550px] lg:h-[650px] overflow-hidden">
-            {/* Main Big Image (Left) */}
-            <div className="col-span-1 md:col-span-2 relative group cursor-pointer overflow-hidden rounded-[2rem]">
-               <img src={hotel.images?.[0] || 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=1200'} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" alt={hotel.name} />
-            </div>
-
-            {/* Middle Column (Two Stacked) */}
-            <div className="col-span-1 hidden md:flex flex-col gap-4">
-               <div className="flex-1 relative group cursor-pointer overflow-hidden rounded-[2rem]">
-                  <img src={hotel.images?.[1] || 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=600'} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" alt="Interior" />
+         {hotel.images && hotel.images.length > 0 ? (
+            <div className={`grid gap-4 overflow-hidden rounded-[2rem] 
+              ${hotel.images.length === 1 ? 'grid-cols-1 h-[400px] md:h-[600px]' : 
+                hotel.images.length === 2 ? 'grid-cols-1 md:grid-cols-2 h-[300px] md:h-[500px]' : 
+                'grid-cols-1 md:grid-cols-4 h-[300px] md:h-[550px] lg:h-[650px]'}`}
+            >
+               {/* Main Image */}
+               <div className={`${hotel.images.length >= 3 ? 'md:col-span-2' : ''} relative group cursor-pointer overflow-hidden`}>
+                  <img 
+                    src={getImageUrl(hotel.images[0])} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" 
+                    alt={hotel.name} 
+                  />
                </div>
-               <div className="flex-1 relative group cursor-pointer overflow-hidden rounded-[2rem]">
-                  <img src={hotel.images?.[2] || 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=600'} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" alt="Interior" />
-               </div>
-            </div>
 
-            {/* Right Big Image (Rounded Top-Right) */}
-            <div className="col-span-1 hidden md:block relative group cursor-pointer overflow-hidden rounded-tr-[5rem] rounded-bl-[2rem] rounded-tl-[2rem] rounded-br-[2rem]">
-               <img src={hotel.images?.[3] || 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=600'} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt="Interior" />
-               <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-all pointer-events-none" />
-               {hotel.images?.length > 4 && (
-                  <div className="absolute bottom-6 right-6 bg-white/20 backdrop-blur-md border border-white/30 text-white px-4 py-2 rounded-full font-sans text-[10px] font-black uppercase tracking-widest shadow-xl">
-                     +{hotel.images.length - 4} More
+               {/* Subsequent Images */}
+               {hotel.images.length === 2 && (
+                  <div className="relative group cursor-pointer overflow-hidden">
+                     <img 
+                        src={getImageUrl(hotel.images[1])} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" 
+                        alt="Interior" 
+                     />
                   </div>
                )}
+
+               {hotel.images.length >= 3 && (
+                  <>
+                     <div className="hidden md:flex flex-col gap-4">
+                        <div className="flex-1 relative group cursor-pointer overflow-hidden rounded-2xl">
+                           <img 
+                              src={getImageUrl(hotel.images[1])} 
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" 
+                              alt="Interior" 
+                           />
+                        </div>
+                        {hotel.images[2] && (
+                           <div className="flex-1 relative group cursor-pointer overflow-hidden rounded-2xl">
+                              <img 
+                                 src={getImageUrl(hotel.images[2])} 
+                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" 
+                                 alt="Interior" 
+                              />
+                           </div>
+                        )}
+                     </div>
+                     {hotel.images[3] && (
+                        <div className="hidden md:block relative group cursor-pointer overflow-hidden">
+                           <img 
+                              src={getImageUrl(hotel.images[3])} 
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
+                              alt="Interior" 
+                           />
+                           {hotel.images.length > 4 && (
+                              <div className="absolute bottom-6 right-6 bg-white/20 backdrop-blur-md border border-white/30 text-white px-4 py-2 rounded-full font-sans text-[10px] font-black uppercase tracking-widest shadow-xl">
+                                 +{hotel.images.length - 4} More
+                              </div>
+                           )}
+                        </div>
+                     )}
+                  </>
+               )}
             </div>
-         </div>
+         ) : (
+            <div className="h-[400px] bg-slate-50 flex flex-col items-center justify-center gap-4 rounded-[2rem] border border-slate-100 italic text-slate-400 font-sans">
+               <ImageIcon size={48} className="opacity-20" />
+               <p className="text-sm font-bold uppercase tracking-widest">No property images available</p>
+            </div>
+         )}
       </div>
 
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">

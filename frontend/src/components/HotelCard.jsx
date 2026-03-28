@@ -2,14 +2,21 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Star, User } from 'lucide-react';
 import { formatCurrency } from '../utils/helpers';
+import { API_BASE_URL } from '../services/api';
 
 const HotelCard = ({ hotel }) => {
+  const getImageUrl = (url) => {
+    if (!url) return 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=1200';
+    if (url.startsWith('http')) return url;
+    return `${API_BASE_URL}/${url}`;
+  };
+
   return (
     <div className="bg-slate-50 border border-slate-100 rounded-[2.5rem] overflow-hidden hover:border-luxury-gold transition-all duration-500 hover:shadow-2xl hover:shadow-slate-200/50 flex flex-col group h-full">
       {/* Property Visual */}
       <div className="relative h-60 overflow-hidden m-6 mb-0 rounded-3xl shrink-0">
         <img 
-          src={(hotel.images && hotel.images[0]) || hotel.image || 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=1200'} 
+          src={getImageUrl((hotel.images && hotel.images[0]) || hotel.image)} 
           alt={hotel.name} 
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
         />
