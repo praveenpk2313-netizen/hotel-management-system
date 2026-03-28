@@ -55,16 +55,21 @@ const HotelCard = ({ hotel }) => {
              "{hotel.description || 'Experience architectural heritage and understated luxury in this sanctuary.'}"
           </p>
 
-          <div className="mt-auto pt-6 border-t border-slate-100 flex items-center justify-between">
-             <div className="flex items-center gap-2 text-slate-400 font-bold text-[11px] uppercase tracking-widest font-sans">
+          <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between font-sans">
+             <div className="flex items-center gap-2 text-slate-400 font-bold text-[11px] uppercase tracking-widest">
                 <User size={14} /> 2+
              </div>
-             <Link 
-               to={`/hotel/${hotel._id || hotel.id}`}
-               className="px-6 py-2.5 bg-luxury-gold text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:brightness-110 transition-all shadow-sm font-sans"
-             >
-                View Details
-             </Link>
+             
+             {hotel._id || hotel.id ? (
+                <Link 
+                  to={`/hotel/${hotel._id || hotel.id}`}
+                  className="px-6 py-2.5 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-luxury-gold transition-all shadow-sm active:scale-95"
+                >
+                   View Details
+                </Link>
+             ) : (
+                <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest italic">Pending</span>
+             )}
           </div>
       </div>
     </div>

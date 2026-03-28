@@ -93,6 +93,8 @@ const HotelDetails = () => {
   };
 
   useEffect(() => {
+    if (!id || id === 'undefined') return;
+
     const loadHotelData = async () => {
       setLoading(true);
       try {
