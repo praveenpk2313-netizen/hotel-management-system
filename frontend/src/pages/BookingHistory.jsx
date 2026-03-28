@@ -56,13 +56,37 @@ const BookingHistory = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const handleReviewClick = useCallback(async (booking) => {
+    setError('');
+    setReviewingBooking(booking);
+    if (booking.isReviewed) {
+      try {
+        const { data } = await fetchReviewByBookingId(booking._id);
+        setReviewForm({ id: data._id, rating: data.rating, comment: data.comment });
+      } catch (err) {
+        setReviewForm({ id: null, rating: 5, comment: '' });
+      }
+    } else {
+      setReviewForm({ id: null, rating: 5, comment: '' });
+    }
+  }, []);
+
   useEffect(() => {
     if (location.state?.successMessage) {
       setSuccess(location.state.successMessage);
+    }
+    if (location.state?.openReviewId && bookings.length > 0) {
+      const booking = bookings.find(b => b._id === location.state.openReviewId);
+      if (booking) {
+        handleReviewClick(booking);
+      }
+    }
+    // Clear state after handling
+    if (location.state) {
       window.history.replaceState({}, document.title);
     }
     window.scrollTo(0, 0);
-  }, [location]);
+  }, [location.state, bookings, handleReviewClick]);
 
   const loadBookings = useCallback(async () => {
     setLoading(true);
@@ -134,21 +158,6 @@ const BookingHistory = () => {
         rating: reviewForm.rating,
         comment: reviewForm.comment
       }));
-    }
-  };
-
-  const handleReviewClick = async (booking) => {
-    setError('');
-    setReviewingBooking(booking);
-    if (booking.isReviewed) {
-      try {
-        const { data } = await fetchReviewByBookingId(booking._id);
-        setReviewForm({ id: data._id, rating: data.rating, comment: data.comment });
-      } catch (err) {
-        setReviewForm({ id: null, rating: 5, comment: '' });
-      }
-    } else {
-      setReviewForm({ id: null, rating: 5, comment: '' });
     }
   };
 
@@ -258,7 +267,18 @@ const BookingHistory = () => {
                           >
                              View Resort
                           </Link>
-                          {booking.status !== 'cancelled' && booking.paymentStatus !== 'paid' && (
+                           {booking.status === 'confirmed' && (
+                             <button 
+                               onClick={() => handleReviewClick(booking)}
+                               className={`w-44 py-3 rounded-2xl font-black text-xs transition-all shadow-sm ${booking.isReviewed ? 'bg-slate-50 border border-slate-200 text-slate-400' : 'bg-luxury-gold text-white hover:bg-slate-900 shadow-luxury-gold/20'}`}
+                             >
+                                <div className="flex items-center justify-center gap-2">
+                                   <StarIcon size={14} className={booking.isReviewed ? 'fill-slate-400' : 'fill-white'} />
+                                   {booking.isReviewed ? 'Edit Review' : 'Rate & Review'}
+                                </div>
+                             </button>
+                           )}
+                           {booking.status !== 'cancelled' && booking.paymentStatus !== 'paid' && (
                             <button 
                               onClick={() => handlePayment(booking)}
                               className="w-44 py-3 bg-blue-600 text-white rounded-2xl font-bold text-xs hover:bg-blue-700 transition-all shadow-lg shadow-blue-200"
@@ -367,12 +387,26 @@ const BookingHistory = () => {
                           <Trash2 size={14} /> Request Cancellation
                        </button>
                     ) : <div></div>}
-                    <button 
-                      onClick={() => setViewingBooking(null)}
-                      className="px-10 py-4 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-luxury-gold transition-all shadow-xl"
-                    >
-                       Close Details
-                    </button>
+                     <div className="flex items-center gap-4">
+                        {viewingBooking.status === 'confirmed' && (
+                          <button 
+                            onClick={() => {
+                              handleReviewClick(viewingBooking);
+                              setViewingBooking(null);
+                            }}
+                            className="px-6 py-4 bg-luxury-gold text-white rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-slate-900 transition-all shadow-lg shadow-luxury-gold/20 flex items-center gap-2"
+                          >
+                             <StarIcon size={14} className="fill-white" />
+                             {viewingBooking.isReviewed ? 'Update Review' : 'Give Review'}
+                          </button>
+                        )}
+                        <button 
+                          onClick={() => setViewingBooking(null)}
+                          className="px-10 py-4 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-luxury-gold transition-all shadow-xl"
+                        >
+                           Close Details
+                        </button>
+                     </div>
                  </div>
               </div>
            </div>

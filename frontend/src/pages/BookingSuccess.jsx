@@ -15,7 +15,9 @@ import {
   ShieldCheck,
   CheckCircle2,
   History,
-  Plane
+  Plane,
+  Hotel,
+  Star as StarIcon
 } from 'lucide-react';
 import { formatCurrency, formatDate } from '../utils/helpers';
 
@@ -124,6 +126,23 @@ const BookingSuccess = () => {
               <p className="text-xs mt-1 font-medium opacity-80">You can also find all details under 'My Bookings' in your dashboard.</p>
            </div>
            {emailSent && <CheckCircle2 className="text-emerald-500 ml-auto hidden md:block" size={24} />}
+        </div>
+
+        {/* Review Encouragement */}
+        <div className="bg-slate-50 border border-slate-100 rounded-3xl p-8 flex flex-col md:flex-row items-center gap-8 group">
+           <div className="w-16 h-16 bg-white border border-slate-200 rounded-2xl flex items-center justify-center shrink-0 shadow-sm text-amber-500 group-hover:bg-amber-500 group-hover:text-white transition-all duration-500">
+              <StarIcon size={32} className="fill-current" />
+           </div>
+           <div className="space-y-2 text-center md:text-left flex-1 font-sans">
+              <h3 className="text-xl font-black text-slate-900">Your opinion matters.</h3>
+              <p className="text-sm text-slate-500 font-medium">Was the booking process seamless? Help us improve by providing a quick review of your experience.</p>
+           </div>
+           <button 
+             onClick={() => navigate('/customer/dashboard', { state: { openReviewId: booking._id } })}
+             className="px-8 h-12 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-xl active:scale-95"
+           >
+              Share Review
+           </button>
         </div>
 
         {/* Action Center */}
