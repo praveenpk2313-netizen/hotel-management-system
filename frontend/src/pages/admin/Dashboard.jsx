@@ -6,7 +6,7 @@ import {
   UserCheck, 
   Hotel, 
   CalendarCheck, 
-  DollarSign, 
+  IndianRupee, 
   TrendingUp, 
   Loader2,
   ArrowUpRight,
@@ -44,7 +44,7 @@ const AdminDashboard = () => {
   }, [dispatch, user]);
 
   const statCards = [
-    { title: 'Global Revenue', value: stats ? formatCurrency(stats.totalRevenue) : '$0', icon: DollarSign, trend: '+12.5%', color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
+    { title: 'Global Revenue', value: stats ? formatCurrency(stats.totalRevenue) : '₹0', icon: IndianRupee, trend: '+12.5%', color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
     { title: 'Active Travelers', value: stats?.userCount || 0, icon: Users, trend: '+5.2%', color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100' },
     { title: 'Verified Partners', value: stats?.managerCount || 0, icon: UserCheck, trend: '+2.1%', color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-100' },
     { title: 'Global Properties', value: stats?.hotelCount || 0, icon: Hotel, trend: '+8.4%', color: 'text-rose-600', bg: 'bg-rose-50', border: 'border-rose-100' },

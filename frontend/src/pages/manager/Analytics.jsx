@@ -16,8 +16,7 @@ import {
 } from 'recharts';
 import { 
   Loader2, 
-  TrendingUp, 
-  DollarSign, 
+  IndianRupee, 
   Users, 
   Award,
   Activity,
@@ -81,7 +80,7 @@ const Analytics = () => {
     {
       label: 'Net Revenue',
       value: formatCurrency((stats?.totalRevenue || 0) * 0.85),
-      icon: DollarSign,
+      icon: IndianRupee,
       color: 'text-primary',
       bg: 'bg-primary/10',
       border: 'border-primary/20',

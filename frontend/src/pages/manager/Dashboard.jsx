@@ -6,7 +6,7 @@ import {
   TrendingUp, 
   Hotel, 
   Calendar, 
-  DollarSign, 
+  IndianRupee, 
   ArrowUpRight, 
   Loader2,
   Users,
@@ -42,7 +42,7 @@ const ManagerDashboard = () => {
   }, [dispatch, user, isInitialized]);
 
   const statCards = [
-    { title: 'Gross Revenue', value: stats ? formatCurrency(stats.totalRevenue) : '$0', icon: DollarSign, trend: '+12.5%', color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
+    { title: 'Gross Revenue', value: stats ? formatCurrency(stats.totalRevenue) : '₹0', icon: IndianRupee, trend: '+12.5%', color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
     { title: 'Elite Properties', value: stats?.totalHotels || 0, icon: Hotel, trend: 'Managed', color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100' },
     { title: 'Total Inventory', value: stats?.totalRooms || 0, icon: Briefcase, trend: 'Rooms', color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-100' },
     { title: 'Confirmed Stays', value: stats?.totalBookings || 0, icon: Calendar, trend: 'Reservations', color: 'text-rose-600', bg: 'bg-rose-50', border: 'border-rose-100' },

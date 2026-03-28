@@ -9,7 +9,7 @@ import {
   Calendar,
   User,
   Activity,
-  DollarSign,
+  IndianRupee,
   Zap,
   ArrowUpRight
 } from 'lucide-react';
@@ -45,7 +45,7 @@ const PaymentManagement = () => {
       {/* Header */}
       <div className="space-y-1">
         <h1 className="text-4xl font-serif text-secondary-dark font-black tracking-tight flex items-center gap-3">
-          <DollarSign className="text-primary" size={32} />
+          <IndianRupee className="text-primary" size={32} />
           Financial Audit
         </h1>
         <p className="text-gray-400 font-medium">Detailed tracking of platform revenue and individual transactions.</p>
