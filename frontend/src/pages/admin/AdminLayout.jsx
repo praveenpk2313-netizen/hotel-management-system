@@ -169,41 +169,29 @@ const AdminLayout = () => {
         
         {/* Top Intelligence Bar */}
         <header className="h-16 lg:h-20 bg-white/80 backdrop-blur-2xl border-b border-gray-100 flex items-center justify-between px-4 lg:px-10 flex-shrink-0 z-[500]">
-            <div className="flex items-center gap-4 lg:gap-8 flex-1">
+            <div className="flex items-center gap-4 lg:gap-8 flex-1 min-w-0">
               <button 
                 onClick={() => setSidebarOpen(true)}
-                className={`w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-secondary-dark hover:bg-gray-100 transition-colors lg:hidden ${isSidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+                className={`w-10 h-10 flex-shrink-0 rounded-xl bg-gray-50 flex items-center justify-center text-secondary-dark hover:bg-gray-100 transition-colors lg:hidden ${isSidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
               >
                 <Menu size={20} />
               </button>
               
-              {/* Internal Search Engine */}
-              <div className="hidden md:flex items-center gap-3 bg-gray-50/80 px-4 py-2.5 rounded-2xl border border-gray-100 max-w-md w-full focus-within:bg-white focus-within:ring-4 focus-within:ring-primary/5 focus-within:border-primary/20 transition-all relative">
+              <div className="flex flex-col lg:hidden min-w-0">
+                 <h1 className="text-sm font-black text-secondary-dark truncate uppercase tracking-widest leading-none">Command Center</h1>
+                 <p className="text-[8px] font-bold text-primary uppercase tracking-[2px] mt-1 truncate">Executive Oracle</p>
+              </div>
+
+              {/* Internal Search Engine - Desktop Only */}
+              <div className="hidden lg:flex items-center gap-3 bg-gray-50/80 px-4 py-2.5 rounded-2xl border border-gray-100 max-w-sm w-full focus-within:bg-white focus-within:ring-4 focus-within:ring-primary/5 focus-within:border-primary/20 transition-all relative">
                  <Search size={18} className="text-gray-400" />
                  <input 
                    type="text" 
-                   placeholder="Audit users, bookings, archives..." 
+                   placeholder="Audit logs..." 
                    className="bg-transparent border-none outline-none text-xs font-bold w-full text-secondary-dark placeholder:text-gray-400"
                    value={searchTerm}
                    onChange={handleSearchChange}
-                   onFocus={() => { if (searchTerm && suggestions.length > 0) setShowSuggestions(true); }}
-                   onBlur={() => setTimeout(() => setShowSuggestions(false), 300)}
                  />
-                 {loadingSuggestions && <Loader2 size={16} className="animate-spin text-primary" />}
-                 
-                 {showSuggestions && suggestions.length > 0 && (
-                   <div className="absolute top-[120%] left-0 w-full bg-white rounded-2xl shadow-premium border border-gray-100 py-3 animate-slide-up z-[1000]">
-                      {suggestions.map((text, idx) => (
-                        <div 
-                          key={idx} onClick={() => handleSuggestionClick(text)}
-                          className="px-6 py-3 hover:bg-gray-50 cursor-pointer flex items-center gap-4 text-xs font-bold text-secondary-dark border-b border-gray-50 last:border-none"
-                        >
-                          <MapPin size={14} className="text-gray-300" />
-                          {text}
-                        </div>
-                      ))}
-                   </div>
-                 )}
               </div>
            </div>
 
@@ -223,8 +211,8 @@ const AdminLayout = () => {
         </header>
 
          {/* Dynamic Canvas Area */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden pt-6 lg:pt-8 pb-32 custom-scrollbar">
-           <div className="max-w-[1600px] mx-auto px-4 lg:px-10">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden pt-6 lg:pt-10 pb-32 custom-scrollbar">
+           <div className="max-w-[1400px] mx-auto px-4 lg:px-10">
               <div className="animate-fade-in">
                  <Outlet />
               </div>

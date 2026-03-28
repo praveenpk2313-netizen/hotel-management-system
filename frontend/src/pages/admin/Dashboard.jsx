@@ -76,8 +76,8 @@ const AdminDashboard = () => {
   return (
     <div className="space-y-12 animate-fade-in pb-10">
       
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-         <div className="space-y-1">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-2">
+         <div className="hidden lg:block space-y-1">
             <h1 className="text-2xl md:text-4xl font-serif text-secondary-dark font-black tracking-tight">Executive Terminal</h1>
             <p className="text-[10px] md:text-sm text-gray-400 font-medium">Global platform oversight and operational analytics.</p>
          </div>
@@ -107,15 +107,15 @@ const AdminDashboard = () => {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 md:gap-8">
         {/* Main Analytics Chart */}
-        <div className="xl:col-span-2 bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 border border-gray-100 shadow-sm relative overflow-hidden">
+        <div className="xl:col-span-2 bg-white rounded-[2rem] md:rounded-[2.5rem] p-5 md:p-10 border border-gray-100 shadow-sm relative overflow-hidden">
            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16" />
            
-           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 md:mb-10 relative z-10">
+           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 md:mb-10 relative z-10">
             <div>
-              <h3 className="text-xl md:text-2xl font-serif text-secondary-dark font-bold leading-tight">Revenue & <span className="text-primary italic">Volume Velocity</span></h3>
-              <p className="text-xs md:text-sm text-gray-400 font-medium">Global platform transaction trajectory.</p>
+              <h3 className="text-lg md:text-2xl font-serif text-secondary-dark font-bold leading-tight">Revenue & <span className="text-primary italic">Volume Velocity</span></h3>
+              <p className="text-[10px] md:text-sm text-gray-400 font-medium">Global platform transaction trajectory.</p>
             </div>
             <div className="flex gap-2 p-1 bg-gray-50 rounded-xl">
                <button className="px-4 py-2 text-[10px] font-black uppercase text-primary bg-white shadow-sm rounded-lg tracking-wider">Financials</button>
@@ -199,18 +199,15 @@ const AdminDashboard = () => {
       {/* Activity Streams */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-8">
         {/* Latest Bookings */}
-        <div className="bg-white rounded-[2.5rem] overflow-hidden border border-gray-100 shadow-sm flex flex-col h-full">
+        <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] overflow-hidden border border-gray-100 shadow-sm flex flex-col h-full">
            <div className="p-6 md:p-8 border-b border-gray-50 flex justify-between items-center">
               <div>
                  <h3 className="text-lg md:text-xl font-serif text-secondary-dark font-bold">New Registrations</h3>
-                 <p className="text-[10px] md:text-xs text-gray-400 font-medium">Verify guest and partner accounts.</p>
+                 <p className="text-[10px] md:text-xs text-gray-400 font-medium whitespace-nowrap">Verify cloud accounts.</p>
               </div>
-              <button className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 hover:text-primary transition-colors">
-                 <ArrowRight size={18} />
-              </button>
            </div>
            
-           <div className="p-6 md:p-8 space-y-4">
+           <div className="p-4 md:p-8 space-y-3">
               {stats?.recentUsers?.map((u) => (
                 <div key={u._id} className="flex items-center justify-between p-5 rounded-2xl border border-gray-50 bg-gray-50/30 hover:bg-white hover:shadow-xl hover:shadow-gray-100 transition-all group">
                    <div className="flex items-center gap-4">
@@ -233,19 +230,15 @@ const AdminDashboard = () => {
         </div>
 
         {/* Global Reservations Monitoring */}
-        <div className="bg-white rounded-[2.5rem] overflow-hidden border border-gray-100 shadow-sm flex flex-col h-full">
+        <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] overflow-hidden border border-gray-100 shadow-sm flex flex-col h-full">
            <div className="p-6 md:p-8 border-b border-gray-50 flex justify-between items-center bg-gray-50/30">
               <div>
                  <h3 className="text-lg md:text-xl font-serif text-secondary-dark font-bold">Flow Monitoring</h3>
-                 <p className="text-[10px] md:text-xs text-gray-400 font-medium">Real-time platform transaction stream.</p>
-              </div>
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500 rounded-lg text-white">
-                 <div className="w-1.5 h-1.5 bg-white rounded-full animate-ping" />
-                 <span className="text-[8px] font-black uppercase tracking-widest">Live Flow</span>
+                 <p className="text-[10px] md:text-xs text-gray-400 font-medium whitespace-nowrap">Real-time stream.</p>
               </div>
            </div>
            
-           <div className="p-6 md:p-8 space-y-4">
+           <div className="p-4 md:p-8 space-y-3">
               {stats?.recentBookings?.map((b) => (
                 <div key={b._id} className="flex items-center justify-between p-5 rounded-2xl border border-gray-50 hover:border-primary/20 transition-all">
                    <div className="flex items-center gap-4">
