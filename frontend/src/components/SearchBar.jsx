@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronDown, MapPin, Calendar, Users, Minus, Plus } from 'lucide-react';
+import { fetchSuggestions } from '../services/api';
 
 const SearchBar = () => {
   const [location, setLocation] = useState('');
@@ -8,6 +9,9 @@ const SearchBar = () => {
   const [guests, setGuests] = useState({ adults: 1, children: 0 });
   const [showGuests, setShowGuests] = useState(false);
   const dropdownRef = React.useRef(null);
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const suggestionRef = React.useRef(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -15,10 +19,31 @@ const SearchBar = () => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowGuests(false);
       }
+      if (suggestionRef.current && !suggestionRef.current.contains(event.target)) {
+        setShowSuggestions(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (location.trim().length > 2) {
+      const timer = setTimeout(async () => {
+        try {
+          const res = await fetchSuggestions(location);
+          setSuggestions(res.data);
+          setShowSuggestions(true);
+        } catch (error) {
+          console.error(error);
+        }
+      }, 300);
+      return () => clearTimeout(timer);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [location]);
 
   const updateGuests = (type, operation) => {
     setGuests(prev => ({
@@ -32,7 +57,7 @@ const SearchBar = () => {
       <div className="flex flex-col lg:flex-row items-stretch lg:divide-x divide-slate-100">
         
         {/* Location Selector */}
-        <div className="flex-[1.5] px-6 py-4 flex flex-col justify-center hover:bg-slate-50 transition-all group rounded-t-xl lg:rounded-none">
+        <div className="flex-[1.5] px-6 py-4 flex flex-col justify-center hover:bg-slate-50 transition-all group rounded-t-xl lg:rounded-none relative" ref={suggestionRef}>
           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 group-focus-within:text-luxury-gold transition-colors block text-left">Location</label>
           <div className="flex items-center gap-2">
              <MapPin size={16} className="text-slate-300 group-focus-within:text-luxury-gold" />
@@ -40,10 +65,35 @@ const SearchBar = () => {
                type="text"
                placeholder="Destination"
                value={location}
-               onChange={(e) => setLocation(e.target.value)}
+               onChange={(e) => {
+                 setLocation(e.target.value);
+                 if (e.target.value.length <= 2) setShowSuggestions(false);
+               }}
+               onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true); }}
                className="bg-transparent border-none outline-none text-slate-900 text-sm font-black w-full placeholder:text-slate-300 font-sans"
              />
           </div>
+          
+          {showSuggestions && suggestions.length > 0 && (
+            <div className="absolute top-[calc(100%+8px)] left-0 right-0 bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.2)] border border-slate-100 py-4 z-[2000] animate-fade-in animate-slide-up max-h-60 overflow-y-auto">
+               {suggestions.map((suggestion, idx) => (
+                 <div 
+                   key={idx}
+                   className="px-6 py-3 hover:bg-slate-50 cursor-pointer flex items-center gap-3 transition-colors"
+                   onClick={() => {
+                     setLocation(suggestion.city || suggestion.name);
+                     setShowSuggestions(false);
+                   }}
+                 >
+                   <MapPin size={14} className="text-luxury-gold shrink-0" />
+                   <div className="truncate text-left">
+                     <p className="text-sm font-black text-slate-900 font-sans truncate">{suggestion.name}</p>
+                     <p className="text-[10px] font-bold text-slate-400 font-sans uppercase tracking-widest truncate">{suggestion.city || 'Location'}</p>
+                   </div>
+                 </div>
+               ))}
+            </div>
+          )}
         </div>
 
         {/* Check-in Selector */}
@@ -90,7 +140,7 @@ const SearchBar = () => {
           </div>
 
           {showGuests && (
-            <div className="absolute top-[calc(100%+12px)] left-0 right-[-80px] lg:right-[-40px] bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.2)] border border-slate-100 p-8 z-[2000] animate-fade-in animate-slide-up">
+            <div className="absolute top-[calc(100%+12px)] left-0 right-0 lg:left-auto lg:right-[0] lg:w-80 bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.2)] border border-slate-100 p-6 lg:p-8 z-[2000] animate-fade-in animate-slide-up">
                <div className="space-y-8">
                   <div className="flex items-center justify-between gap-12">
                      <div className="flex-grow">

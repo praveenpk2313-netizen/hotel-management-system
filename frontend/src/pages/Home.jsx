@@ -28,7 +28,7 @@ const Home = () => {
     <div className="relative min-h-screen bg-white overflow-x-hidden">
       
       {/* Hero Section - Centered Clean Layout */}
-      <section id="hero" className="relative h-[95vh] flex items-center justify-center overflow-hidden">
+      <section id="hero" className="relative min-h-[95vh] py-32 lg:py-0 flex items-center justify-center overflow-hidden">
         {/* Background Image with Overlay */}
         <div className="absolute inset-0 z-0">
           <img 
@@ -73,8 +73,8 @@ const Home = () => {
           </div>
 
           {/* Integrated Search Bar Placeholder / Transition */}
-          <div className="max-w-4xl mx-auto bg-white/10 backdrop-blur-xl p-2 rounded-2xl border border-white/20 shadow-2xl">
-            <div className="bg-white rounded-xl overflow-hidden">
+          <div className="max-w-4xl mx-auto bg-white/10 backdrop-blur-xl p-2 rounded-2xl border border-white/20 shadow-2xl relative z-50">
+            <div className="bg-white rounded-xl">
                <SearchBar />
             </div>
           </div>
