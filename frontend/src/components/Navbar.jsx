@@ -50,13 +50,13 @@ const Navbar = () => {
         <Link 
           to="/" 
           onClick={scrollToTop}
-          className="flex items-center gap-3 text-2xl font-serif font-black tracking-tighter text-slate-900 group"
+          className="flex items-center gap-2 md:gap-3 text-xl md:text-2xl font-serif font-black tracking-tighter text-slate-900 group"
         >
           <div className="w-10 h-10 bg-luxury-gold flex items-center justify-center rounded-xl shadow-lg shadow-luxury-gold/20 group-hover:scale-110 transition-transform duration-500">
              <Building2 size={24} className="text-white" />
           </div>
-          <span className="flex items-baseline">
-             PK <span className="italic ml-1 text-luxury-gold">UrbanStay</span>
+          <span className="flex items-baseline leading-none">
+             PK <span className="italic ml-1 text-luxury-gold hidden sm:inline text-lg md:text-2xl">UrbanStay</span>
           </span>
         </Link>
         
@@ -110,7 +110,7 @@ const Navbar = () => {
           ) : (
             <Link 
               to="/login" 
-              className="flex items-center gap-3 px-8 py-3 rounded-full bg-slate-900 text-white hover:bg-luxury-gold text-[10px] font-black uppercase tracking-widest shadow-xl transition-all"
+              className="flex items-center gap-2 px-4 py-2 md:px-8 md:py-3 rounded-full bg-slate-900 text-white hover:bg-luxury-gold text-[9px] md:text-[10px] font-black uppercase tracking-widest shadow-xl transition-all whitespace-nowrap"
             >
               Sign In
             </Link>
@@ -138,6 +138,16 @@ const Navbar = () => {
           )}
           {(!user || user.role === 'customer') && (
             <Link to="/customer/dashboard" onClick={() => setIsMenuOpen(false)} className="text-sm font-bold text-slate-800 border-b border-gray-50 pb-3">My Trips</Link>
+          )}
+
+          {!user && (
+             <Link 
+               to="/login" 
+               onClick={() => setIsMenuOpen(false)}
+               className="mt-2 w-full py-4 bg-luxury-gold text-white text-center rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg"
+             >
+                Sign In to Account
+             </Link>
           )}
 
           {user && (
