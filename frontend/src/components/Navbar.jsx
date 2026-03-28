@@ -88,7 +88,7 @@ const Navbar = () => {
                    <NotificationBell scrolled={true} />
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="hidden md:flex items-center gap-4">
                    <div className="flex flex-col items-end">
                       <span className="text-[11px] font-black uppercase tracking-widest text-slate-900">
                          {user.name || "PRAVEEN KUMAR R"}
@@ -112,11 +112,49 @@ const Navbar = () => {
           )}
 
           {/* Mobile Menu Toggle */}
-          <button className="lg:hidden">
-             <Menu size={24} className="text-slate-900" />
+          <button className="lg:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+             {isMenuOpen ? <X size={24} className="text-slate-900" /> : <Menu size={24} className="text-slate-900" />}
           </button>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <div className="lg:hidden absolute top-full left-0 w-full bg-white border-b border-gray-100 shadow-lg animate-fade-in flex flex-col pt-4 pb-6 px-6 gap-4 z-[1000]">
+          <Link to="/" onClick={scrollToTop} className="text-sm font-bold text-slate-800 border-b border-gray-50 pb-3">Home</Link>
+          <Link to="/hotels" onClick={() => setIsMenuOpen(false)} className="text-sm font-bold text-slate-800 border-b border-gray-50 pb-3">Hotels</Link>
+          <button onClick={() => scrollToSection('about')} className="text-sm font-bold text-slate-800 border-b border-gray-50 pb-3 text-left">About Us</button>
+          
+          {user?.role === 'manager' && (
+            <Link to="/manager/dashboard" onClick={() => setIsMenuOpen(false)} className="text-sm font-bold text-luxury-gold border-b border-gray-50 pb-3">Manager Portal</Link>
+          )}
+          {user?.role === 'admin' && (
+            <Link to="/admin/dashboard" onClick={() => setIsMenuOpen(false)} className="text-sm font-bold text-luxury-gold border-b border-gray-50 pb-3">Admin Panel</Link>
+          )}
+          {(!user || user.role === 'customer') && (
+            <Link to="/customer/dashboard" onClick={() => setIsMenuOpen(false)} className="text-sm font-bold text-slate-800 border-b border-gray-50 pb-3">My Trips</Link>
+          )}
+
+          {user && (
+            <div className="pt-2 flex flex-col gap-4">
+               <div className="flex items-center gap-3">
+                  <span className="text-xs font-black uppercase text-slate-500">Language:</span>
+                  <span className="text-xs font-bold text-slate-900">EN</span>
+               </div>
+               <div className="flex items-center gap-3 border-t border-gray-50 pt-4">
+                  <span className="text-xs font-black uppercase text-slate-500">Account:</span>
+                   <span className="text-sm font-bold text-slate-900">{user.name || "PRAVEEN KUMAR R"}</span>
+               </div>
+               <button 
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 mt-2 w-fit text-rose-500 hover:text-rose-600 text-xs font-black uppercase tracking-widest transition-colors"
+               >
+                  <LogOut size={16} /> Logout
+               </button>
+            </div>
+          )}
+        </div>
+      )}
     </nav>
   );
 };

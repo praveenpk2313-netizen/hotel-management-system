@@ -172,7 +172,7 @@ button {
 .table-container {
   background: white;
   border-radius: 16px;
-  overflow: hidden;
+  overflow-x: auto;
   box-shadow: var(--shadow-sm);
   border: 1px solid #f1f5f9;
 }
@@ -180,6 +180,7 @@ button {
 .data-table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 600px;
 }
 
 .data-table th {

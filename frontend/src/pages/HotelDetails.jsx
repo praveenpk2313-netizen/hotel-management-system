@@ -141,14 +141,14 @@ const HotelDetails = () => {
       
       {/* 2. Gallery Grid */}
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12 mb-16 animate-fade-in">
-         <div className="grid grid-cols-4 gap-4 h-[450px] md:h-[550px] lg:h-[650px] overflow-hidden">
+         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 h-[300px] md:h-[550px] lg:h-[650px] overflow-hidden">
             {/* Main Big Image (Left) */}
-            <div className="col-span-2 relative group cursor-pointer overflow-hidden rounded-[2rem]">
+            <div className="col-span-1 md:col-span-2 relative group cursor-pointer overflow-hidden rounded-[2rem]">
                <img src={hotel.images?.[0] || 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=1200'} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" alt={hotel.name} />
             </div>
 
             {/* Middle Column (Two Stacked) */}
-            <div className="col-span-1 flex flex-col gap-4">
+            <div className="col-span-1 hidden md:flex flex-col gap-4">
                <div className="flex-1 relative group cursor-pointer overflow-hidden rounded-[2rem]">
                   <img src={hotel.images?.[1] || 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=600'} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" alt="Interior" />
                </div>
@@ -158,7 +158,7 @@ const HotelDetails = () => {
             </div>
 
             {/* Right Big Image (Rounded Top-Right) */}
-            <div className="col-span-1 relative group cursor-pointer overflow-hidden rounded-tr-[5rem] rounded-bl-[2rem] rounded-tl-[2rem] rounded-br-[2rem]">
+            <div className="col-span-1 hidden md:block relative group cursor-pointer overflow-hidden rounded-tr-[5rem] rounded-bl-[2rem] rounded-tl-[2rem] rounded-br-[2rem]">
                <img src={hotel.images?.[3] || 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=600'} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt="Interior" />
                <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-all pointer-events-none" />
                {hotel.images?.length > 4 && (

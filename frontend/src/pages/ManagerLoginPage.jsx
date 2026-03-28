@@ -231,7 +231,7 @@ const ManagerLoginPage = () => {
             {/* Footer Links */}
             <div className="pt-8 text-center space-y-4">
                <p className="text-sm font-medium text-gray-500">
-                  Expansion ready? <Link to="/manager/register" className="text-secondary-dark font-black tracking-tight hover:text-primary transition-colors">Apply for Partnership</Link>
+                  New Manager? <Link to="/manager/register" className="text-secondary-dark font-black tracking-tight hover:text-primary transition-colors">Sign Up</Link>
                </p>
                <div className="flex items-center justify-center gap-6">
                   <Link to="/login" className="text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-primary transition-colors flex items-center gap-1.5">

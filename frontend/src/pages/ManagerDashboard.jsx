@@ -203,8 +203,8 @@ const ManagerDashboard = () => {
         </button>
       </div>
 
-      <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+      <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e5e7eb', overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '600px' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid #e5e7eb', background: '#f9fafb' }}>
               <th style={{ padding: '1rem', fontSize: '0.875rem', fontWeight: '600', color: '#4b5563' }}>Hotel Name</th>
@@ -263,8 +263,8 @@ const ManagerDashboard = () => {
         )}
       </div>
 
-      <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+      <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e5e7eb', overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '600px' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid #e5e7eb', background: '#f9fafb' }}>
               <th style={{ padding: '1rem', fontSize: '0.875rem', fontWeight: '600', color: '#4b5563' }}>Room No</th>
@@ -298,8 +298,8 @@ const ManagerDashboard = () => {
     <div style={{ padding: '2rem 3rem' }}>
       <h2 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#111827', marginBottom: '2rem' }}>Reservations</h2>
       
-      <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+      <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e5e7eb', overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '600px' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid #e5e7eb', background: '#f9fafb' }}>
               <th style={{ padding: '1rem', fontSize: '0.875rem', fontWeight: '600', color: '#4b5563' }}>Guest</th>

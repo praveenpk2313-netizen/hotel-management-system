@@ -19,6 +19,7 @@ const ManagerRegisterPage = () => {
   const [error,    setError]    = useState('');
   const [loading,  setLoading]  = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const onChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
@@ -33,7 +34,7 @@ const ManagerRegisterPage = () => {
 
     setLoading(true);
     try {
-      await registerUser({
+      const { data } = await registerUser({
         name:         formData.name,
         username:     formData.username,
         email:        formData.email,
@@ -42,7 +43,8 @@ const ManagerRegisterPage = () => {
         role:         'manager',
       });
 
-      navigate('/manager/login', { state: { message: 'Inquiry received. Please verify and log in.' } });
+      login(data);
+      navigate('/manager/dashboard', { state: { message: 'Registration successful! Welcome to the portal.' } });
     } catch (err) {
       setError(err.response?.data?.message || 'Application failed. Please try again.');
     } finally {
@@ -100,10 +102,10 @@ const ManagerRegisterPage = () => {
                <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full text-primary font-black text-[10px] uppercase tracking-[3px]">
                   <UserPlus size={14} /> Partnership Application
                </div>
-               <h1 className="text-4xl lg:text-5xl font-serif text-secondary-dark font-black tracking-tight">
-                  Manager Enrollment
-               </h1>
-               <p className="text-gray-400 font-medium tracking-tight">Create your professional PK UrbanStay identity.</p>
+                <h1 className="text-4xl lg:text-5xl font-serif text-secondary-dark font-black tracking-tight">
+                   Manager Sign Up
+                </h1>
+                <p className="text-gray-400 font-medium tracking-tight">Register to create your PK UrbanStay identity.</p>
             </div>
 
             {/* Error Message */}
@@ -245,7 +247,7 @@ const ManagerRegisterPage = () => {
                     <Loader2 className="animate-spin" size={20} />
                   ) : (
                     <>
-                       Sumbit Application <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform text-primary" />
+                       Sign Up <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform text-primary" />
                     </>
                   )}
                </button>
