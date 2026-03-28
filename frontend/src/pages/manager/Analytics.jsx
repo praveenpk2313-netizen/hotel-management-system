@@ -16,6 +16,7 @@ import {
 } from 'recharts';
 import { 
   Loader2, 
+  TrendingUp,
   IndianRupee, 
   Users, 
   Award,
