@@ -127,6 +127,11 @@ const AdminLayout = () => {
               <NavLink
                 key={item.path}
                 to={item.path}
+                onClick={() => {
+                  if (window.innerWidth < 1024) {
+                    setSidebarOpen(false);
+                  }
+                }}
                 className={({ isActive }) => `
                   group flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-300
                   ${isActive 
