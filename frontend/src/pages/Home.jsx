@@ -58,7 +58,7 @@ const Home = () => {
         <div className="relative z-10 max-w-4xl mx-auto text-center px-6 animate-fade-in">
           <div className="flex items-center justify-center gap-3 mb-6">
             <span className="h-[1px] w-8 bg-luxury-gold" />
-            <span className="text-white text-xs font-black uppercase tracking-[0.4em]">Welcome to Stay Savvy</span>
+            <span className="text-white text-xs font-black uppercase tracking-[0.4em]">Welcome to PK UrbanStay</span>
             <span className="h-[1px] w-8 bg-luxury-gold" />
           </div>
 
@@ -169,7 +169,7 @@ const Home = () => {
                <div className="absolute -bottom-12 -right-12 w-80 h-80 bg-slate-900 rounded-[3rem] p-12 flex flex-col justify-center text-white hidden md:flex shadow-2xl border-8 border-white group-hover:-translate-x-4 group-hover:-translate-y-4 transition-transform duration-700">
                   <Sparkles size={48} className="text-luxury-gold mb-8" />
                   <h3 className="text-4xl font-serif font-bold leading-tight">Masterfully <br />Crafted</h3>
-                  <p className="text-sm mt-6 opacity-60 font-medium">UrbanStay connects discerning travelers with historic locations reimagined for modern excellence.</p>
+                  <p className="text-sm mt-6 opacity-60 font-medium">PK UrbanStay connects discerning travelers with historic locations reimagined for modern excellence.</p>
                </div>
             </div>
 
@@ -236,7 +236,7 @@ const Home = () => {
                         </div>
                         <div>
                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Direct Assistance</p>
-                           <p className="text-white font-serif text-xl tracking-wide">+44 20 7946 0123 / stay@urbanstay.com</p>
+                           <p className="text-white font-serif text-xl tracking-wide">+44 20 7946 0123 / stay@pkurbanstay.com</p>
                         </div>
                      </div>
                   </div>

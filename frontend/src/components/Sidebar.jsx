@@ -39,14 +39,14 @@ const Sidebar = ({ isOpen, onClose }) => {
       {/* Mobile Backdrop */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[1000] lg:hidden animate-fade-in"
+          className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[2000] lg:hidden animate-fade-in"
           onClick={onClose}
         />
       )}
 
       {/* Sidebar Container */}
       <aside className={`
-        fixed inset-y-0 left-0 z-[1001] w-72 bg-[#1e293b] text-white flex flex-col transition-transform duration-300 ease-in-out
+        fixed inset-y-0 left-0 z-[2001] w-72 bg-[#1e293b] text-white flex flex-col transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         {/* Brand Logo */}
