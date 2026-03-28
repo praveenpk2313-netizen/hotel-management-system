@@ -98,7 +98,7 @@ const AdminLayout = () => {
       >
         <div className="flex flex-col h-full bg-secondary-dark/95 backdrop-blur-xl border-r border-white/5">
           {/* Logo Section */}
-          <div className="h-24 flex items-center px-6 border-b border-white/5">
+          <div className="h-24 flex items-center justify-between px-6 border-b border-white/5">
             <div className="flex items-center gap-4">
                <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/20 flex-shrink-0">
                   <ShieldCheck size={24} />
@@ -110,6 +110,15 @@ const AdminLayout = () => {
                  </div>
                )}
             </div>
+            {/* Mobile Close Button */}
+            {isSidebarOpen && (
+              <button 
+                onClick={() => setSidebarOpen(false)}
+                className="lg:hidden w-8 h-8 flex items-center justify-center text-gray-400 hover:text-white transition-colors"
+              >
+                 <X size={20} />
+              </button>
+            )}
           </div>
 
           {/* Navigation Links */}
@@ -160,12 +169,12 @@ const AdminLayout = () => {
         
         {/* Top Intelligence Bar */}
         <header className="h-16 lg:h-20 bg-white/80 backdrop-blur-2xl border-b border-gray-100 flex items-center justify-between px-4 lg:px-10 flex-shrink-0 z-[500]">
-           <div className="flex items-center gap-4 lg:gap-8 flex-1">
+            <div className="flex items-center gap-4 lg:gap-8 flex-1">
               <button 
-                onClick={() => setSidebarOpen(!isSidebarOpen)}
-                className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-secondary-dark hover:bg-gray-100 transition-colors lg:hidden"
+                onClick={() => setSidebarOpen(true)}
+                className={`w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-secondary-dark hover:bg-gray-100 transition-colors lg:hidden ${isSidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
               >
-                {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+                <Menu size={20} />
               </button>
               
               {/* Internal Search Engine */}

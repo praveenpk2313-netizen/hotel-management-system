@@ -41,7 +41,7 @@ const ManagerLayout = () => {
       <main className="flex-1 flex flex-col min-w-0 transition-all duration-300 lg:pl-72">
         
         {/* Top Header */}
-        <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-6 lg:px-10 sticky top-0 z-[50] flex-shrink-0 shadow-sm">
+        <header className="h-16 lg:h-20 bg-white border-b border-slate-200 flex items-center justify-between px-4 lg:px-10 sticky top-0 z-[1100] flex-shrink-0 shadow-sm">
           
           <div className="flex items-center gap-6 flex-1 max-w-xl">
             <button 

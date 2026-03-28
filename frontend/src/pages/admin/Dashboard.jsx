@@ -78,8 +78,8 @@ const AdminDashboard = () => {
       
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
          <div className="space-y-1">
-            <h1 className="text-3xl md:text-4xl font-serif text-secondary-dark font-black tracking-tight">Executive Terminal</h1>
-            <p className="text-xs md:text-sm text-gray-400 font-medium">Global platform oversight and operational analytics.</p>
+            <h1 className="text-2xl md:text-4xl font-serif text-secondary-dark font-black tracking-tight">Executive Terminal</h1>
+            <p className="text-[10px] md:text-sm text-gray-400 font-medium">Global platform oversight and operational analytics.</p>
          </div>
          <div className="hidden md:flex items-center gap-3 bg-gray-50 border border-gray-100 p-2 rounded-2xl">
             <div className="w-10 h-10 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center justify-center text-emerald-500">
@@ -93,15 +93,15 @@ const AdminDashboard = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {statCards.map((card, idx) => (
-          <div key={idx} className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex items-center gap-5 hover:border-primary/20 transition-all group">
-            <div className={`w-14 h-14 ${card.bg} ${card.color} rounded-xl flex items-center justify-center shrink-0`}>
-              <card.icon size={24} />
+          <div key={idx} className="bg-white rounded-2xl p-4 md:p-6 border border-slate-100 shadow-sm flex items-center gap-4 hover:border-primary/20 transition-all group">
+            <div className={`w-12 h-12 md:w-14 md:h-14 ${card.bg} ${card.color} rounded-xl flex items-center justify-center shrink-0`}>
+              <card.icon size={20} md:size={24} />
             </div>
             <div className="min-w-0">
-               <p className="text-[11px] font-bold text-slate-400 font-serif uppercase tracking-widest truncate">{card.title}</p>
-               <h3 className="text-2xl font-black text-slate-900 mt-0.5">{card.value}</h3>
+               <p className="text-[10px] font-bold text-slate-400 font-serif uppercase tracking-widest truncate">{card.title}</p>
+               <h3 className="text-xl md:text-2xl font-black text-slate-900 mt-0.5">{card.value}</h3>
             </div>
           </div>
         ))}
