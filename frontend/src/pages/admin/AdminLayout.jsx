@@ -180,9 +180,9 @@ const AdminLayout = () => {
               </button>
               
               <div className="flex flex-col lg:hidden min-w-0">
-                 <h1 className="text-sm font-black text-secondary-dark truncate uppercase tracking-widest leading-none">Command Center</h1>
-                 <p className="text-[8px] font-bold text-primary uppercase tracking-[2px] mt-1 truncate">Executive Oracle</p>
-              </div>
+                  <h1 className="text-[11px] font-black text-secondary-dark truncate uppercase tracking-[2px] leading-none">Command</h1>
+                  <p className="text-[7px] font-bold text-primary uppercase tracking-[1px] mt-1.5 truncate">Active Oracle</p>
+               </div>
 
               {/* Internal Search Engine - Desktop Only */}
               <div className="hidden lg:flex items-center gap-3 bg-gray-50/80 px-4 py-2.5 rounded-2xl border border-gray-100 max-w-sm w-full focus-within:bg-white focus-within:ring-4 focus-within:ring-primary/5 focus-within:border-primary/20 transition-all relative">
@@ -197,9 +197,9 @@ const AdminLayout = () => {
               </div>
            </div>
 
-           <div className="flex items-center gap-6">
-              <NotificationBell />
-              <div className="w-px h-8 bg-gray-100" />
+            <div className="flex items-center gap-3 md:gap-6 flex-shrink-0">
+               <NotificationBell />
+               <div className="hidden sm:block w-px h-8 bg-gray-100" />
               <div className="flex items-center gap-4 group cursor-pointer">
                  <div className="text-right hidden sm:block">
                     <p className="text-[10px] font-black uppercase tracking-widest leading-none text-secondary-dark">{user?.name}</p>

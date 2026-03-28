@@ -80,29 +80,36 @@ const NotificationBell = () => {
       </button>
 
       {isOpen && (
-        <div className="animate-fade-in" style={{ 
-          position: 'absolute', 
-          top: '100%', 
-          right: 0, 
-          width: '360px', 
+        <div className="animate-fade-in notification-dropdown" style={{ 
+          position: 'fixed', 
+          top: '70px', 
+          right: '10px', 
+          left: '10px',
+          maxWidth: '400px',
+          margin: '0 auto',
           background: 'white', 
-          borderRadius: '20px', 
-          boxShadow: '0 20px 50px rgba(0,0,0,0.1)', 
-          marginTop: '15px',
+          borderRadius: '24px', 
+          boxShadow: '0 25px 60px rgba(0,0,0,0.15), 0 0 1px rgba(0,0,0,0.1)', 
           zIndex: 2000,
           overflow: 'hidden',
-          border: '1px solid #f1f5f9'
+          border: '1px solid rgba(241, 245, 249, 0.8)',
+          maxHeight: 'calc(100vh - 100px)',
+          display: 'flex',
+          flexDirection: 'column'
         }}>
-          <div style={{ padding: '1.25rem', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fdfcfb' }}>
-            <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '700' }}>Notifications</h4>
+          <div style={{ padding: '1.25rem', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fdfcfb', flexShrink: 0 }}>
+            <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: '800', color: '#1e293b' }}>Intelligent Alerts</h4>
             {unreadCount > 0 && (
-              <button onClick={handleMarkAllRead} style={{ background: 'none', border: 'none', color: '#C5A059', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer' }}>
-                Mark all as read
+              <button 
+                onClick={handleMarkAllRead} 
+                style={{ background: 'none', border: 'none', color: '#C5A059', fontSize: '0.7rem', fontWeight: '800', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+              >
+                Clear All
               </button>
             )}
           </div>
 
-          <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+          <div style={{ maxHeight: '380px', overflowY: 'auto', flex: 1 }}>
             {loading && notifications.length === 0 ? (
                <div style={{ padding: '2rem', textAlign: 'center', color: '#94a3b8' }}>Loading...</div>
             ) : notifications.length === 0 ? (
@@ -185,11 +192,21 @@ const NotificationBell = () => {
 
       <style>{`
         .animate-fade-in {
-          animation: fadeIn 0.3s ease-out;
+          animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
+          from { opacity: 0; transform: translateY(15px) scale(0.98); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @media (min-width: 1024px) {
+          .notification-dropdown {
+            position: absolute !important;
+            top: 100% !important;
+            right: 0 !important;
+            left: auto !important;
+            width: 380px !important;
+            margin-top: 15px !important;
+          }
         }
       `}</style>
     </div>
