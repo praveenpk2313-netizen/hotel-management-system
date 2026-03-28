@@ -92,23 +92,23 @@ const AdminLayout = () => {
       
       {/* ─── SIDEBAR ───────────────────────────────────────────────────────── */}
       <aside 
-        className={`fixed inset-y-0 left-0 z-[1000] bg-secondary-dark text-white transition-all duration-300 ease-in-out lg:relative lg:block ${
-          isSidebarOpen ? 'w-72 translate-x-0' : 'w-0 lg:w-20 -translate-x-full lg:translate-x-0'
+        className={`fixed inset-y-0 left-0 z-[1001] bg-secondary-dark text-white transition-all duration-500 ease-in-out lg:relative lg:translate-x-0 overflow-hidden ${
+          isSidebarOpen 
+            ? 'w-72 translate-x-0' 
+            : 'w-72 -translate-x-full lg:w-24 lg:translate-x-0'
         }`}
       >
         <div className="flex flex-col h-full bg-secondary-dark/95 backdrop-blur-xl border-r border-white/5">
           {/* Logo Section */}
-          <div className="h-24 flex items-center justify-between px-6 border-b border-white/5">
+          <div className="h-24 flex items-center justify-between px-6 border-b border-white/5 shrink-0">
             <div className="flex items-center gap-4">
-               <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/20 flex-shrink-0">
-                  <ShieldCheck size={24} />
+               <div className="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center text-primary shadow-lg border border-primary/20 flex-shrink-0">
+                  <ShieldCheck size={22} strokeWidth={2.5} />
                </div>
-               {isSidebarOpen && (
-                 <div className="animate-fade-in whitespace-nowrap">
-                    <h2 className="text-lg font-serif font-black italic tracking-tighter leading-none">StayNow</h2>
-                    <p className="text-[8px] font-black text-primary uppercase tracking-[3px] mt-1">Admin Terminal</p>
-                 </div>
-               )}
+               <div className={`transition-all duration-300 whitespace-nowrap ${isSidebarOpen ? 'opacity-100' : 'opacity-0 lg:hidden'}`}>
+                  <h2 className="text-lg font-serif font-black italic tracking-tighter leading-none">StayNow</h2>
+                  <p className="text-[8px] font-black text-primary uppercase tracking-[3px] mt-1">Admin Terminal</p>
+               </div>
             </div>
             {/* Mobile Close Button */}
             {isSidebarOpen && (
@@ -122,26 +122,26 @@ const AdminLayout = () => {
           </div>
 
           {/* Navigation Links */}
-          <nav className="flex-1 px-4 py-8 space-y-2 overflow-y-auto custom-scrollbar">
+          <nav className="flex-1 px-4 py-8 space-y-2 overflow-y-auto custom-scrollbar overflow-x-hidden">
             {navItems.map((item) => (
               <NavLink
                 key={item.path}
                 to={item.path}
                 className={({ isActive }) => `
-                  group flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-200
+                  group flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-300
                   ${isActive 
                     ? 'bg-primary text-white shadow-lg shadow-primary/20' 
                     : 'text-gray-400 hover:bg-white/5 hover:text-white'
                   }
-                  ${!isSidebarOpen && 'lg:justify-center lg:px-0'}
+                  ${!isSidebarOpen && 'lg:px-0 lg:justify-center'}
                 `}
               >
-                <span className="flex-shrink-0">{item.icon}</span>
-                {isSidebarOpen && (
-                  <span className="text-xs font-black uppercase tracking-widest">{item.name}</span>
-                )}
-                {!isSidebarOpen && isSidebarOpen && (
-                   <div className="absolute left-full ml-4 px-3 py-1 bg-white text-secondary-dark text-[10px] font-black rounded-lg opacity-0 group-hover:opacity-100 shadow-xl transition-opacity pointer-events-none">
+                <div className="shrink-0">{item.icon}</div>
+                <span className={`text-[10px] font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${isSidebarOpen ? 'opacity-100' : 'opacity-0 lg:hidden'}`}>
+                  {item.name}
+                </span>
+                {!isSidebarOpen && (
+                   <div className="fixed left-24 px-4 py-2 bg-secondary-dark border border-white/10 text-white text-[10px] font-black rounded-xl opacity-0 group-hover:opacity-100 shadow-2xl transition-all duration-200 pointer-events-none whitespace-nowrap z-[2000] hidden lg:block translate-x-4 group-hover:translate-x-0">
                       {item.name}
                    </div>
                 )}
@@ -150,15 +150,17 @@ const AdminLayout = () => {
           </nav>
 
           {/* Logout Section */}
-          <div className="p-4 border-t border-white/5">
+          <div className="p-4 border-t border-white/5 shrink-0">
             <button 
               onClick={handleLogout}
               className={`w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-rose-400 hover:bg-rose-500/10 transition-all ${
                 !isSidebarOpen && 'lg:justify-center'
               }`}
             >
-              <LogOut size={20} />
-              {isSidebarOpen && <span className="text-xs font-black uppercase tracking-widest">Terminate Session</span>}
+              <LogOut size={20} className="shrink-0" />
+              <span className={`text-[10px] font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${isSidebarOpen ? 'opacity-100' : 'opacity-0 lg:hidden'}`}>
+                Sign Out
+              </span>
             </button>
           </div>
         </div>
