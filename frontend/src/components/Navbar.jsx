@@ -59,7 +59,7 @@ const Navbar = () => {
         <div className="hidden lg:flex items-center gap-10 font-bold text-xs text-slate-600">
           <Link to="/" className="hover:text-luxury-gold transition-colors">Home</Link>
           <Link to="/hotels" className="hover:text-luxury-gold transition-colors">Hotels</Link>
-          <button className="hover:text-luxury-gold transition-colors uppercase text-[10px] tracking-widest">About Us</button>
+          <button onClick={() => scrollToSection('about')} className="hover:text-luxury-gold transition-colors uppercase text-[10px] tracking-widest">About Us</button>
           
           {user?.role === 'manager' && (
             <Link to="/manager/dashboard" className="text-luxury-gold hover:text-slate-900 border-b-2 border-luxury-gold pb-1 animate-pulse">Manager Portal</Link>

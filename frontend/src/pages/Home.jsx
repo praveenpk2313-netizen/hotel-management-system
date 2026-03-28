@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import SearchBar from '../components/SearchBar';
 import HotelCard from '../components/HotelCard';
 import { fetchHotels } from '../services/api';
@@ -9,6 +9,22 @@ const Home = () => {
   const [popularHotels, setPopularHotels] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const scrollToSection = (id) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  useEffect(() => {
+    if (location.state?.scrollTo) {
+      setTimeout(() => {
+        scrollToSection(location.state.scrollTo);
+      }, 100);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     const loadHotels = async () => {
