@@ -2,11 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import SearchBar from '../components/SearchBar';
 import HotelCard from '../components/HotelCard';
-import { fetchHotels } from '../services/api';
-import { Loader2, Sparkles, Building2, Globe, ArrowRight } from 'lucide-react';
+import { fetchHotels, fetchPublicPromotions } from '../services/api';
+import { 
+  Loader2, 
+  Sparkles, 
+  Building2, 
+  Globe, 
+  ArrowRight, 
+  Tag, 
+  ChevronRight,
+  TrendingUp
+} from 'lucide-react';
 
 const Home = () => {
   const [popularHotels, setPopularHotels] = useState([]);
+  const [promotions, setPromotions] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
@@ -27,17 +37,21 @@ const Home = () => {
   }, [location.state]);
 
   useEffect(() => {
-    const loadHotels = async () => {
+    const loadData = async () => {
       try {
-        const response = await fetchHotels();
-        setPopularHotels(response.data.slice(0, 4));
+        const [hotelsRes, promoRes] = await Promise.all([
+          fetchHotels(),
+          fetchPublicPromotions()
+        ]);
+        setPopularHotels(hotelsRes.data.slice(0, 4));
+        setPromotions(promoRes.data);
       } catch (error) {
-        console.error('Error fetching hotels:', error);
+        console.error('Error fetching home data:', error);
       } finally {
         setLoading(false);
       }
     };
-    loadHotels();
+    loadData();
   }, []);
 
   return (
@@ -123,6 +137,66 @@ const Home = () => {
             </div>
          </div>
       </section>
+
+      {/* ── PROMOTIONS SECTION ────────────────────────────────────────────────── */}
+      {promotions.length > 0 && (
+        <section className="py-20 bg-slate-950 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+             <div className="absolute -top-24 -left-24 w-96 h-96 bg-luxury-gold rounded-full blur-[120px]" />
+          </div>
+
+          <div className="max-w-7xl mx-auto px-6 relative z-10">
+            <div className="flex items-center justify-between mb-12">
+              <div className="flex items-center gap-4">
+                 <div className="p-3 bg-luxury-gold/10 rounded-2xl text-luxury-gold">
+                    <Tag size={24} />
+                 </div>
+                 <h2 className="text-3xl font-serif text-white font-bold">Exclusive Offers</h2>
+              </div>
+              <div className="hidden md:flex gap-2">
+                 <div className="w-10 h-1 bg-luxury-gold rounded-full" />
+                 <div className="w-4 h-1 bg-white/20 rounded-full" />
+                 <div className="w-4 h-1 bg-white/20 rounded-full" />
+              </div>
+            </div>
+
+            <div className="flex gap-8 overflow-x-auto pb-10 scrollbar-hide snap-x">
+              {promotions.map((promo) => (
+                <div 
+                  key={promo._id} 
+                  className="min-w-[320px] md:min-w-[450px] bg-white/5 border border-white/10 rounded-[2.5rem] p-10 snap-center hover:bg-white/10 transition-all group relative overflow-hidden"
+                >
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-luxury-gold/5 rounded-full blur-3xl group-hover:bg-luxury-gold/10 transition-all" />
+                  
+                  <div className="space-y-6 relative z-10">
+                    <div className="flex justify-between items-start">
+                       <span className="px-4 py-1 bg-luxury-gold/20 border border-luxury-gold/30 rounded-full text-[10px] font-black text-luxury-gold uppercase tracking-[0.2em]">
+                          {promo.hotelId ? promo.hotelId.name : 'Global Collection'}
+                       </span>
+                       <TrendingUp className="text-luxury-gold opacity-30" size={20} />
+                    </div>
+
+                    <h3 className="text-2xl font-serif text-white font-bold leading-tight">
+                       {promo.title}
+                    </h3>
+                    
+                    <p className="text-slate-400 text-sm leading-relaxed font-medium line-clamp-3">
+                       {promo.content}
+                    </p>
+
+                    <button 
+                      onClick={() => navigate(promo.hotelId ? `/hotel/${promo.hotelId._id}` : '/hotels')}
+                      className="flex items-center gap-3 text-luxury-gold text-xs font-black uppercase tracking-widest hover:gap-5 transition-all"
+                    >
+                       Discover More <ArrowRight size={16} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Popular Properties Section */}
       <section id="hotels" className="py-32 bg-slate-50/50">
@@ -290,6 +364,13 @@ const Home = () => {
         @keyframes slideUp {
           from { opacity: 0; transform: translateY(30px); }
           to { opacity: 1; transform: translateY(0); }
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
         }
       `}</style>
     </div>

@@ -3,6 +3,7 @@ const Booking = require('../models/Booking');
 const Hotel = require('../models/Hotel');
 const Payment = require('../models/Payment');
 const Review = require('../models/Review');
+const Promotion = require('../models/Promotion');
 const { sendEmail, getPromotionTemplate } = require('../utils/emailService');
 const { sendNotification } = require('../utils/socket');
 
@@ -226,9 +227,22 @@ const deleteReview = async (req, res) => {
 
 // ─── Promotions ──────────────────────────────────────────────────────────────
 
-const sendPromotion = async (req, res) => {
-  const { title, content } = req.body;
+const createPromotion = async (req, res) => {
+  const { title, content, hotelId, duration } = req.body;
   try {
+    // 1. Create Promotion in DB
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + (parseInt(duration) || 7));
+
+    const promotion = await Promotion.create({
+      title,
+      content,
+      hotelId: hotelId || null,
+      expiresAt,
+      isActive: true
+    });
+
+    // 2. Send Emails/Notifications
     const users = await User.find({ role: 'customer', isBlocked: false });
     const html = getPromotionTemplate({ title, content });
 
@@ -246,7 +260,33 @@ const sendPromotion = async (req, res) => {
     );
 
     await Promise.all([...emailPromises, ...notificationPromises]);
-    res.json({ message: `Promotion sent to ${users.length} users.` });
+    res.json({ message: `Promotion created and sent to ${users.length} users.`, promotion });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getAllPromotions = async (req, res) => {
+  try {
+    const promotions = await Promotion.find({ 
+      isActive: true, 
+      expiresAt: { $gt: new Date() } 
+    }).populate('hotelId', 'name images location').sort('-createdAt');
+    res.json(promotions);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const deletePromotion = async (req, res) => {
+  try {
+    const promotion = await Promotion.findById(req.params.id);
+    if (promotion) {
+      await promotion.deleteOne();
+      res.json({ message: 'Campaign removed' });
+    } else {
+      res.status(404).json({ message: 'Campaign not found' });
+    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -266,5 +306,7 @@ module.exports = {
   getAllPayments,
   getAllReviews,
   deleteReview,
-  sendPromotion
+  createPromotion,
+  getAllPromotions,
+  deletePromotion
 };

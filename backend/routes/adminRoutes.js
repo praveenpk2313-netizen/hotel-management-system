@@ -14,7 +14,9 @@ const {
   getAllPayments,
   getAllReviews,
   deleteReview,
-  sendPromotion
+  createPromotion,
+  getAllPromotions,
+  deletePromotion
 } = require('../controllers/adminController');
 const { protect } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/roleMiddleware');
@@ -47,6 +49,9 @@ router.get('/reviews', protect, adminOnly, getAllReviews);
 router.delete('/reviews/:id', protect, adminOnly, deleteReview);
 
 // Promotions
-router.post('/send-promotion', protect, adminOnly, sendPromotion);
+router.get('/promotions/public', getAllPromotions); // Public endpoint for landing page
+router.get('/promotions', protect, adminOnly, getAllPromotions); // Admin view
+router.post('/create-promotion', protect, adminOnly, createPromotion);
+router.delete('/promotions/:id', protect, adminOnly, deletePromotion);
 
 module.exports = router;

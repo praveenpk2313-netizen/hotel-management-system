@@ -144,7 +144,12 @@ export const cancelAdminBooking = (id) => api.put(`/admin/bookings/cancel/${id}`
 export const fetchAdminPayments = () => api.get('/admin/payments');
 export const fetchAdminReviews = () => api.get('/admin/reviews');
 export const deleteAdminReview = (id) => api.delete(`/admin/reviews/${id}`);
-export const sendAdminPromotion = (data) => api.post('/admin/send-promotion', data);
+
+// Promotions
+export const fetchPublicPromotions = () => api.get('/admin/promotions/public');
+export const fetchAdminPromotions = () => api.get('/admin/promotions');
+export const createAdminPromotion = (data) => api.post('/admin/create-promotion', data);
+export const deleteAdminPromotion = (id) => api.delete(`/admin/promotions/${id}`);
 
 // ─── Reviews ───────────────────────────────────────────────────────────────────
 export const addReview = (data) => api.post('/reviews', data);
