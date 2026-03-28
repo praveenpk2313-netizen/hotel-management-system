@@ -39,7 +39,7 @@ const HotelListPage = () => {
   const [filters, setFilters] = useState({
     location: searchParams.get('location') || '',
     minPrice: 0,
-    maxPrice: 2000,
+    maxPrice: 50000,
     amenities: [],
     rating: 0,
     startDate: searchParams.get('checkin') ? new Date(searchParams.get('checkin')) : null,
@@ -90,7 +90,7 @@ const HotelListPage = () => {
     setFilters({
       location: '',
       minPrice: 0,
-      maxPrice: 2000,
+      maxPrice: 50000,
       amenities: [],
       rating: 0,
       startDate: null,
@@ -143,15 +143,15 @@ const HotelListPage = () => {
                   <input 
                     type="range" 
                     min="0" 
-                    max="5000" 
-                    step="50"
+                    max="50000" 
+                    step="500"
                     value={filters.maxPrice}
                     onChange={(e) => setFilters({...filters, maxPrice: e.target.value})}
                     className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-luxury-gold"
                   />
                   <div className="flex justify-between text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">
-                    <span>$0</span>
-                    <span>$5,000+</span>
+                    <span>₹0</span>
+                    <span>₹50,000+</span>
                   </div>
                 </div>
 

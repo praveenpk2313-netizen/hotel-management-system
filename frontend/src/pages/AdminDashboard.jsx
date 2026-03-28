@@ -3,7 +3,7 @@ import {
   Users, 
   Hotel, 
   TrendingUp, 
-  DollarSign, 
+  IndianRupee, 
   MoreHorizontal, 
   Search,
   Bell,
@@ -28,6 +28,7 @@ import {
 } from 'recharts';
 import Sidebar from '../components/Sidebar';
 import * as api from '../services/api';
+import { formatCurrency } from '../utils/helpers';
 
 const revenueData = [
   { name: 'Mon', value: 4000 },
@@ -98,7 +99,7 @@ const AdminDashboard = () => {
   };
 
   const stats = [
-    { title: 'Total Revenue', value: statsData ? `$${statsData.revenue || '0'}` : '$0', change: '+12.5%', icon: DollarSign, color: '#10b981' },
+    { title: 'Total Revenue', value: statsData ? formatCurrency(statsData.revenue || 0) : '₹0', change: '+12.5%', icon: IndianRupee, color: '#10b981' },
     { title: 'Total Bookings', value: statsData ? statsData.bookingCount : '0', change: '+5.2%', icon: TrendingUp, color: '#3b82f6' },
     { title: 'Registered Users', value: statsData ? statsData.userCount : '0', change: '+8.1%', icon: Users, color: '#8b5cf6' },
     { title: 'Total Hotels', value: statsData ? statsData.hotelCount : '0', change: '+2.4%', icon: Hotel, color: '#f59e0b' },
@@ -231,10 +232,10 @@ const AdminDashboard = () => {
                 </thead>
                 <tbody>
                   {[
-                    { name: 'John Doe', room: 'Luxury Suite', date: '2024-03-12', amount: '$450.00', status: 'Completed', color: '#10b981' },
-                    { name: 'Sarah Wilson', room: 'Deluxe Room', date: '2024-03-12', amount: '$280.00', status: 'Pending', color: '#f59e0b' },
-                    { name: 'Michael Chen', room: 'Presidential', date: '2024-03-11', amount: '$1,200.00', status: 'Completed', color: '#10b981' },
-                    { name: 'Emily Brown', room: 'Executive Room', date: '2024-03-11', amount: '$320.00', status: 'Canceled', color: '#ef4444' }
+                    { name: 'John Doe', room: 'Luxury Suite', date: '2024-03-12', amount: '₹4,500', status: 'Completed', color: '#10b981' },
+                    { name: 'Sarah Wilson', room: 'Deluxe Room', date: '2024-03-12', amount: '₹2,800', status: 'Pending', color: '#f59e0b' },
+                    { name: 'Michael Chen', room: 'Presidential', date: '2024-03-11', amount: '₹12,000', status: 'Completed', color: '#10b981' },
+                    { name: 'Emily Brown', room: 'Executive Room', date: '2024-03-11', amount: '₹3,200', status: 'Canceled', color: '#ef4444' }
                   ].map((row, i) => (
                     <tr key={i}>
                       <td style={{ fontWeight: '600' }}>{row.name}</td>
