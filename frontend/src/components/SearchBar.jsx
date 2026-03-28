@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronDown, MapPin, Calendar, Users, Minus, Plus } from 'lucide-react';
 import { fetchSuggestions } from '../services/api';
 
@@ -12,6 +13,16 @@ const SearchBar = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const suggestionRef = React.useRef(null);
+  const navigate = useNavigate();
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (location) params.append('location', location);
+    if (checkIn) params.append('checkin', checkIn);
+    if (checkOut) params.append('checkout', checkOut);
+    
+    navigate(`/hotels?${params.toString()}`);
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -178,7 +189,11 @@ const SearchBar = () => {
         </div>
 
         {/* Action Button */}
-        <button type="button" className="lg:w-1/4 bg-slate-900 hover:bg-luxury-gold text-white flex items-center justify-center transition-all active:scale-[0.98] group rounded-b-xl lg:rounded-none py-6 lg:py-0 lg:rounded-r-xl border-none cursor-pointer">
+        <button 
+          type="button" 
+          onClick={handleSearch}
+          className="lg:w-1/4 bg-slate-900 hover:bg-luxury-gold text-white flex items-center justify-center transition-all active:scale-[0.98] group rounded-b-xl lg:rounded-none py-6 lg:py-0 lg:rounded-r-xl border-none cursor-pointer"
+        >
           <span className="text-[10px] font-black uppercase tracking-[0.3em] group-hover:tracking-[0.4em] transition-all">Search Room</span>
         </button>
       </div>
