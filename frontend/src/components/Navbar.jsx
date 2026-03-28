@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, Menu, X, ChevronDown, User, Globe, Search } from 'lucide-react';
+import { LogOut, Menu, X, ChevronDown, User, Globe, Search, Building2 } from 'lucide-react';
 import NotificationBell from './NotificationBell';
 
 const Navbar = () => {
@@ -50,9 +50,14 @@ const Navbar = () => {
         <Link 
           to="/" 
           onClick={scrollToTop}
-          className="text-2xl font-serif font-black tracking-tighter text-slate-900"
+          className="flex items-center gap-3 text-2xl font-serif font-black tracking-tighter text-slate-900 group"
         >
-          Stay <span className="italic">Savvy</span>
+          <div className="w-10 h-10 bg-luxury-gold flex items-center justify-center rounded-xl shadow-lg shadow-luxury-gold/20 group-hover:scale-110 transition-transform duration-500">
+             <Building2 size={24} className="text-white" />
+          </div>
+          <span className="flex items-baseline">
+             PK <span className="italic ml-1 text-luxury-gold">UrbanStay</span>
+          </span>
         </Link>
         
         {/* Navigation Links */}

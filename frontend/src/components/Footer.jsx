@@ -17,8 +17,11 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-20 mb-20 text-center md:text-left">
           
           <div className="space-y-8">
-            <Link to="/" className="text-3xl font-serif font-black tracking-tight flex justify-center md:justify-start">
-               Stay Savvy<span className="text-[#c5a059]">.</span>
+            <Link to="/" className="text-3xl font-serif font-black tracking-tight flex items-center justify-center md:justify-start gap-3">
+               <div className="w-10 h-10 bg-[#c5a059] flex items-center justify-center rounded-xl shadow-lg shadow-[#c5a059]/10">
+                  <Building2 size={24} className="text-[#1a1a1a]" />
+               </div>
+               PK <span className="italic ml-1 text-[#c5a059]">UrbanStay</span>
             </Link>
             <p className="text-slate-500 text-sm font-medium leading-relaxed max-w-xs mx-auto md:mx-0">
                Founded on architectural preservation, we connect travelers with historic havens reimagined for luxury.
@@ -57,7 +60,7 @@ const Footer = () => {
                 </div>
                 <div className="flex items-center justify-center md:justify-start gap-4">
                    <Globe size={16} className="text-[#c5a059]" />
-                   <span>support@staysavvy.com</span>
+                   <span>support@pkurbanstay.com</span>
                 </div>
              </div>
           </div>
@@ -76,7 +79,7 @@ const Footer = () => {
            </div>
            
            <p className="text-slate-500 text-[9px] font-black uppercase tracking-[0.5em] text-center">
-              © 2026 STAY SAVVY COLLECTION. WORLDWIDE RIGHTS RESERVED.
+              © 2026 PK URBANSTAY COLLECTION. WORLDWIDE RIGHTS RESERVED.
            </p>
         </div>
       </div>

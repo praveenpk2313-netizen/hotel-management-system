@@ -103,10 +103,12 @@ const AdminLayout = () => {
           <div className="h-24 flex items-center justify-between px-6 border-b border-white/5 shrink-0">
             <div className="flex items-center gap-4">
                <div className="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center text-primary shadow-lg border border-primary/20 flex-shrink-0">
-                  <ShieldCheck size={22} strokeWidth={2.5} />
+                  <Hotel size={22} strokeWidth={2.5} />
                </div>
                <div className={`transition-all duration-300 whitespace-nowrap ${isSidebarOpen ? 'opacity-100' : 'opacity-0 lg:hidden'}`}>
-                  <h2 className="text-lg font-serif font-black italic tracking-tighter leading-none">StayNow</h2>
+                  <h2 className="text-lg font-serif font-black tracking-tighter leading-none italic">
+                     PK <span className="text-primary">UrbanStay</span>
+                  </h2>
                   <p className="text-[8px] font-black text-primary uppercase tracking-[3px] mt-1">Admin Terminal</p>
                </div>
             </div>
