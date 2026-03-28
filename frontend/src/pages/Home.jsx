@@ -44,9 +44,9 @@ const Home = () => {
     <div className="relative min-h-screen bg-white overflow-x-hidden">
       
       {/* Hero Section - Centered Clean Layout */}
-      <section id="hero" className="relative min-h-[95vh] py-32 lg:py-0 flex items-center justify-center overflow-hidden">
+      <section id="hero" className="relative min-h-[95vh] py-32 lg:py-0 flex items-center justify-center">
         {/* Background Image with Overlay */}
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-0 overflow-hidden">
           <img 
             src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&q=100&w=2000" 
             alt="Luxury Resort" 
