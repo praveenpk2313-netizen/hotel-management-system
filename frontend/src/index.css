@@ -6,98 +6,80 @@
 
 @layer base {
   :root {
-    --primary: 197 160 89; /* #c5a059 - UrbanGold */
-    --primary-dark: 157 127 71; /* #9d7f47 - Darker Gold */
-    --background: 255 255 255; 
-    --slate-900: 15 23 42; 
-    --slate-400: 148 163 184;
-    --border: 241 245 249; 
+    --primary: 99 102 241; /* Indigo 500 */
+    --primary-dark: 67 56 202; /* Indigo 700 */
+    --accent: 14 165 233; /* Sky 500 */
+    --background: 2 6 23; /* Slate 950 */
+    --surface: 15 23 42; /* Slate 900 */
+    --text-main: 248 250 252; /* Slate 50 */
+    --text-muted: 148 163 184; /* Slate 400 */
   }
 
   html {
     scroll-behavior: smooth;
     -webkit-tap-highlight-color: transparent;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
   body {
-    @apply bg-white text-slate-900 antialiased m-0 p-0;
+    @apply bg-[#020617] text-slate-50 antialiased m-0 p-0;
     font-family: 'Outfit', system-ui, sans-serif;
-    letter-spacing: -0.01em;
   }
 
-  .bg-diagonal-pattern {
-    background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 10px);
-  }
-
-  .text-luxury-gold {
-    background: linear-gradient(to right, #c5a059, #f9e3b4, #c5a059);
+  .text-luxury-gradient {
+    background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
-  .bg-luxury-gold {
-    background: linear-gradient(135deg, #c5a059 0%, #ecd08d 50%, #c5a059 100%);
+  .bg-glass {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10;
   }
   
-  .bg-luxury-gold-hover {
-    background: linear-gradient(135deg, #ecd08d 0%, #f9e3b4 50%, #ecd08d 100%);
+  .bg-glass-heavy {
+    @apply bg-slate-900/40 backdrop-blur-2xl border border-white/5;
   }
 
   h1, h2, h3, h4, .font-serif {
     font-family: 'Playfair Display', serif;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
   }
 
   ::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
   }
   ::-webkit-scrollbar-track {
-    @apply bg-slate-50;
+    @apply bg-[#020617];
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-slate-300 rounded-full hover:bg-[#c5a059]/50 transition-all duration-500;
+    @apply bg-slate-800 rounded-full hover:bg-indigo-500/50 transition-all duration-500;
   }
 }
 
 @layer components {
   .btn-premium {
-    @apply inline-flex items-center justify-center gap-2 px-12 py-5 bg-slate-900 text-white font-extrabold uppercase tracking-[0.25em] rounded-full 
-           hover:bg-[#c5a059] active:scale-[0.97] transition-all shadow-[0_20px_50px_rgba(15,23,42,0.15)] duration-700;
-    font-size: 0.6rem;
+    @apply inline-flex items-center justify-center gap-2 px-10 py-4 bg-indigo-600 text-white font-bold uppercase tracking-[0.2em] rounded-full 
+           hover:bg-indigo-500 active:scale-[0.98] transition-all shadow-[0_10px_30px_-10px_rgba(79,70,229,0.5)] duration-500;
+    font-size: 0.7rem;
   }
 
-  .shadow-premium {
-    box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.1), 0 10px 20px -10px rgba(0, 0, 0, 0.05);
-  }
-
-  .glass-premium {
-    @apply bg-white/70 backdrop-blur-2xl border border-white/20 shadow-premium;
+  .card-premium {
+    @apply bg-slate-900/50 backdrop-blur-md border border-white/5 rounded-[2rem] overflow-hidden hover:border-indigo-500/30 transition-all duration-500;
   }
 }
 
 @layer utilities {
-  .text-gold { color: #c5a059; }
-  .bg-gold { background-color: #c5a059; }
-  .border-gold { border-color: #c5a059; }
-  
-  .animate-fade-in {
-    animation: fadeIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-
-  .animate-slide-up {
-    animation: slideUp 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
   }
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
 }
 
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(60px); }
-  to { opacity: 1; transform: translateY(0); }
+.glow-indigo {
+  box-shadow: 0 0 50px -10px rgba(79, 70, 229, 0.3);
 }
 
