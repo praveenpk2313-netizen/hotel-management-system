@@ -43,132 +43,128 @@ const Navbar = () => {
   const isAuthPage = location.pathname === '/login' || location.pathname === '/register' || location.pathname === '/forgot-password';
 
   return (
-    <nav className={`fixed top-0 left-0 w-full z-[1000] py-6 transition-all duration-700 ${scrolled ? 'bg-slate-950/80 backdrop-blur-2xl border-b border-white/5 py-4 shadow-2xl' : 'bg-transparent'}`}>
+    <nav className={`fixed top-0 left-0 w-full z-[1000] py-4 transition-all duration-500 bg-white border-b border-gray-100`}>
       <div className="max-w-7xl mx-auto px-6 md:px-10 flex justify-between items-center">
         
         {/* Brand Logo */}
         <Link 
           to="/" 
           onClick={scrollToTop}
-          className="flex items-center gap-3 text-xl md:text-2xl font-serif font-black tracking-tighter text-white group"
+          className="flex items-center gap-2 md:gap-3 text-xl md:text-2xl font-serif font-black tracking-tighter text-slate-900 group"
         >
-          <div className="w-11 h-11 bg-indigo-600 flex items-center justify-center rounded-[1rem] shadow-2xl shadow-indigo-600/30 group-hover:scale-110 transition-transform duration-700 relative overflow-hidden">
-             <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-             <Building2 size={24} className="text-white relative z-10" />
+          <div className="w-10 h-10 bg-luxury-gold flex items-center justify-center rounded-xl shadow-lg shadow-luxury-gold/20 group-hover:scale-110 transition-transform duration-500">
+             <Building2 size={24} className="text-white" />
           </div>
           <span className="flex items-baseline leading-none">
-             PK <span className="italic ml-2 text-indigo-400 hidden sm:inline text-lg md:text-2xl group-hover:text-white transition-colors">UrbanStay</span>
+             PK <span className="italic ml-1 text-luxury-gold hidden sm:inline text-lg md:text-2xl">UrbanStay</span>
           </span>
         </Link>
         
         {/* Navigation Links */}
-        <div className="hidden lg:flex items-center gap-12 font-black text-[10px] uppercase tracking-[0.25em] text-slate-400">
-          <Link to="/" className="hover:text-white transition-all relative group">
-             Home
-             <span className="absolute -bottom-2 left-0 w-0 h-[2px] bg-indigo-500 transition-all group-hover:w-full" />
-          </Link>
-          <Link to="/hotels" className="hover:text-white transition-all relative group">
-             Hotels
-             <span className="absolute -bottom-2 left-0 w-0 h-[2px] bg-indigo-500 transition-all group-hover:w-full" />
-          </Link>
-          <button onClick={() => scrollToSection('about')} className="hover:text-white transition-all relative group uppercase">
-             About
-             <span className="absolute -bottom-2 left-0 w-0 h-[2px] bg-indigo-500 transition-all group-hover:w-full" />
-          </button>
+        <div className="hidden lg:flex items-center gap-10 font-bold text-xs text-slate-600">
+          <Link to="/" className="hover:text-luxury-gold transition-colors">Home</Link>
+          <Link to="/hotels" className="hover:text-luxury-gold transition-colors">Hotels</Link>
+          <button onClick={() => scrollToSection('about')} className="hover:text-luxury-gold transition-colors uppercase text-[10px] tracking-widest">About Us</button>
           
           {user?.role === 'manager' && (
-            <Link to="/manager/dashboard" className="text-indigo-400 hover:text-white flex items-center gap-2 group">
-               <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse" />
-               Manager Portal
-            </Link>
+            <Link to="/manager/dashboard" className="text-luxury-gold hover:text-slate-900 border-b-2 border-luxury-gold pb-1 animate-pulse">Manager Portal</Link>
           )}
           {user?.role === 'admin' && (
-            <Link to="/admin/dashboard" className="text-rose-400 hover:text-white flex items-center gap-2 group">
-               <div className="w-1.5 h-1.5 bg-rose-500 rounded-full animate-pulse" />
-               Admin Panel
-            </Link>
+            <Link to="/admin/dashboard" className="text-luxury-gold hover:text-slate-900 border-b-2 border-luxury-gold pb-1 animate-pulse">Admin Panel</Link>
+          )}
+          {(!user || user.role === 'customer') && (
+            <Link to="/customer/dashboard" className="hover:text-luxury-gold transition-colors">My Trips</Link>
           )}
         </div>
 
         {/* Auth & Actions */}
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-6">
           {user ? (
-             <div className="flex items-center gap-8">
+             <div className="flex items-center gap-6">
                 {/* Language Toggle */}
-                <div className="hidden md:flex items-center bg-white/5 px-2 py-1 rounded-full gap-2 border border-white/10 hover:bg-white/10 transition-colors">
-                   <Globe size={12} className="text-indigo-400 ml-2" />
-                   <span className="text-[9px] font-black px-2 text-white">EN</span>
+                <div className="hidden md:flex items-center bg-gray-50 px-2 py-1 rounded-full gap-2 border border-gray-100">
+                   <span className="text-[10px] font-black px-2">EN</span>
+                   <div className="w-8 h-4 bg-white rounded-full border border-gray-200 shadow-sm relative">
+                      <div className="absolute left-1 top-0.5 w-2.5 h-2.5 bg-gray-400 rounded-full" />
+                   </div>
                 </div>
 
                 <div className="relative">
                    <NotificationBell scrolled={true} />
                 </div>
 
-                <div className="hidden md:flex items-center gap-6">
+                <div className="hidden md:flex items-center gap-4">
                    <div className="flex flex-col items-end">
-                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/90">
-                         {user.name || "Guest User"}
+                      <span className="text-[11px] font-black uppercase tracking-widest text-slate-900">
+                         {user.name || "PRAVEEN KUMAR R"}
                       </span>
                    </div>
                    <button 
                      onClick={handleLogout}
-                     className="w-10 h-10 flex items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-rose-400 hover:bg-rose-500 hover:text-white transition-all"
+                     className="flex items-center gap-2 text-rose-500 hover:text-rose-600 text-[10px] font-black uppercase tracking-widest transition-colors"
                    >
-                      <LogOut size={16} />
+                     <LogOut size={14} /> Logout
                    </button>
                 </div>
              </div>
           ) : (
             <Link 
               to="/login" 
-              className="px-10 py-3.5 rounded-full bg-white text-slate-900 hover:bg-indigo-600 hover:text-white text-[10px] font-black uppercase tracking-widest shadow-2xl transition-all glow-indigo"
+              className="flex items-center gap-2 px-4 py-2 md:px-8 md:py-3 rounded-full bg-slate-900 text-white hover:bg-luxury-gold text-[9px] md:text-[10px] font-black uppercase tracking-widest shadow-xl transition-all whitespace-nowrap"
             >
               Sign In
             </Link>
           )}
 
           {/* Mobile Menu Toggle */}
-          <button className="lg:hidden w-10 h-10 flex items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-white" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-             {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          <button className="lg:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+             {isMenuOpen ? <X size={24} className="text-slate-900" /> : <Menu size={24} className="text-slate-900" />}
           </button>
         </div>
       </div>
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 w-full bg-slate-950 border-b border-white/10 shadow-2xl animate-fade-in flex flex-col pt-6 pb-10 px-8 gap-6 z-[1000] backdrop-blur-3xl bg-slate-950/95">
-          <Link to="/" onClick={scrollToTop} className="text-xl font-serif italic text-white border-b border-white/5 pb-4">Home</Link>
-          <Link to="/hotels" onClick={() => setIsMenuOpen(false)} className="text-xl font-serif italic text-white border-b border-white/5 pb-4">Hotels Collection</Link>
-          <button onClick={() => scrollToSection('about')} className="text-xl font-serif italic text-white border-b border-white/5 pb-4 text-left">The Philosophy</button>
+        <div className="lg:hidden absolute top-full left-0 w-full bg-white border-b border-gray-100 shadow-lg animate-fade-in flex flex-col pt-4 pb-6 px-6 gap-4 z-[1000]">
+          <Link to="/" onClick={scrollToTop} className="text-sm font-bold text-slate-800 border-b border-gray-50 pb-3">Home</Link>
+          <Link to="/hotels" onClick={() => setIsMenuOpen(false)} className="text-sm font-bold text-slate-800 border-b border-gray-50 pb-3">Hotels</Link>
+          <button onClick={() => scrollToSection('about')} className="text-sm font-bold text-slate-800 border-b border-gray-50 pb-3 text-left">About Us</button>
           
           {user?.role === 'manager' && (
-            <Link to="/manager/dashboard" onClick={() => setIsMenuOpen(false)} className="text-lg font-bold text-indigo-400 border-b border-white/5 pb-4">Manager Terminal</Link>
+            <Link to="/manager/dashboard" onClick={() => setIsMenuOpen(false)} className="text-sm font-bold text-luxury-gold border-b border-gray-50 pb-3">Manager Portal</Link>
           )}
           {user?.role === 'admin' && (
-            <Link to="/admin/dashboard" onClick={() => setIsMenuOpen(false)} className="text-lg font-bold text-rose-400 border-b border-white/5 pb-4">Security Terminal</Link>
+            <Link to="/admin/dashboard" onClick={() => setIsMenuOpen(false)} className="text-sm font-bold text-luxury-gold border-b border-gray-50 pb-3">Admin Panel</Link>
+          )}
+          {(!user || user.role === 'customer') && (
+            <Link to="/customer/dashboard" onClick={() => setIsMenuOpen(false)} className="text-sm font-bold text-slate-800 border-b border-gray-50 pb-3">My Trips</Link>
           )}
 
           {!user && (
              <Link 
                to="/login" 
                onClick={() => setIsMenuOpen(false)}
-               className="mt-4 w-full h-16 bg-indigo-600 text-white flex items-center justify-center rounded-3xl text-[10px] font-black uppercase tracking-[0.3em] shadow-2xl glow-indigo"
+               className="mt-2 w-full py-4 bg-luxury-gold text-white text-center rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg"
              >
-                Enter Portfolio
+                Sign In to Account
              </Link>
           )}
 
           {user && (
-            <div className="pt-4 flex flex-col gap-6">
-               <div className="flex items-center justify-between pb-4 border-b border-white/5">
-                   <span className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Account Identity</span>
-                   <span className="text-sm font-bold text-white">{user.name || "Guest User"}</span>
+            <div className="pt-2 flex flex-col gap-4">
+               <div className="flex items-center gap-3">
+                  <span className="text-xs font-black uppercase text-slate-500">Language:</span>
+                  <span className="text-xs font-bold text-slate-900">EN</span>
+               </div>
+               <div className="flex items-center gap-3 border-t border-gray-50 pt-4">
+                  <span className="text-xs font-black uppercase text-slate-500">Account:</span>
+                   <span className="text-sm font-bold text-slate-900">{user.name || "PRAVEEN KUMAR R"}</span>
                </div>
                <button 
                   onClick={handleLogout}
-                  className="flex items-center justify-center gap-3 w-full h-16 bg-rose-500/10 border border-rose-500/20 text-rose-500 hover:bg-rose-500 hover:text-white text-[10px] font-black uppercase tracking-[0.2em] transition-all rounded-3xl"
+                  className="flex items-center gap-2 mt-2 w-fit text-rose-500 hover:text-rose-600 text-xs font-black uppercase tracking-widest transition-colors"
                >
-                  <LogOut size={16} /> Decommission Session
+                  <LogOut size={16} /> Logout
                </button>
             </div>
           )}

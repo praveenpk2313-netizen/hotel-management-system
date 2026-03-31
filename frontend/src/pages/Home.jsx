@@ -55,85 +55,83 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="relative min-h-screen bg-[#020617] text-slate-50 overflow-x-hidden">
+    <div className="relative min-h-screen bg-white overflow-x-hidden">
       
       {/* Hero Section - Centered Clean Layout */}
-      <section id="hero" className="relative min-h-screen py-32 lg:py-0 flex items-center justify-center">
+      <section id="hero" className="relative min-h-[95vh] py-32 lg:py-0 flex items-center justify-center">
         {/* Background Image with Overlay */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <img 
-            src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=100&w=2000" 
-            alt="Luxury Night View" 
-            className="w-full h-full object-cover scale-105 animate-slow-zoom opacity-60"
+            src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&q=100&w=2000" 
+            alt="Luxury Resort" 
+            className="w-full h-full object-cover scale-105 animate-slow-zoom"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#020617]/80 via-transparent to-[#020617]" />
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
         </div>
 
-        <div className="relative z-10 max-w-5xl mx-auto text-center px-6 animate-fade-in mt-20">
-          <div className="flex items-center justify-center gap-3 mb-8">
-            <span className="h-[1px] w-12 bg-indigo-500/50" />
-            <span className="text-indigo-400 text-xs font-black uppercase tracking-[0.6em]">Urban Sanctuary & Escapes</span>
-            <span className="h-[1px] w-12 bg-indigo-500/50" />
+        <div className="relative z-10 max-w-4xl mx-auto text-center px-6 animate-fade-in">
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <span className="h-[1px] w-8 bg-luxury-gold" />
+            <span className="text-white text-xs font-black uppercase tracking-[0.4em]">Welcome to PK UrbanStay</span>
+            <span className="h-[1px] w-8 bg-luxury-gold" />
           </div>
 
-          <h1 className="text-6xl md:text-9xl text-white font-serif leading-[0.9] mb-10 tracking-tighter">
-            Elegance <br />
-            <span className="text-luxury-gradient italic font-black">Redefined</span>
+          <h1 className="text-6xl md:text-8xl text-white font-serif leading-tight mb-8">
+            The Pinnacle of <br />
+            <span className="text-luxury-gold italic font-black">Luxury Living</span>
           </h1>
 
-          <p className="text-slate-400 text-lg md:text-2xl max-w-3xl mx-auto mb-16 font-medium leading-relaxed">
-            Discover a curated collection of the world's most sophisticated stays. 
-            Where architectural brilliance meets unparalleled personalized service.
+          <p className="text-slate-200 text-lg md:text-xl max-w-2xl mx-auto mb-12 font-medium leading-relaxed">
+            Experience the extraordinary in the world's most iconic destinations. 
+            Tailored comfort, historic elegance, and unparalleled service.
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-8 mb-24 animate-slide-up">
+          <div className="flex flex-wrap items-center justify-center gap-6 mb-16 animate-slide-up">
              <button 
                onClick={() => navigate('/hotels')}
-               className="btn-premium px-12 py-5 glow-indigo group"
+               className="px-10 py-4 bg-luxury-gold text-white font-black uppercase tracking-widest text-xs rounded-full hover:bg-white hover:text-slate-900 transition-all shadow-2xl flex items-center gap-2 group"
              >
-                Explore Collection
-                <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
+                Start Exploring
+                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
              </button>
              <button 
                onClick={() => scrollToSection('about')}
-               className="px-12 py-5 border border-white/10 text-white font-black uppercase tracking-widest text-xs rounded-full hover:bg-white/5 transition-all backdrop-blur-md"
+               className="px-10 py-4 border border-white/30 text-white font-black uppercase tracking-widest text-xs rounded-full hover:bg-white/10 transition-all"
              >
-                Our Philosophy
+                Our Story
              </button>
           </div>
 
           {/* Integrated Search Bar Placeholder / Transition */}
-          <div className="max-w-5xl mx-auto bg-slate-900/40 backdrop-blur-3xl p-3 rounded-[2.5rem] border border-white/10 shadow-2xl relative z-50 animate-slide-up" style={{ animationDelay: '0.3s' }}>
-            <div className="bg-white rounded-[2rem] overflow-hidden">
+          <div className="max-w-4xl mx-auto bg-white/10 backdrop-blur-xl p-2 rounded-2xl border border-white/20 shadow-2xl relative z-50">
+            <div className="bg-white rounded-xl">
                <SearchBar />
             </div>
           </div>
         </div>
 
         {/* Ambient Decorative Elements */}
-        <div className="absolute bottom-20 left-20 hidden lg:flex flex-col gap-4 opacity-20">
-           <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse" />
+        <div className="absolute bottom-10 left-10 flex flex-col gap-2 opacity-30">
+           <div className="w-1.5 h-1.5 bg-white rounded-full" />
            <div className="w-1.5 h-1.5 bg-white rounded-full" />
            <div className="w-1.5 h-1.5 bg-white rounded-full" />
         </div>
       </section>
 
       {/* Trust & Features Section */}
-      <section className="py-32 border-b border-white/5 bg-slate-950/50">
+      <section className="py-24 border-b border-slate-100">
          <div className="max-w-7xl mx-auto px-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-16 md:gap-12">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
                {[
-                 { icon: <Globe className="text-indigo-400" />, title: "Iconic Locations", desc: "Premier global destinations" },
-                 { icon: <Sparkles className="text-indigo-400" />, title: "Bespoke Service", desc: "24/7 Elite concierge" },
-                 { icon: <Building2 className="text-indigo-400" />, title: "Timeless Design", desc: "Architectural masterpieces" },
-                 { icon: <Globe className="text-indigo-400" />, title: "Secure Retreat", desc: "Absolute privacy & security" },
+                 { icon: <Globe className="text-luxury-gold" />, title: "Prime Locations", desc: "Handpicked global spots" },
+                 { icon: <Sparkles className="text-luxury-gold" />, title: "Premium Service", desc: "24/7 Personal concierge" },
+                 { icon: <Building2 className="text-luxury-gold" />, title: "Historic Design", desc: "Preserved heritage sites" },
+                 { icon: <Globe className="text-luxury-gold" />, title: "Secure Booking", desc: "Direct & Safe payments" },
                ].map((item, idx) => (
                  <div key={idx} className="flex flex-col items-center text-center group">
-                    <div className="mb-8 p-6 rounded-[2rem] bg-slate-900/50 border border-white/5 group-hover:border-indigo-500/50 transition-all duration-700 group-hover:-translate-y-2">
-                      {item.icon}
-                    </div>
-                    <h3 className="font-black text-white mb-3 uppercase tracking-widest text-xs">{item.title}</h3>
-                    <p className="text-xs text-slate-500 font-bold leading-relaxed">{item.desc}</p>
+                    <div className="mb-6 p-5 rounded-3xl bg-slate-50 group-hover:bg-luxury-gold/10 transition-colors duration-500">{item.icon}</div>
+                    <h3 className="font-black text-slate-900 mb-2 uppercase tracking-widest text-xs">{item.title}</h3>
+                    <p className="text-xs text-slate-400 font-bold">{item.desc}</p>
                  </div>
                ))}
             </div>
@@ -142,23 +140,23 @@ const Home = () => {
 
       {/* ── PROMOTIONS SECTION ────────────────────────────────────────────────── */}
       {promotions.length > 0 && (
-        <section className="py-32 bg-[#020617] relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-900/10 rounded-full blur-[120px] translate-y-1/2 -translate-x-1/2" />
+        <section className="py-20 bg-slate-950 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+             <div className="absolute -top-24 -left-24 w-96 h-96 bg-luxury-gold rounded-full blur-[120px]" />
+          </div>
 
           <div className="max-w-7xl mx-auto px-6 relative z-10">
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
-              <div className="space-y-4">
-                 <div className="inline-flex items-center gap-3 px-4 py-2 bg-indigo-500/10 rounded-full border border-indigo-500/20">
-                    <Tag size={16} className="text-indigo-400" />
-                    <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Seasonal Privileges</span>
+            <div className="flex items-center justify-between mb-12">
+              <div className="flex items-center gap-4">
+                 <div className="p-3 bg-luxury-gold/10 rounded-2xl text-luxury-gold">
+                    <Tag size={24} />
                  </div>
-                 <h2 className="text-5xl font-serif text-white font-bold leading-tight">Exclusive <br />Curated Offers</h2>
+                 <h2 className="text-3xl font-serif text-white font-bold">Exclusive Offers</h2>
               </div>
-              <div className="hidden md:flex gap-3 pb-2">
-                 <div className="w-12 h-1.5 bg-indigo-500 rounded-full" />
-                 <div className="w-4 h-1.5 bg-white/10 rounded-full" />
-                 <div className="w-4 h-1.5 bg-white/10 rounded-full" />
+              <div className="hidden md:flex gap-2">
+                 <div className="w-10 h-1 bg-luxury-gold rounded-full" />
+                 <div className="w-4 h-1 bg-white/20 rounded-full" />
+                 <div className="w-4 h-1 bg-white/20 rounded-full" />
               </div>
             </div>
 
@@ -166,19 +164,19 @@ const Home = () => {
               {promotions.map((promo) => (
                 <div 
                   key={promo._id} 
-                  className="min-w-[320px] md:min-w-[480px] bg-slate-900/40 backdrop-blur-xl border border-white/5 rounded-[3rem] p-12 snap-center hover:bg-slate-900/60 transition-all group relative overflow-hidden"
+                  className="min-w-[320px] md:min-w-[450px] bg-white/5 border border-white/10 rounded-[2.5rem] p-10 snap-center hover:bg-white/10 transition-all group relative overflow-hidden"
                 >
-                  <div className="absolute top-0 right-0 w-40 h-40 bg-indigo-500/5 rounded-full blur-3xl group-hover:bg-indigo-500/10 transition-all" />
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-luxury-gold/5 rounded-full blur-3xl group-hover:bg-luxury-gold/10 transition-all" />
                   
-                  <div className="space-y-8 relative z-10">
+                  <div className="space-y-6 relative z-10">
                     <div className="flex justify-between items-start">
-                       <span className="px-5 py-2 bg-white/5 border border-white/10 rounded-full text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">
+                       <span className="px-4 py-1 bg-luxury-gold/20 border border-luxury-gold/30 rounded-full text-[10px] font-black text-luxury-gold uppercase tracking-[0.2em]">
                           {promo.hotelId ? promo.hotelId.name : 'Global Collection'}
                        </span>
-                       <TrendingUp className="text-indigo-400 opacity-40 shrink-0" size={24} />
+                       <TrendingUp className="text-luxury-gold opacity-30" size={20} />
                     </div>
 
-                    <h3 className="text-3xl font-serif text-white font-bold leading-tight group-hover:text-indigo-400 transition-colors">
+                    <h3 className="text-2xl font-serif text-white font-bold leading-tight">
                        {promo.title}
                     </h3>
                     
@@ -188,9 +186,9 @@ const Home = () => {
 
                     <button 
                       onClick={() => navigate(promo.hotelId ? `/hotel/${promo.hotelId._id}` : '/hotels')}
-                      className="flex items-center gap-4 text-indigo-400 text-[10px] font-black uppercase tracking-widest hover:gap-6 transition-all pt-4"
+                      className="flex items-center gap-3 text-luxury-gold text-xs font-black uppercase tracking-widest hover:gap-5 transition-all"
                     >
-                       Discover More <ArrowRight size={18} />
+                       Discover More <ArrowRight size={16} />
                     </button>
                   </div>
                 </div>
@@ -201,29 +199,29 @@ const Home = () => {
       )}
 
       {/* Popular Properties Section */}
-      <section id="hotels" className="py-40 bg-slate-950/30">
+      <section id="hotels" className="py-32 bg-slate-50/50">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-24 gap-10 animate-fade-in">
-            <div className="space-y-4">
-              <p className="text-indigo-500 text-[10px] font-black uppercase tracking-[0.5em] mb-2 text-center md:text-left">The Collection</p>
-              <h2 className="text-5xl md:text-7xl font-serif text-white text-center md:text-left leading-tight">Elite <br />Properties</h2>
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 animate-fade-in">
+            <div>
+              <p className="text-luxury-gold text-[10px] font-black uppercase tracking-[0.5em] mb-4 text-center md:text-left">Portfolio of Excellence</p>
+              <h2 className="text-5xl md:text-6xl font-serif text-slate-900 text-center md:text-left">Popular Properties</h2>
             </div>
             <button 
               onClick={() => navigate('/hotels')}
-              className="px-12 py-5 bg-white/5 border border-white/10 rounded-full text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white hover:text-slate-950 transition-all backdrop-blur-xl shadow-2xl"
+              className="mt-10 md:mt-0 px-10 py-4 bg-white border border-slate-200 rounded-full text-[10px] font-black uppercase tracking-[0.2em] hover:bg-slate-900 hover:text-white transition-all shadow-sm hover:shadow-xl"
             >
-              Browse All Escapes
+              View More Escapes
             </button>
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="aspect-[3/4] rounded-[3rem] bg-slate-900/50 animate-pulse border border-white/5" />
+                <div key={i} className="aspect-[3/4] rounded-[2rem] bg-slate-100 animate-pulse" />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {popularHotels.map((hotel) => (
                 <HotelCard key={hotel._id} hotel={hotel} />
               ))}
@@ -233,116 +231,118 @@ const Home = () => {
       </section>
 
       {/* About & Experience section */}
-      <section id="about" className="py-48 bg-[#020617] relative">
-         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
+      <section id="about" className="py-40 bg-white">
+         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
             <div className="relative group">
-               <div className="aspect-[4/5] rounded-[3rem] overflow-hidden shadow-2xl border border-white/5">
+               <div className="aspect-[4/5] rounded-[2.5rem] overflow-hidden shadow-2xl">
                   <img 
-                    src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&q=80" 
-                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 opacity-80" 
+                    src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80" 
+                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
                   />
                </div>
-               <div className="absolute -bottom-16 -right-16 w-80 h-80 bg-slate-900/60 backdrop-blur-3xl rounded-[4rem] p-12 flex flex-col justify-center text-white hidden md:flex shadow-2xl border border-white/10 group-hover:-translate-x-6 group-hover:-translate-y-6 transition-transform duration-1000">
-                  <Sparkles size={48} className="text-indigo-400 mb-8" />
-                  <h3 className="text-4xl font-serif font-bold leading-tight">Masterfully <br />Created</h3>
-                  <p className="text-sm mt-8 text-slate-400 font-medium leading-relaxed">Connecting discerning travelers with architectural heritage reimagined for the modern era.</p>
+               <div className="absolute -bottom-12 -right-12 w-80 h-80 bg-slate-900 rounded-[3rem] p-12 flex flex-col justify-center text-white hidden md:flex shadow-2xl border-8 border-white group-hover:-translate-x-4 group-hover:-translate-y-4 transition-transform duration-700">
+                  <Sparkles size={48} className="text-luxury-gold mb-8" />
+                  <h3 className="text-4xl font-serif font-bold leading-tight">Masterfully <br />Crafted</h3>
+                  <p className="text-sm mt-6 opacity-60 font-medium">PK UrbanStay connects discerning travelers with historic locations reimagined for modern excellence.</p>
                </div>
             </div>
 
-            <div className="lg:pl-20">
-               <p className="text-indigo-500 text-[10px] font-black uppercase tracking-[0.5em] mb-6">Our Legacy</p>
-               <h2 className="text-5xl md:text-8xl font-serif text-white leading-[0.9] mb-12 tracking-tighter">Beyond <br />Expectation</h2>
-               <p className="text-slate-400 text-xl leading-relaxed mb-16 font-medium">
-                  We believe that true luxury is found in the quiet moments of perfection. 
-                  Every property is a testament to historic soulful design and forward-thinking comfort.
+            <div className="lg:pl-16">
+               <p className="text-luxury-gold text-[10px] font-black uppercase tracking-[0.5em] mb-4">Our Heritage</p>
+               <h2 className="text-5xl md:text-7xl font-serif text-slate-900 leading-[1.1] mb-10">Unforgettable Moments, Reimagined</h2>
+               <p className="text-slate-500 text-lg leading-relaxed mb-12 font-medium">
+                  We believe that luxury is not just a destination, but a journey of small details. 
+                  Our team meticulously preserves the historic soul of our properties while integrating 
+                  state-of-the-art comforts for the modern globalist.
                </p>
                
-               <div className="grid grid-cols-2 gap-10 mb-16">
-                  <div className="p-10 rounded-[3rem] bg-slate-900/40 border border-white/5 hover:border-indigo-500/30 transition-all group">
-                     <p className="text-6xl font-serif font-black text-white mb-2 group-hover:text-indigo-400 transition-colors">15k+</p>
-                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Global Members</p>
+               <div className="grid grid-cols-2 gap-8 mb-12">
+                  <div className="p-8 rounded-[2rem] bg-slate-50 border border-slate-100 hover:border-luxury-gold/30 transition-colors">
+                     <p className="text-5xl font-serif font-black text-slate-900 mb-2">12k+</p>
+                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Happy Guests</p>
                   </div>
-                  <div className="p-10 rounded-[3rem] bg-slate-900/40 border border-white/5 hover:border-indigo-500/30 transition-all group">
-                     <p className="text-6xl font-serif font-black text-white mb-2 group-hover:text-indigo-400 transition-colors">24/7</p>
-                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Elite Support</p>
+                  <div className="p-8 rounded-[2rem] bg-slate-50 border border-slate-100 hover:border-luxury-gold/30 transition-colors">
+                     <p className="text-5xl font-serif font-black text-slate-900 mb-2">24/7</p>
+                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Concierge desk</p>
                   </div>
                </div>
 
                <button 
                  onClick={() => navigate('/hotels')}
-                 className="btn-premium px-12 py-5 glow-indigo"
+                 className="px-12 py-5 bg-slate-900 text-white font-black uppercase tracking-widest text-xs rounded-full hover:bg-luxury-gold transition-all shadow-xl"
                >
-                  Join the Collection
+                  Browse Collection
                </button>
             </div>
          </div>
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-48 bg-slate-950 relative overflow-hidden">
-         <div className="absolute top-0 right-0 w-1/2 h-full bg-indigo-600/5 -skew-x-12 translate-x-1/3" />
+      <section id="contact" className="py-40 bg-slate-900 relative overflow-hidden">
+         <div className="absolute top-0 right-0 w-1/3 h-full bg-luxury-gold opacity-5 skew-x-12 translate-x-20" />
+         <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-white/5 blur-[120px] rounded-full -translate-x-1/2 translate-y-1/2" />
          
          <div className="max-w-7xl mx-auto px-6 relative z-10">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-start">
                <div className="text-left">
-                  <div className="inline-flex p-5 rounded-3xl bg-indigo-500/10 border border-indigo-500/20 mb-10">
-                     <Globe className="text-indigo-400" size={32} />
+                  <div className="inline-flex p-4 rounded-2xl bg-white/5 border border-white/10 mb-8">
+                     <Globe className="text-luxury-gold" size={32} />
                   </div>
-                  <h2 className="text-5xl md:text-8xl font-serif text-white leading-[0.9] mb-10 tracking-tighter">Your Sanctuary <br />Awaits</h2>
-                  <p className="text-slate-400 text-xl max-w-xl mb-16 font-medium leading-relaxed">
-                     Our personal concierges are available 24/7 to curate your unique experience. 
-                     Let us design your next unforgettable escape.
+                  <h2 className="text-5xl md:text-7xl font-serif text-white leading-tight mb-8">Let's Design Your <br />Perfect Escape</h2>
+                  <p className="text-slate-400 text-lg max-w-xl mb-12 font-medium leading-relaxed">
+                     Our personal concierges are available 24/7 to curate your unique stay. 
+                     From historic suites to modern penthouses, your sanctuary awaits.
                   </p>
                   
-                  <div className="space-y-12">
-                     <div className="flex items-center gap-8 group cursor-pointer">
-                        <div className="w-16 h-16 rounded-3xl bg-slate-900/50 border border-white/5 flex items-center justify-center group-hover:bg-indigo-600 group-hover:border-indigo-600 transition-all duration-700 text-white shadow-2xl">
-                           <Globe size={24} />
+                  <div className="space-y-10">
+                     <div className="flex items-center gap-6 group cursor-pointer">
+                        <div className="w-14 h-14 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-luxury-gold group-hover:border-luxury-gold transition-all duration-500 text-white">
+                           <Globe size={20} />
                         </div>
                         <div>
-                           <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 font-sans">Global HQ</p>
-                           <p className="text-white font-serif text-2xl tracking-tight">Knightsbridge, London, UK</p>
+                           <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Global Headquarters</p>
+                           <p className="text-white font-serif text-xl tracking-wide">12th Ave, Mayfair, London, UK</p>
                         </div>
                      </div>
-                     <div className="flex items-center gap-8 group cursor-pointer">
-                        <div className="w-16 h-16 rounded-3xl bg-slate-900/50 border border-white/5 flex items-center justify-center group-hover:bg-indigo-600 group-hover:border-indigo-600 transition-all duration-700 text-white shadow-2xl">
-                           <Sparkles size={24} />
+                     <div className="flex items-center gap-6 group cursor-pointer">
+                        <div className="w-14 h-14 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-luxury-gold group-hover:border-luxury-gold transition-all duration-500 text-white">
+                           <Sparkles size={20} />
                         </div>
                         <div>
-                           <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 font-sans">Contact Details</p>
-                           <p className="text-white font-serif text-2xl tracking-tight">concierge@pkurbanstay.com / +44 20 7000 0000</p>
+                           <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Direct Assistance</p>
+                           <p className="text-white font-serif text-xl tracking-wide">+44 20 7946 0123 / stay@pkurbanstay.com</p>
                         </div>
                      </div>
                   </div>
                </div>
 
-               <div className="bg-slate-900/40 backdrop-blur-3xl p-12 md:p-16 rounded-[4rem] border border-white/5 shadow-2xl">
-                  <form className="space-y-10" onSubmit={(e) => e.preventDefault()}>
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                        <div className="space-y-4">
-                           <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1 font-sans">Full Name</label>
-                           <input type="text" placeholder="Alex Sterling" className="w-full h-16 bg-white/5 border border-white/10 rounded-2xl px-6 text-white placeholder:text-white/20 outline-none focus:border-indigo-500 transition-all font-sans font-bold" />
+               <div className="bg-white/5 backdrop-blur-3xl p-10 md:p-14 rounded-[3rem] border border-white/10 shadow-2xl">
+                  <form className="space-y-8">
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="space-y-3">
+                           <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Full Name</label>
+                           <input type="text" placeholder="John Doe" className="w-full h-14 bg-white/5 border border-white/10 rounded-xl px-5 text-white placeholder:text-white/20 outline-none focus:border-luxury-gold transition-colors font-sans font-bold" />
                         </div>
-                        <div className="space-y-4">
-                           <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1 font-sans">Private Email</label>
-                           <input type="email" placeholder="alex@sterling.com" className="w-full h-16 bg-white/5 border border-white/10 rounded-2xl px-6 text-white placeholder:text-white/20 outline-none focus:border-indigo-500 transition-all font-sans font-bold" />
+                        <div className="space-y-3">
+                           <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Email</label>
+                           <input type="email" placeholder="john@sanctuary.com" className="w-full h-14 bg-white/5 border border-white/10 rounded-xl px-5 text-white placeholder:text-white/20 outline-none focus:border-luxury-gold transition-colors font-sans font-bold" />
                         </div>
                      </div>
-                     <div className="space-y-4">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1 font-sans">Inquiry Focus</label>
-                        <select className="w-full h-16 bg-white/5 border border-white/10 rounded-2xl px-6 text-white outline-none focus:border-indigo-500 transition-all font-sans font-black uppercase text-xs appearance-none cursor-pointer">
-                           <option>Bespoke Concierge</option>
-                           <option>Corporate Retreats</option>
-                           <option>VIP Villa Bookings</option>
-                           <option>Event Curation</option>
+                     <div className="space-y-3">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Inquiry Type</label>
+                        <select className="w-full h-14 bg-white/5 border border-white/10 rounded-xl px-5 text-white outline-none focus:border-luxury-gold transition-colors font-sans font-black uppercase text-xs appearance-none cursor-pointer">
+                           <option>General Concierge</option>
+                           <option>Booking Request</option>
+                           <option>VIP Experiences</option>
+                           <option>Event Planning</option>
                         </select>
                      </div>
-                     <div className="space-y-4">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1 font-sans">Your Message</label>
-                        <textarea placeholder="How can we elevate your journey?" rows="4" className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-white placeholder:text-white/20 outline-none focus:border-indigo-500 transition-all font-sans font-bold resize-none"></textarea>
+                     <div className="space-y-3">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Message</label>
+                        <textarea placeholder="Describe your dream stay..." rows="4" className="w-full bg-white/5 border border-white/10 rounded-xl p-5 text-white placeholder:text-white/20 outline-none focus:border-luxury-gold transition-colors font-sans font-bold"></textarea>
                      </div>
-                     <button type="submit" className="w-full h-20 bg-indigo-600 text-white font-black uppercase tracking-[0.3em] text-[10px] rounded-2xl hover:bg-white hover:text-slate-950 transition-all shadow-2xl glow-indigo">
-                        Send Inquiry
+                     <button type="submit" className="w-full h-16 bg-luxury-gold text-white font-black uppercase tracking-[0.2em] text-xs rounded-xl hover:bg-white hover:text-slate-900 transition-all shadow-xl shadow-luxury-gold/20">
+                        Inquire Now
                      </button>
                   </form>
                </div>
@@ -352,17 +352,17 @@ const Home = () => {
 
       <style>{`
         .animate-slow-zoom {
-          animation: slowZoom 30s infinite alternate cubic-bezier(0.445, 0.05, 0.55, 0.95);
+          animation: slowZoom 20s infinite alternate linear;
         }
         @keyframes slowZoom {
-          from { transform: scale(1.05); }
-          to { transform: scale(1.15); }
+          from { transform: scale(1); }
+          to { transform: scale(1.1); }
         }
         .animate-slide-up {
-          animation: slideUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          animation: slideUp 1s ease-out forwards;
         }
         @keyframes slideUp {
-          from { opacity: 0; transform: translateY(40px); }
+          from { opacity: 0; transform: translateY(30px); }
           to { opacity: 1; transform: translateY(0); }
         }
         .scrollbar-hide::-webkit-scrollbar {
