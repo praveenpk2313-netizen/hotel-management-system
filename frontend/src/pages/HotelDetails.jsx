@@ -18,7 +18,9 @@ import {
   ArrowLeft,
   Wind,
   Monitor,
-  Users
+  Users,
+  SlidersHorizontal,
+  Snowflake
 } from 'lucide-react';
 import { fetchHotelById, fetchRooms, API_BASE_URL } from '../services/api';
 import { useAuth } from '../context/AuthContext';
