@@ -49,7 +49,8 @@ const HotelListPage = () => {
     amenities: [],
     rating: 0,
     startDate: searchParams.get('checkin') ? new Date(searchParams.get('checkin')) : null,
-    endDate: searchParams.get('checkout') ? new Date(searchParams.get('checkout')) : null
+    endDate: searchParams.get('checkout') ? new Date(searchParams.get('checkout')) : null,
+    sortBy: 'recommended'
   });
 
   const [showMobileFilters, setShowMobileFilters] = useState(false);
@@ -62,7 +63,8 @@ const HotelListPage = () => {
         minPrice: filters.minPrice,
         maxPrice: filters.maxPrice,
         rating: filters.rating > 0 ? filters.rating : undefined,
-        amenities: filters.amenities.length > 0 ? filters.amenities.join(',') : undefined
+        amenities: filters.amenities.length > 0 ? filters.amenities.join(',') : undefined,
+        sortBy: filters.sortBy
       };
 
       const { data } = await fetchHotels(params);
@@ -74,7 +76,7 @@ const HotelListPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [filters.location, filters.minPrice, filters.maxPrice, filters.rating, filters.amenities]);
+  }, [filters.location, filters.minPrice, filters.maxPrice, filters.rating, filters.amenities, filters.sortBy]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -100,7 +102,8 @@ const HotelListPage = () => {
       amenities: [],
       rating: 0,
       startDate: null,
-      endDate: null
+      endDate: null,
+      sortBy: 'recommended'
     });
   };
 
@@ -227,11 +230,15 @@ const HotelListPage = () => {
               <div className="flex items-center gap-4 font-sans">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sort by:</label>
                 <div className="relative group">
-                   <select className="bg-transparent text-sm font-black text-luxury-gold outline-none cursor-pointer appearance-none pr-6">
-                      <option>Recommended</option>
-                      <option>Price: Low to High</option>
-                      <option>Price: High to Low</option>
-                      <option>Review Score</option>
+                   <select 
+                      value={filters.sortBy}
+                      onChange={(e) => setFilters({...filters, sortBy: e.target.value})}
+                      className="bg-transparent text-sm font-black text-luxury-gold outline-none cursor-pointer appearance-none pr-6"
+                   >
+                      <option value="recommended">Recommended</option>
+                      <option value="price_asc">Price: Low to High</option>
+                      <option value="price_desc">Price: High to Low</option>
+                      <option value="rating_desc">Review Score</option>
                    </select>
                    <ChevronRight className="absolute right-0 top-1/2 -translate-y-1/2 rotate-90 text-luxury-gold pointer-events-none" size={14} />
                 </div>

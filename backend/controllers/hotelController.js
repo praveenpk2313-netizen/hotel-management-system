@@ -77,6 +77,18 @@ const getHotels = async (req, res) => {
       }
     });
 
+    // Sorting
+    const { sortBy } = req.query;
+    if (sortBy === 'price_asc') {
+      pipeline.push({ $sort: { minPrice: 1 } });
+    } else if (sortBy === 'price_desc') {
+      pipeline.push({ $sort: { minPrice: -1 } });
+    } else if (sortBy === 'rating_desc') {
+      pipeline.push({ $sort: { averageRating: -1 } });
+    } else {
+      pipeline.push({ $sort: { createdAt: -1 } }); // Default: Newest first
+    }
+
     const hotels = await Hotel.aggregate(pipeline);
     res.json(hotels);
   } catch (error) {
