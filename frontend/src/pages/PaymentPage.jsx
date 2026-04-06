@@ -44,6 +44,7 @@ const PaymentPage = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('card');
   const razorpayTxnRef = useRef('MOCK_TRX_'  + Math.random().toString(36).substr(2, 9).toUpperCase());
 
   const { bookingData, hotel, selectedRoom } = location.state || {};
@@ -66,6 +67,87 @@ const PaymentPage = () => {
     document.body.appendChild(script);
     return () => { document.body.removeChild(script); };
   }, []);
+
+  const handleRazorpayCheckout = async () => {
+    setLoading(true);
+    setError('');
+
+    try {
+      const handlePaymentSuccess = (finalBooking) => {
+        setLoading(false);
+        navigate('/booking-success', { state: { booking: finalBooking } });
+      };
+
+      const handlePaymentError = (err, customHeader = 'Payment failed') => {
+        setLoading(false);
+        const data = err.response?.data;
+        if (data?.code === 'DATES_UNAVAILABLE' || err.response?.status === 400) {
+          const errMsg = data?.message || 'Selected dates are no longer available.';
+          setError(errMsg);
+          setTimeout(() => {
+            navigate(`/hotel/${hotel._id}`, { state: { error: errMsg, initialData: bookingData } });
+          }, 3000);
+          return;
+        }
+        setError(data?.message || customHeader);
+      };
+
+      if (MOCK_PAYMENT) {
+        setLoading(true);
+        await new Promise(r => setTimeout(r, 1500));
+        const payload = {
+          ...bookingData,
+          paymentMethod: 'Razorpay (Native Mock)',
+          transactionId: razorpayTxnRef.current
+        };
+        try {
+          const { data: finalBooking } = await confirmBookingAfterPayment(payload);
+          handlePaymentSuccess(finalBooking);
+        } catch (err) {
+          handlePaymentError(err);
+        }
+        return;
+      }
+
+      const { data: orderData } = await createRazorpayOrder({ amount: bookingData.totalPrice });
+      const options = {
+        key: orderData.key,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: "PK UrbanStay Luxury",
+        description: `Stay at ${hotel.name}`,
+        image: hotel.images?.[0],
+        order_id: orderData.orderId,
+        handler: async (response) => {
+          try {
+            const { data: finalBooking } = await confirmBookingAfterPayment({
+              ...bookingData,
+              paymentMethod: 'Razorpay',
+              transactionId: response.razorpay_payment_id,
+              razorpayData: response
+            });
+            handlePaymentSuccess(finalBooking);
+          } catch (err) {
+            handlePaymentError(err, 'Verification failed. PID: ' + response.razorpay_payment_id);
+          }
+        },
+        prefill: { name: user?.name, email: user?.email },
+        theme: { color: "#0891b2" },
+        modal: { ondismiss: () => setLoading(false) }
+      };
+
+      if (!window.Razorpay) {
+        setError('Payment gateway failed to load. Please check AdBlockers.');
+        setLoading(false);
+        return;
+      }
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Payment initiation failed.');
+      setLoading(false);
+    }
+  };
 
 
   if (!bookingData || !hotel) return null;
@@ -147,35 +229,76 @@ const PaymentPage = () => {
                    </div>
                  )}
 
-                 <button 
-                   className="p-6 rounded-2xl border-2 border-cyan-500 bg-cyan-50/30 text-left space-y-5 transition-all outline-none w-full"
-                 >
-                    <div className="flex justify-between items-center">
-                       <div className="p-3.5 rounded-xl flex items-center justify-center border shadow-sm transition-all bg-cyan-600 text-white border-cyan-700">
-                          <CreditCard size={24} />
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <button 
+                      onClick={() => setPaymentMethod('card')}
+                      className={`p-6 rounded-2xl border-2 text-left space-y-5 transition-all outline-none ${
+                        paymentMethod === 'card' ? 'border-cyan-500 bg-cyan-50/30' : 'border-slate-100 hover:border-slate-200'
+                      }`}
+                    >
+                       <div className="flex justify-between items-center">
+                          <div className={`p-3.5 rounded-xl flex items-center justify-center border shadow-sm transition-all ${paymentMethod === 'card' ? 'bg-cyan-600 text-white border-cyan-700' : 'bg-slate-50 text-slate-400 border-slate-200'}`}>
+                             <CreditCard size={24} />
+                          </div>
+                          {paymentMethod === 'card' && <CheckCircle2 size={24} className="text-cyan-600 drop-shadow-sm" />}
                        </div>
-                       <CheckCircle2 size={24} className="text-cyan-600 drop-shadow-sm" />
-                    </div>
-                    <div>
-                       <p className="font-bold text-slate-900 text-lg">Debit or Credit Card</p>
-                       <div className="flex gap-2 mt-2">
-                          <img src="https://img.icons8.com/color/48/000000/visa.png" className="h-5 opacity-90" alt="Visa" />
-                          <img src="https://img.icons8.com/color/48/000000/mastercard.png" className="h-5 opacity-90" alt="MC" />
-                          <img src="https://razorpay.com/favicon.png" className="h-5 ml-2" alt="Razorpay" />
+                       <div>
+                          <p className="font-bold text-slate-900 text-lg">Debit or Credit Card</p>
+                          <div className="flex gap-2 mt-2">
+                             <img src="https://img.icons8.com/color/48/000000/visa.png" className="h-5 opacity-90" alt="Visa" />
+                             <img src="https://img.icons8.com/color/48/000000/mastercard.png" className="h-5 opacity-90" alt="MC" />
+                          </div>
                        </div>
-                    </div>
-                 </button>
+                    </button>
+
+                    <button 
+                      onClick={() => setPaymentMethod('razorpay')}
+                      className={`p-6 rounded-2xl border-2 text-left space-y-5 transition-all outline-none ${
+                        paymentMethod === 'razorpay' ? 'border-cyan-500 bg-cyan-50/30' : 'border-slate-100 hover:border-slate-200'
+                      }`}
+                    >
+                       <div className="flex justify-between items-center">
+                          <div className={`p-3.5 rounded-xl flex items-center justify-center border shadow-sm transition-all ${paymentMethod === 'razorpay' ? 'bg-cyan-600 text-white border-cyan-700' : 'bg-slate-50 text-slate-400 border-slate-200'}`}>
+                             <Zap size={24} />
+                          </div>
+                          {paymentMethod === 'razorpay' && <CheckCircle2 size={24} className="text-cyan-600 drop-shadow-sm" />}
+                       </div>
+                       <div>
+                          <p className="font-bold text-slate-900 text-lg">Razorpay</p>
+                          <div className="flex items-center gap-2 mt-2 opacity-80">
+                             <img src="https://razorpay.com/favicon.png" className="h-5" alt="Razorpay" />
+                             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Secure UPI / Wallet</span>
+                          </div>
+                       </div>
+                    </button>
+                 </div>
 
                  <div className="pt-8 border-t border-slate-100">
-                    <RazorpayCustomForm 
-                      bookingData={bookingData} 
-                      transactionId={razorpayTxnRef.current}
-                      navigate={navigate}
-                      onSuccess={() => setSuccess(true)} 
-                      onError={setError}
-                      setLoading={setLoading}
-                      loading={loading}
-                    />
+                    {paymentMethod === 'card' ? (
+                       <RazorpayCustomForm 
+                         bookingData={bookingData} 
+                         transactionId={razorpayTxnRef.current}
+                         navigate={navigate}
+                         onSuccess={() => setSuccess(true)} 
+                         onError={setError}
+                         setLoading={setLoading}
+                         loading={loading}
+                       />
+                    ) : (
+                       <div className="space-y-6">
+                          <div className="bg-cyan-50/50 p-6 rounded-xl text-center border border-cyan-100">
+                             <p className="text-sm font-bold text-slate-800 leading-relaxed">Pay instantly using UPI, Wallets or Net Banking via Razorpay's secure checkout portal.</p>
+                          </div>
+                          <button 
+                            onClick={handleRazorpayCheckout}
+                            disabled={loading}
+                            className="w-full h-16 bg-cyan-600 text-white rounded-2xl font-bold shadow-lg shadow-cyan-600/20 hover:bg-cyan-700 hover:shadow-cyan-600/30 transition-all flex items-center justify-center gap-3 active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100 text-lg"
+                          >
+                             {loading ? <Loader2 className="animate-spin" size={24} /> : <Zap size={24} />}
+                             {loading ? 'Processing...' : `Pay ${formatCurrency(bookingData.totalPrice)}`}
+                          </button>
+                       </div>
+                    )}
                  </div>
               </section>
            </div>
