@@ -294,7 +294,7 @@ const PaymentPage = () => {
                           <p className="font-bold text-slate-900 text-lg">UPI</p>
                           <div className="flex items-center gap-2 mt-2 opacity-80">
                              <img src="https://img.icons8.com/color/48/000000/google-pay.png" className="h-5" alt="GPay" />
-                             <img src="https://img.icons8.com/color/48/000000/phonepe.png" className="h-5" alt="PhonePe" />
+                             <img src="https://img.icons8.com/color/48/phone-pe.png" className="h-5" alt="PhonePe" />
                              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Instant Pay</span>
                           </div>
                        </div>
@@ -443,7 +443,7 @@ const UPIPaymentSection = ({ bookingData, upiOption, setUpiOption, upiId, setUpi
   
   const upiProviders = [
     { id: 'googlepay', name: 'Google Pay', icon: 'https://img.icons8.com/color/48/000000/google-pay.png' },
-    { id: 'phonepe', name: 'PhonePe', icon: 'https://img.icons8.com/color/48/000000/phonepe.png' },
+    { id: 'phonepe', name: 'PhonePe', icon: 'https://img.icons8.com/color/48/phone-pe.png' },
     { id: 'paytm', name: 'Paytm', icon: 'https://img.icons8.com/color/48/000000/paytm.png' }
   ];
 
@@ -452,11 +452,11 @@ const UPIPaymentSection = ({ bookingData, upiOption, setUpiOption, upiId, setUpi
       setError('Please select a UPI provider.');
       return;
     }
-    if (upiOption === 'googlepay' && !upiId) {
-      setError('Please enter your Google Pay UPI ID.');
+    if (!upiId) {
+      setError('Please enter your UPI ID.');
       return;
     }
-    if (upiOption === 'googlepay' && !upiId.includes('@')) {
+    if (!upiId.includes('@')) {
       setError('Please enter a valid UPI ID (e.g., name@okaxis).');
       return;
     }
@@ -510,14 +510,16 @@ const UPIPaymentSection = ({ bookingData, upiOption, setUpiOption, upiId, setUpi
         </div>
       </div>
 
-      {upiOption === 'googlepay' && (
+      {upiOption && (
         <div className="space-y-4 animate-slide-up">
-           <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Enter GPay UPI ID</label>
+           <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">
+              Enter {upiProviders.find(p => p.id === upiOption)?.name} UPI ID
+           </label>
            <div className="relative group">
               <Smartphone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-cyan-500 transition-colors" size={20} />
               <input 
                 type="text" 
-                placeholder="yourname@okaxis"
+                placeholder="yourname@bank"
                 value={upiId}
                 onChange={(e) => setUpiId(e.target.value)}
                 className="w-full h-14 pl-12 pr-4 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-bold focus:bg-white focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 transition-all outline-none"
