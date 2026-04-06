@@ -38,7 +38,10 @@ const getHotels = async (req, res) => {
     // Amenities filter
     if (amenities) {
       const amenitiesArray = amenities.split(',');
-      pipeline.push({ $match: { amenities: { $all: amenitiesArray } } });
+      // Create a regex for each amenity to allow for case-insensitive and partial matches
+      // This helps bridge the gap between IDs (e.g., 'wifi') and stored strings (e.g., 'Free WiFi')
+      const regexArray = amenitiesArray.map(a => new RegExp(a, 'i'));
+      pipeline.push({ $match: { amenities: { $all: regexArray } } });
     }
 
     // Lookup rooms to filter by price

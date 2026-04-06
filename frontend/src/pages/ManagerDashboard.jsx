@@ -21,12 +21,13 @@ import { useAuth } from '../context/AuthContext';
 import * as api from '../services/api';
 
 const AMENITIES_LIST = [
-  { id: 'wifi', label: 'Free Wi-Fi', icon: '📶' },
-  { id: 'ac', label: 'Air Conditioning (AC)', icon: '❄️' },
-  { id: 'power', label: '24/7 Power Backup', icon: '⚡' },
-  { id: 'lift', label: 'Lift / Elevator', icon: '🛗' },
+  { id: 'wifi', label: 'Free WiFi', icon: '📶' },
+  { id: 'pool', label: 'Swimming Pool', icon: '🏊' },
+  { id: 'gym', label: 'Fitness Center', icon: '🏋️' },
+  { id: 'spa', label: 'Luxury Spa', icon: '💆' },
+  { id: 'breakfast', label: 'Breakfast Included', icon: '🍳' },
+  { id: 'ac', label: 'Air Conditioning', icon: '❄️' },
   { id: 'parking', label: 'Free Parking', icon: '🅿️' },
-  { id: 'reception', label: '24-hour Reception', icon: '🏪' },
   { id: 'tv', label: 'Smart TV', icon: '📺' }
 ];
 
@@ -89,9 +90,9 @@ const ManagerDashboard = () => {
     navigate('/manager/login');
   };
 
-  const toggleAmenity = (label) => {
+  const toggleAmenity = (id) => {
     setSelectedAmenities(prev => 
-      prev.includes(label) ? prev.filter(a => a !== label) : [...prev, label]
+      prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]
     );
   };
 
@@ -518,7 +519,7 @@ const ManagerDashboard = () => {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', maxHeight: '150px', overflowY: 'auto', padding: '0.5rem', border: '1px solid #e5e7eb', borderRadius: '8px' }}>
                     {AMENITIES_LIST.map((item) => (
                       <label key={item.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', cursor: 'pointer' }}>
-                        <input type="checkbox" checked={selectedAmenities.includes(`${item.label} ${item.icon}`)} onChange={() => toggleAmenity(`${item.label} ${item.icon}`)} />
+                        <input type="checkbox" checked={selectedAmenities.includes(item.id)} onChange={() => toggleAmenity(item.id)} />
                         {item.icon} {item.label}
                       </label>
                     ))}

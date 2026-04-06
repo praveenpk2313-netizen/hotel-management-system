@@ -261,24 +261,46 @@ const HotelDetails = () => {
                <section className="space-y-10">
                   <h2 className="text-4xl font-black text-slate-900 tracking-tight">Premium Amenities</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl">
-                     <div className="flex items-center gap-6 p-6 bg-orange-50/20 rounded-[2rem] border border-orange-100/30 transition-all hover:bg-orange-50/40">
-                        <div className="w-16 h-16 bg-white shadow-sm rounded-2xl flex items-center justify-center text-orange-400">
-                           <Wifi size={28} />
-                        </div>
-                        <span className="text-lg font-black text-slate-700 uppercase tracking-widest font-sans">wifi</span>
-                     </div>
-                     <div className="flex items-center gap-6 p-6 bg-orange-50/20 rounded-[2rem] border border-orange-100/30 transition-all hover:bg-orange-50/40">
-                        <div className="w-16 h-16 bg-white shadow-sm rounded-2xl flex items-center justify-center text-orange-400">
-                           <Wind size={28} />
-                        </div>
-                        <span className="text-lg font-black text-slate-700 uppercase tracking-widest font-sans">ac</span>
-                     </div>
-                     <div className="flex items-center gap-6 p-6 bg-orange-50/20 rounded-[2rem] border border-orange-100/30 transition-all hover:bg-orange-50/40">
-                        <div className="w-16 h-16 bg-white shadow-sm rounded-2xl flex items-center justify-center text-orange-400">
-                           <Monitor size={28} />
-                        </div>
-                        <span className="text-lg font-black text-slate-700 uppercase tracking-widest font-sans">tv</span>
-                     </div>
+                     {hotel.amenities && hotel.amenities.length > 0 ? (
+                        hotel.amenities.map((amenity, idx) => {
+                           const iconMap = {
+                              wifi: Wifi,
+                              pool: Wind,
+                              gym: SlidersHorizontal,
+                              spa: Star,
+                              breakfast: Coffee,
+                              ac: Snowflake,
+                              parking: Car,
+                              tv: Monitor
+                           };
+                           // Handle both IDs and potentially old labels using regex matching
+                           const getIcon = (a) => {
+                              const lower = a.toLowerCase();
+                              if (lower.includes('wifi')) return Wifi;
+                              if (lower.includes('pool')) return Wind;
+                              if (lower.includes('gym') || lower.includes('fitness')) return SlidersHorizontal;
+                              if (lower.includes('spa')) return Star;
+                              if (lower.includes('breakfast')) return Coffee;
+                              if (lower.includes('ac') || lower.includes('air')) return Snowflake;
+                              if (lower.includes('parking')) return Car;
+                              if (lower.includes('tv')) return Monitor;
+                              return ShieldCheck;
+                           };
+                           const Icon = getIcon(amenity);
+                           const label = amenity.replace(/[^a-zA-Z\s]/g, '').trim();
+
+                           return (
+                              <div key={idx} className="flex items-center gap-6 p-6 bg-luxury-gold/5 rounded-[2rem] border border-luxury-gold/10 transition-all hover:bg-luxury-gold/10 group">
+                                 <div className="w-16 h-16 bg-white shadow-sm rounded-2xl flex items-center justify-center text-luxury-gold group-hover:scale-110 transition-transform">
+                                    <Icon size={28} />
+                                 </div>
+                                 <span className="text-lg font-black text-slate-700 uppercase tracking-widest font-sans">{label || amenity}</span>
+                              </div>
+                           );
+                        })
+                     ) : (
+                        <p className="text-slate-400 font-medium italic">Standard luxury essentials included.</p>
+                     )}
                   </div>
                </section>
 

@@ -16,7 +16,10 @@ import {
   Calendar,
   Sparkles,
   Zap,
-  Filter
+  Filter,
+  Monitor,
+  Car,
+  Snowflake
 } from 'lucide-react';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
@@ -28,6 +31,9 @@ const AMENITIES_OPTIONS = [
   { id: 'gym', name: 'Fitness Center', icon: SlidersHorizontal },
   { id: 'spa', name: 'Luxury Spa', icon: Star },
   { id: 'breakfast', name: 'Breakfast Included', icon: Coffee },
+  { id: 'ac', name: 'Air Conditioning', icon: Snowflake },
+  { id: 'parking', name: 'Free Parking', icon: Car },
+  { id: 'tv', name: 'Smart TV', icon: Monitor },
 ];
 
 const HotelListPage = () => {
