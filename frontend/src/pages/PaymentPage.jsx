@@ -97,7 +97,7 @@ const PaymentPage = () => {
         await new Promise(r => setTimeout(r, 1500));
         const payload = {
           ...bookingData,
-          paymentMethod: 'Razorpay (Native Mock)',
+          paymentMethod: 'Mock/Razorpay',
           transactionId: razorpayTxnRef.current
         };
         try {
@@ -399,7 +399,7 @@ const RazorpayCustomForm = ({ bookingData, transactionId, navigate, onSuccess, o
 
       const payload = {
         ...bookingData,
-        paymentMethod: 'Razorpay (Card)',
+        paymentMethod: 'Razorpay',
         transactionId: transactionId
       };
       
