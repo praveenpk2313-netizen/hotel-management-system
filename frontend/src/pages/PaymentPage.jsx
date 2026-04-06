@@ -21,7 +21,10 @@ import {
   Tag,
   Award,
   ArrowRight,
-  UserCheck
+  UserCheck,
+  Smartphone,
+  Landmark,
+  Wallet
 } from 'lucide-react';
 import { 
   confirmBookingAfterPayment,
@@ -45,6 +48,9 @@ const PaymentPage = () => {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('card');
+  const [upiOption, setUpiOption] = useState('');
+  const [upiId, setUpiId] = useState('');
+  const [selectedBank, setSelectedBank] = useState('');
   const razorpayTxnRef = useRef('MOCK_TRX_'  + Math.random().toString(36).substr(2, 9).toUpperCase());
 
   const { bookingData, hotel, selectedRoom } = location.state || {};
@@ -251,7 +257,7 @@ const PaymentPage = () => {
                        </div>
                     </button>
 
-                    <button 
+                     <button 
                       onClick={() => setPaymentMethod('razorpay')}
                       className={`p-6 rounded-2xl border-2 text-left space-y-5 transition-all outline-none ${
                         paymentMethod === 'razorpay' ? 'border-cyan-500 bg-cyan-50/30' : 'border-slate-100 hover:border-slate-200'
@@ -267,14 +273,56 @@ const PaymentPage = () => {
                           <p className="font-bold text-slate-900 text-lg">Razorpay</p>
                           <div className="flex items-center gap-2 mt-2 opacity-80">
                              <img src="https://razorpay.com/favicon.png" className="h-5" alt="Razorpay" />
-                             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Secure UPI / Wallet</span>
+                             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Secure UI Checkout</span>
+                          </div>
+                       </div>
+                    </button>
+
+                    <button 
+                      onClick={() => setPaymentMethod('upi')}
+                      className={`p-6 rounded-2xl border-2 text-left space-y-5 transition-all outline-none ${
+                        paymentMethod === 'upi' ? 'border-cyan-500 bg-cyan-50/30' : 'border-slate-100 hover:border-slate-200'
+                      }`}
+                    >
+                       <div className="flex justify-between items-center">
+                          <div className={`p-3.5 rounded-xl flex items-center justify-center border shadow-sm transition-all ${paymentMethod === 'upi' ? 'bg-cyan-600 text-white border-cyan-700' : 'bg-slate-50 text-slate-400 border-slate-200'}`}>
+                             <Smartphone size={24} />
+                          </div>
+                          {paymentMethod === 'upi' && <CheckCircle2 size={24} className="text-cyan-600 drop-shadow-sm" />}
+                       </div>
+                       <div>
+                          <p className="font-bold text-slate-900 text-lg">UPI</p>
+                          <div className="flex items-center gap-2 mt-2 opacity-80">
+                             <img src="https://img.icons8.com/color/48/000000/google-pay.png" className="h-5" alt="GPay" />
+                             <img src="https://img.icons8.com/color/48/000000/phonepe.png" className="h-5" alt="PhonePe" />
+                             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Instant Pay</span>
+                          </div>
+                       </div>
+                    </button>
+
+                    <button 
+                      onClick={() => setPaymentMethod('netbanking')}
+                      className={`p-6 rounded-2xl border-2 text-left space-y-5 transition-all outline-none ${
+                        paymentMethod === 'netbanking' ? 'border-cyan-500 bg-cyan-50/30' : 'border-slate-100 hover:border-slate-200'
+                      }`}
+                    >
+                       <div className="flex justify-between items-center">
+                          <div className={`p-3.5 rounded-xl flex items-center justify-center border shadow-sm transition-all ${paymentMethod === 'netbanking' ? 'bg-cyan-600 text-white border-cyan-700' : 'bg-slate-50 text-slate-400 border-slate-200'}`}>
+                             <Landmark size={24} />
+                          </div>
+                          {paymentMethod === 'netbanking' && <CheckCircle2 size={24} className="text-cyan-600 drop-shadow-sm" />}
+                       </div>
+                       <div>
+                          <p className="font-bold text-slate-900 text-lg">Net Banking</p>
+                          <div className="flex items-center gap-2 mt-2 opacity-80">
+                             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">All Major Banks</span>
                           </div>
                        </div>
                     </button>
                  </div>
-
+                 
                  <div className="pt-8 border-t border-slate-100">
-                    {paymentMethod === 'card' ? (
+                    {paymentMethod === 'card' && (
                        <RazorpayCustomForm 
                          bookingData={bookingData} 
                          transactionId={razorpayTxnRef.current}
@@ -284,7 +332,9 @@ const PaymentPage = () => {
                          setLoading={setLoading}
                          loading={loading}
                        />
-                    ) : (
+                    )}
+
+                    {paymentMethod === 'razorpay' && (
                        <div className="space-y-6">
                           <div className="bg-cyan-50/50 p-6 rounded-xl text-center border border-cyan-100">
                              <p className="text-sm font-bold text-slate-800 leading-relaxed">Pay instantly using UPI, Wallets or Net Banking via Razorpay's secure checkout portal.</p>
@@ -298,6 +348,34 @@ const PaymentPage = () => {
                              {loading ? 'Processing...' : `Pay ${formatCurrency(bookingData.totalPrice)}`}
                           </button>
                        </div>
+                    )}
+
+                    {paymentMethod === 'upi' && (
+                       <UPIPaymentSection 
+                         bookingData={bookingData}
+                         upiOption={upiOption}
+                         setUpiOption={setUpiOption}
+                         upiId={upiId}
+                         setUpiId={setUpiId}
+                         transactionId={razorpayTxnRef.current}
+                         navigate={navigate}
+                         setError={setError}
+                         setLoading={setLoading}
+                         loading={loading}
+                       />
+                    )}
+
+                    {paymentMethod === 'netbanking' && (
+                        <NetBankingSection 
+                          bookingData={bookingData}
+                          selectedBank={selectedBank}
+                          setSelectedBank={setSelectedBank}
+                          transactionId={razorpayTxnRef.current}
+                          navigate={navigate}
+                          setError={setError}
+                          setLoading={setLoading}
+                          loading={loading}
+                        />
                     )}
                  </div>
               </section>
@@ -359,7 +437,186 @@ const PaymentPage = () => {
   );
 };
 
-// ─── Stripe Checkout Form Component ──────────────────────────────────────────
+// ─── UPI Payment Section ──────────────────────────────────────────────────
+
+const UPIPaymentSection = ({ bookingData, upiOption, setUpiOption, upiId, setUpiId, transactionId, navigate, setError, setLoading, loading }) => {
+  
+  const upiProviders = [
+    { id: 'googlepay', name: 'Google Pay', icon: 'https://img.icons8.com/color/48/000000/google-pay.png' },
+    { id: 'phonepe', name: 'PhonePe', icon: 'https://img.icons8.com/color/48/000000/phonepe.png' },
+    { id: 'paytm', name: 'Paytm', icon: 'https://img.icons8.com/color/48/000000/paytm.png' }
+  ];
+
+  const handleUPIPay = async () => {
+    if (!upiOption) {
+      setError('Please select a UPI provider.');
+      return;
+    }
+    if (upiOption === 'googlepay' && !upiId) {
+      setError('Please enter your Google Pay UPI ID.');
+      return;
+    }
+    if (upiOption === 'googlepay' && !upiId.includes('@')) {
+      setError('Please enter a valid UPI ID (e.g., name@okaxis).');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      console.log(`💸 UPI: Processing ${upiOption} payment...`);
+      await new Promise(r => setTimeout(r, 2000));
+
+      const payload = {
+        ...bookingData,
+        paymentMethod: `UPI (${upiOption})`,
+        transactionId: transactionId,
+        upiId: upiId
+      };
+      
+      try {
+         const { data: finalBooking } = await confirmBookingAfterPayment(payload);
+         setLoading(false);
+         navigate('/booking-success', { state: { booking: finalBooking } });
+      } catch (err) {
+         setLoading(false);
+         setError(err.response?.data?.message || 'Booking confirmation failed.');
+      }
+    } catch (err) {
+      setLoading(false);
+      setError('UPI payment failed.');
+    }
+  };
+
+  return (
+    <div className="space-y-8 animate-fade-in">
+      <div className="space-y-4">
+        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Select UPI App</label>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {upiProviders.map((provider) => (
+            <button
+              key={provider.id}
+              onClick={() => setUpiOption(provider.id)}
+              className={`flex flex-col items-center justify-center p-5 rounded-2xl border-2 transition-all gap-3 ${
+                upiOption === provider.id ? 'border-cyan-500 bg-cyan-50/30 shadow-sm' : 'border-slate-100 hover:border-slate-200 bg-slate-50/50'
+              }`}
+            >
+              <img src={provider.icon} alt={provider.name} className="h-10 w-10 object-contain" />
+              <span className={`text-sm font-bold ${upiOption === provider.id ? 'text-cyan-700' : 'text-slate-600'}`}>{provider.name}</span>
+              {upiOption === provider.id && <CheckCircle2 size={16} className="text-cyan-600 absolute top-3 right-3" />}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {upiOption === 'googlepay' && (
+        <div className="space-y-4 animate-slide-up">
+           <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Enter GPay UPI ID</label>
+           <div className="relative group">
+              <Smartphone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-cyan-500 transition-colors" size={20} />
+              <input 
+                type="text" 
+                placeholder="yourname@okaxis"
+                value={upiId}
+                onChange={(e) => setUpiId(e.target.value)}
+                className="w-full h-14 pl-12 pr-4 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-bold focus:bg-white focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 transition-all outline-none"
+              />
+           </div>
+        </div>
+      )}
+
+      <button 
+        onClick={handleUPIPay}
+        disabled={loading}
+        className="w-full h-16 bg-cyan-600 text-white rounded-2xl font-bold shadow-lg shadow-cyan-600/20 hover:bg-cyan-700 hover:shadow-cyan-600/30 transition-all flex items-center justify-center gap-3 active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100 text-lg"
+      >
+        {loading ? <Loader2 className="animate-spin" size={24} /> : <ShieldCheck size={24} />}
+        {loading ? 'Processing UPI...' : `Pay ${formatCurrency(bookingData.totalPrice)}`}
+      </button>
+    </div>
+  );
+};
+
+// ─── Net Banking Section ────────────────────────────────────────────────────
+
+const NetBankingSection = ({ bookingData, selectedBank, setSelectedBank, transactionId, navigate, setError, setLoading, loading }) => {
+  const banks = [
+    { id: 'sbi', name: 'State Bank of India', icon: 'https://logo.clearbit.com/sbi.co.in' },
+    { id: 'hdfc', name: 'HDFC Bank', icon: 'https://logo.clearbit.com/hdfcbank.com' },
+    { id: 'icici', name: 'ICICI Bank', icon: 'https://logo.clearbit.com/icicibank.com' },
+    { id: 'axis', name: 'Axis Bank', icon: 'https://logo.clearbit.com/axisbank.com' }
+  ];
+
+  const handleBankPay = async () => {
+    if (!selectedBank) {
+      setError('Please select a bank.');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      console.log(`🏛️ Net Banking: Processing ${selectedBank} payment...`);
+      await new Promise(r => setTimeout(r, 2500));
+
+      const payload = {
+        ...bookingData,
+        paymentMethod: `Net Banking (${selectedBank.toUpperCase()})`,
+        transactionId: transactionId
+      };
+      
+      try {
+         const { data: finalBooking } = await confirmBookingAfterPayment(payload);
+         setLoading(false);
+         navigate('/booking-success', { state: { booking: finalBooking } });
+      } catch (err) {
+         setLoading(false);
+         setError(err.response?.data?.message || 'Booking confirmation failed.');
+      }
+    } catch (err) {
+      setLoading(false);
+      setError('Net Banking payment failed.');
+    }
+  };
+
+  return (
+    <div className="space-y-8 animate-fade-in">
+       <div className="space-y-4">
+        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Select Bank</label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {banks.map((bank) => (
+            <button
+              key={bank.id}
+              onClick={() => setSelectedBank(bank.id)}
+              className={`flex items-center p-5 rounded-2xl border-2 transition-all gap-4 text-left ${
+                selectedBank === bank.id ? 'border-cyan-500 bg-cyan-50/30 shadow-sm' : 'border-slate-100 hover:border-slate-200 bg-slate-50/50'
+              }`}
+            >
+              <div className="w-10 h-10 bg-white rounded-lg p-1 flex items-center justify-center border border-slate-100">
+                 <img src={bank.icon} alt={bank.name} className="h-full w-full object-contain" onError={(e) => e.target.src = "https://img.icons8.com/color/48/000000/bank.png"} />
+              </div>
+              <span className={`text-sm font-bold ${selectedBank === bank.id ? 'text-cyan-700' : 'text-slate-600'}`}>{bank.name}</span>
+              {selectedBank === bank.id && <CheckCircle2 size={16} className="text-cyan-600 ml-auto" />}
+            </button>
+          ))}
+        </div>
+      </div>
+
+       <button 
+        onClick={handleBankPay}
+        disabled={loading}
+        className="w-full h-16 bg-cyan-600 text-white rounded-2xl font-bold shadow-lg shadow-cyan-600/20 hover:bg-cyan-700 hover:shadow-cyan-600/30 transition-all flex items-center justify-center gap-3 active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100 text-lg"
+      >
+        {loading ? <Loader2 className="animate-spin" size={24} /> : <ShieldCheck size={24} />}
+        {loading ? 'Redirecting to Bank...' : `Pay ${formatCurrency(bookingData.totalPrice)}`}
+      </button>
+    </div>
+  );
+};
+
+// ─── Card Checkout Form Component ──────────────────────────────────────────
 
 const RazorpayCustomForm = ({ bookingData, transactionId, navigate, onSuccess, onError, setLoading, loading }) => {
   const [cardNumber, setCardNumber] = useState('');
