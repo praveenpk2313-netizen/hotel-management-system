@@ -37,11 +37,13 @@ const getHotels = async (req, res) => {
 
     // Amenities filter
     if (amenities) {
-      const amenitiesArray = amenities.split(',');
-      // Create a regex for each amenity to allow for case-insensitive and partial matches
-      // This helps bridge the gap between IDs (e.g., 'wifi') and stored strings (e.g., 'Free WiFi')
-      const regexArray = amenitiesArray.map(a => new RegExp(a, 'i'));
-      pipeline.push({ $match: { amenities: { $all: regexArray } } });
+      const amenitiesArray = amenities.split(',').map(a => a.trim()).filter(a => a !== "");
+      if (amenitiesArray.length > 0) {
+        const amenityMatches = amenitiesArray.map(a => ({
+          amenities: { $regex: a, $options: 'i' }
+        }));
+        pipeline.push({ $match: { $and: amenityMatches } });
+      }
     }
 
     // Lookup rooms to filter by price
@@ -58,7 +60,7 @@ const getHotels = async (req, res) => {
     if (minPrice || maxPrice) {
       const priceMatch = {};
       if (minPrice && minPrice != 0) priceMatch['rooms.price'] = { $gte: Number(minPrice) };
-      if (maxPrice && maxPrice != 2000) { // 2000 is default frontend max
+      if (maxPrice && maxPrice != 50000) { // 50000 is new default frontend max
         priceMatch['rooms.price'] = { ...priceMatch['rooms.price'], $lte: Number(maxPrice) };
       }
       
